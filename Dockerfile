@@ -5,9 +5,10 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+# Installation d'uv directement 
+RUN pip install uv
 
-# Ajout de dépendances système nécessaires
+# Dépendances système nécessaires
 RUN apt-get update && apt-get install -y \
     curl \
     build-essential \
@@ -17,15 +18,15 @@ RUN apt-get update && apt-get install -y \
     libwebp-dev \ 
     && rm -rf /var/lib/apt/lists/*
 
-# Création du répertoire de cache
-RUN mkdir -p /var/tmp/django_cache_images && chmod 777 /var/tmp/django_cache_images
+# Création du répertoire de cache 
+RUN mkdir -p /app/cache && chmod 777 /app/cache
 
 # Copie des requirements et installation
-COPY src/requirements.txt .
-RUN uv pip install -r requirements.txt --system
+COPY requirements.txt .
+RUN uv pip install -r requirements.txt
 
 # Copie du code source
-COPY src/ .
+COPY . .
 
 EXPOSE 8000
 

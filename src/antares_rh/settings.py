@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os 
+import dj_database_url
 
 #serveur email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -29,9 +30,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-9m%eny%^*d9+b8y^qj6@c##c*xe5-+$#!ar+@c8^c4ko_qk8x7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '.onrender.com'
+]
 
 
 # Application definition
@@ -49,6 +54,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'crispy_forms',
     'crispy_bootstrap5',
+    'whitenoise.runserver_nostatic',
     
     'authentication',
     'documents',
@@ -66,21 +72,17 @@ INSTALLED_APPS = [
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-
-
-
-
-
 MIDDLEWARE = [
-    #'django.middleware.cache.UpdateCacheMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',    
-    #'django.middleware.cache.FetchFromCacheMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'antares_rh.urls'
@@ -111,23 +113,15 @@ WSGI_APPLICATION = 'antares_rh.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.postgresql',
-#        'NAME': os.environ['POSTGRES_DB'],
-#        'USER': os.environ['POSTGRES_USER'],
-#        'PASSWORD': os.environ['POSTGRES_PASSWORD'],
-#        'HOST': os.environ['DB_HOST'],
-#        'PORT': os.environ['DB_PORT'],
-#    }
-#}
-#
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+if 'DATABASE_URL' in os.environ:
+    DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
 
 # Password validation
@@ -173,49 +167,33 @@ STATICFILES_DIRS = [
     BASE_DIR / 'site_web/static',  # Chemin vers les statics de l'app site_web
 
 ]
-# Dans settings.py
-STATICFILES_FINDERS = [
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-   
-]
+# Configuration Whitenoise pour les fichiers statiques
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-#CACHES = {
-#    'default': {
-#        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-#        'LOCATION': '/var/tmp/django_cache',  # Chemin simplifié
-#        'TIMEOUT': 60 * 60 * 24 * 30,  # 30 jours
-#        'OPTIONS': {
-#            'MAX_ENTRIES': 1000
-#        }
-#    }
-#}
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.path.join(BASE_DIR, 'cache'),  # Meilleur chemin pour Render
+        'TIMEOUT': 60 * 60 * 24 * 30,  # 30 jours
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000
+        }
+    }
+}
 
-# Versionnement des fichiers statiques
-#STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
-# Durée du cache (en secondes)
-#CACHE_MIDDLEWARE_SECONDS = 60 * 60 * 24 * 30  # 30 jours
+# Durée du cache middleware
+CACHE_MIDDLEWARE_SECONDS = 60 * 60 * 24 * 30  # 30 jours
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'authentication.User'
-
-
-
-
 # Redirection après login/logout
 LOGIN_URL = 'login'
 
-
-
-
-
 ASGI_APPLICATION = 'antares_rh.asgi.application'
-
-
 
 
 SUMMERNOTE_CONFIG = {
