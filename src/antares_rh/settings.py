@@ -30,13 +30,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-9m%eny%^*d9+b8y^qj6@c##c*xe5-+$#!ar+@c8^c4ko_qk8x7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+DEBUG = False
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '.onrender.com'
-]
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -72,6 +68,8 @@ INSTALLED_APPS = [
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
+
+# Middleware avec cache
 MIDDLEWARE = [
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -81,10 +79,9 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',    
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.cache.FetchFromCacheMiddleware',
 ]
-
 ROOT_URLCONF = 'antares_rh.urls'
 
 TEMPLATES = [
@@ -173,18 +170,18 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': os.path.join(BASE_DIR, 'cache'),  # Meilleur chemin pour Render
-        'TIMEOUT': 60 * 60 * 24 * 30,  # 30 jours
+        'LOCATION': os.path.join(BASE_DIR, 'cache'),
+        'TIMEOUT': 60 * 60 * 24 * 30,
         'OPTIONS': {
             'MAX_ENTRIES': 1000
         }
     }
 }
 
-
-# Durée du cache middleware
-CACHE_MIDDLEWARE_SECONDS = 60 * 60 * 24 * 30  # 30 jours
-
+# Cache middleware
+CACHE_MIDDLEWARE_ALIAS = 'default'
+CACHE_MIDDLEWARE_SECONDS = 60 * 60 * 24 * 30
+CACHE_MIDDLEWARE_KEY_PREFIX = 'antares_rh'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -211,5 +208,21 @@ SUMMERNOTE_CONFIG = {
             ['insert', ['link', 'picture', 'video']],
             ['view', ['codeview', 'help']],
         ],
+    },
+}
+
+
+# Logging configuration to see actual errors
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'ERROR',
     },
 }
