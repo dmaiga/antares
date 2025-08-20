@@ -1,0 +1,94 @@
+{% extends 'base_candidate.html' %}
+{% load static %}
+
+{% block title %}Mes Compétences{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-code me-2"></i>Mes Compétences</h2>
+                <div>
+                    <a href="{% url 'diplome_list' %}" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-graduation-cap me-1"></i> Gérer les diplômes
+                    </a>
+                    <a href="{% url 'experience_list' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-briefcase me-1"></i> Gérer les expériences
+                    </a>
+                </div>
+            </div>
+
+            <!-- Compétences des diplômes -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-graduation-cap me-2"></i>
+                        Compétences académiques
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if competences_diplomes %}
+                        <div class="row">
+                            {% for competence in competences_diplomes %}
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-header">
+                                            <h6 class="mb-0">{{ competence.source }}</h6>
+                                            <small class="text-muted">{{ competence.date|date:"F Y" }}</small>
+                                        </div>
+                                        <div class="card-body">
+                                            {{ competence.contenu|safe }}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Aucune compétence académique enregistrée.
+                            <a href="{% url 'add_diplome' %}" class="alert-link">Ajouter un diplôme</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Compétences des expériences -->
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-briefcase me-2"></i>
+                        Compétences professionnelles
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if competences_experiences %}
+                        <div class="row">
+                            {% for competence in competences_experiences %}
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-header">
+                                            <h6 class="mb-0">{{ competence.source }}</h6>
+                                            <small class="text-muted">{{ competence.date|date:"F Y" }}</small>
+                                        </div>
+                                        <div class="card-body">
+                                            {{ competence.contenu|safe }}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Aucune compétence professionnelle enregistrée.
+                            <a href="{% url 'add_experience' %}" class="alert-link">Ajouter une expérience</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

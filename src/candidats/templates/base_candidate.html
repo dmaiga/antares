@@ -1,0 +1,362 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Antares - Espace Candidat {% block title %}{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <link href="{% static 'summernote/summernote-lite.min.css' %}" rel="stylesheet">
+  <style>
+    :root {
+      --secondary-blue: #2D76B6;
+      --light-gray: #F4F4F9;
+      --dark-gray: #333333;
+      --light-blue: #E6F0FA;
+      --accent-orange: #FA8301;
+      --primary-blue: #0A4B8C;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: var(--light-gray);
+      color: var(--dark-gray);
+      line-height: 1.5;
+      font-size: 1.2rem;
+    }
+
+    .navbar {
+      background-color: white;
+      box-shadow: 0 1px 8px rgba(13, 59, 102, 0.1);
+      border-bottom: 1px solid var(--light-blue);
+      padding: 0.5rem 1rem;
+    }
+
+    .navbar-logo {
+      height: 70px;
+      width: auto;
+      transition: all 0.2s ease;
+    }
+
+    .nav-link {
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      font-size: 1.2rem;
+      transition: all 0.2s ease;
+      color: var(--primary-blue) !important;
+    }
+
+    .nav-link:hover,
+    .nav-link:focus,
+    .nav-link.active {
+      color: var(--accent-orange) !important;
+    }
+
+    .navbar-brand {
+      margin-right: auto;
+      display: flex;
+      align-items: center;
+    }
+
+    .btn-orange {
+      background-color: var(--accent-orange);
+      color: white;
+      border: none;
+      font-weight: 400;
+      padding: 0.4rem 1rem;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-orange:hover {
+      background-color: #e0552e;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(244, 96, 54, 0.2);
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid var(--accent-orange);
+      margin-right: 0.5rem;
+    }
+
+    .user-menu .dropdown-toggle::after {
+      display: none;
+    }
+
+    .dropdown-menu {
+      min-width: 200px;
+      border: 1px solid rgba(0,0,0,0.05);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      font-size: 0.85rem;
+    }
+
+    .dropdown-item {
+      padding: 0.4rem 1rem;
+      transition: all 0.2s;
+    }
+
+    .dropdown-item:hover {
+      background-color: var(--light-blue);
+      color: var(--primary-blue);
+    }
+
+    .dropdown-item .text-muted {
+      font-size: 0.75rem;
+    }
+
+    .navbar-container {
+      display: flex;
+      width: 100%;
+      align-items: center;
+    }
+
+    .navbar-links-container {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+    }
+
+    .navbar-auth-container {
+      margin-left: auto;
+    }
+
+    footer {
+      background-color: var(--primary-blue);
+      color: white;
+      padding: 1.5rem 0;
+      font-size: 0.85rem;
+    }
+
+    footer a {
+      color: white;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    footer a:hover {
+      color: var(--accent-orange);
+    }
+
+    .container {
+      max-width: 1140px;
+    }
+
+    @media (max-width: 991.98px) {
+      .navbar-logo {
+        height: 40px;
+      }
+
+      .nav-link {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+      }
+
+      .navbar-collapse {
+        background-color: white;
+        padding: 1rem;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 5px 15px rgba(13, 59, 102, 0.1);
+      }
+
+      .nav-item {
+        border-bottom: 1px solid var(--light-blue);
+      }
+
+      .nav-item:last-child {
+        border-bottom: none;
+      }
+
+      .navbar-toggler {
+        border-color: var(--primary-blue);
+        padding: 0.3rem;
+      }
+
+      .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2813, 59, 102, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+      }
+
+      .dropdown-menu {
+        border: none;
+        box-shadow: none;
+        font-size: 0.8rem;
+      }
+
+      .container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .navbar-brand span {
+        font-size: 0.9rem;
+      }
+
+      .btn-orange {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.8rem;
+      }
+
+      .user-avatar {
+        width: 28px;
+        height: 28px;
+      }
+
+      footer {
+        padding: 1rem 0;
+      }
+
+      footer p, footer a {
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container navbar-container">
+      <!-- Logo à gauche -->
+      <a class="navbar-brand" href="{% url 'home' %}">
+        <img src="{% static 'site_web/images/hero/logo_antares.png' %}" 
+             alt="Logo Antares" 
+             loading="lazy"
+             class="navbar-logo">
+    
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Liens de navigation centrés -->
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="navbar-links-container">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link {% if request.resolver_match.url_name == 'dashboard_candidat' %}active{% endif %}" href="{% url 'dashboard_candidat' %}">
+               Tableau de bord
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.resolver_match.url_name == 'candidat_job_list' %}active{% endif %}" href="{% url 'candidat_job_list' %}">
+               Offres d'emploies
+              </a>
+            </li>
+            
+            <li class="nav-item">
+              <a class="nav-link {% if 'candidature' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'candidature_list' %}">
+              Mes Candidatures
+              </a>
+            </li>
+              <li class="nav-item">
+              <a class="nav-link {% if 'home' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'home' %}">
+              Site web
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.resolver_match.url_name == 'edit_profil' %}active{% endif %}" href="{% url 'edit_profil' %}">
+               Profil
+              </a>
+            </li>
+
+          </ul>
+        </div>
+
+        <!-- Menu utilisateur -->
+        <div class="navbar-auth-container">
+          <ul class="navbar-nav">
+            {% if user.is_authenticated and user.role == 'candidat' %}
+              <li class="nav-item dropdown list-unstyled user-menu">
+                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <img  src="{% if profil_form.instance.photo %}{{ profil_form.instance.photo.url }}{% endif %}" 
+                       class="user-avatar" alt="">
+
+                      
+
+                  <span class="d-none d-md-inline fw-medium">{{ user.first_name|default:user.email }}</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li class="dropdown-header">
+                    <div class="fw-medium">{{ user.get_full_name|default:user.email }}</div>
+                    <small class="text-muted">{{ user.email }}</small>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="{% url 'dashboard_candidat' %}">
+                    <i class="bi bi-speedometer2 me-2"></i> Tableau de bord
+                  </a></li>
+                  <li><a class="dropdown-item" href="{% url 'edit_profil' %}">
+                    <i class="bi bi-person-vcard me-2"></i> Mon profil
+                  </a></li>
+                  <li><a class="dropdown-item" href="{% url 'candidature_list' %}">
+                    <i class="bi bi-file-earmark-text me-2"></i> Mes candidatures
+                  </a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="{% url 'home' %}">
+                    <i class="bi bi-house me-2"></i> Site principal
+                  </a></li>
+                  <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">
+                    <i class="bi bi-box-arrow-right me-2"></i> Déconnexion
+                  </a></li>
+                </ul>
+              </li>
+            {% else %}
+              <li class="nav-item">
+                <a class="nav-link btn btn-orange" href="{% url 'login' %}?type=candidate">
+                  Se connecter
+                </a>
+              </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Messages Django -->
+  <div class="container mt-3">
+    {% if messages %}
+      <div class="mb-3">
+        {% for message in messages %}
+          <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Contenu principal -->
+    {% block content %}{% endblock %}
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-primary-blue text-white py-3">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6 text-center text-md-start">
+          <p class="mb-0">&copy; 2025 Antarès RH. Tous droits réservés.</p>
+        </div>
+        <div class="col-md-6 text-center text-md-end">
+          <a href="{% url 'home' %}" class="text-white me-2"><i class="bi bi-house me-1"></i> Site principal</a>
+          <a href="#" class="text-white me-2">Mentions légales</a>
+          <a href="#" class="text-white">Politique de confidentialité</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  {% block extra_js %}{% endblock %}
+  <script src="{% static 'summernote/summernote-lite.min.js' %}"></script>
+<script src="{% static 'summernote/lang/summernote-fr-FR.min.js' %}"></script>
+</body>
+</html>

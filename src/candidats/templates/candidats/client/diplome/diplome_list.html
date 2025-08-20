@@ -1,0 +1,72 @@
+{% extends 'base_candidate.html' %}
+{% load static %}
+
+{% block title %}Mes Diplômes{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-graduation-cap me-2"></i>Mes Diplômes</h2>
+                <a href="{% url 'add_diplome' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i> Ajouter un diplôme
+                </a>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if diplomes %}
+                <div class="row">
+                    {% for diplome in diplomes %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ diplome.intitule }}</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">{{ diplome.etablissement }}</h6>
+                                    <p class="card-text">
+                                        <strong>Domaine:</strong> {{ diplome.domaine_etude }}<br>
+                                        <strong>Niveau:</strong> {{ diplome.get_niveau_display }}<br>
+                                        <strong>Période:</strong> {{ diplome.date_debut|date:"M Y" }} - 
+                                        {% if diplome.en_cours %}En cours{% else %}{{ diplome.date_fin|date:"M Y" }}{% endif %}
+                                    </p>
+                                    {% if diplome.description %}
+                                        <p class="card-text">{{ diplome.description|truncatewords:20 }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <div class="d-flex justify-content-end">
+                                        <a href="{% url 'edit_diplome' diplome.pk %}" class="btn btn-sm btn-outline-primary me-2">
+                                            <i class="fas fa-edit"></i> Modifier
+                                        </a>
+                                        <a href="{% url 'delete_diplome' diplome.pk %}" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i> Supprimer
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Vous n'avez ajouté aucun diplôme pour le moment.
+                    <div class="mt-3">
+                        <a href="{% url 'add_diplome' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i> Ajouter votre premier diplôme
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

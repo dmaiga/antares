@@ -1,0 +1,60 @@
+{% extends 'base_candidate.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if form.instance.pk %}Modifier{% else %}Ajouter{% endif %} un Diplôme{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-graduation-cap me-2"></i>
+                        {% if form.instance.pk %}Modifier le Diplôme{% else %}Ajouter un Nouveau Diplôme{% endif %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {{ form|crispy }}
+                        
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-success me-2">
+                                <i class="fas fa-save me-1"></i> Enregistrer
+                            </button>
+                            <a href="{% url 'diplome_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript pour gérer l'affichage conditionnel de la date de fin -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const enCoursCheckbox = document.getElementById('id_en_cours');
+        const dateFinField = document.getElementById('div_id_date_fin');
+        
+        function toggleDateFin() {
+            if (enCoursCheckbox.checked) {
+                dateFinField.style.display = 'none';
+            } else {
+                dateFinField.style.display = 'block';
+            }
+        }
+        
+        // Initial state
+        toggleDateFin();
+        
+        // Add event listener
+        enCoursCheckbox.addEventListener('change', toggleDateFin);
+    });
+</script>
+{% endblock %}

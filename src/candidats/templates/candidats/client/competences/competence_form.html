@@ -1,0 +1,13 @@
+{% extends 'base_candidate.html' %}
+
+{% block content %}
+<div class="container py-3">
+  <h2 class="h5 mb-3">Ajouter / Modifier une compétence</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+    <a href="{% url 'competence_list' %}" class="btn btn-secondary">Annuler</a>
+  </form>
+</div>
+{% endblock %}

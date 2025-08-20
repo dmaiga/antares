@@ -1,0 +1,196 @@
+{% extends 'base_candidate.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Modifier{% else %}Ajouter{% endif %} une Expérience Professionnelle{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-briefcase me-2"></i>
+                        {% if form.instance.pk %}Modifier l'Expérience{% else %}Ajouter une Nouvelle Expérience{% endif %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3 required-field">
+                                <label for="{{ form.poste.id_for_label }}" class="form-label">{{ form.poste.label }}</label>
+                                {{ form.poste }}
+                                {% if form.poste.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.poste.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3 required-field">
+                                <label for="{{ form.entreprise.id_for_label }}" class="form-label">{{ form.entreprise.label }}</label>
+                                {{ form.entreprise }}
+                                {% if form.entreprise.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.entreprise.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.lieu.id_for_label }}" class="form-label">{{ form.lieu.label }}</label>
+                                {{ form.lieu }}
+                                {% if form.lieu.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.lieu.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3 required-field">
+                                <label for="{{ form.type_emploi.id_for_label }}" class="form-label">{{ form.type_emploi.label }}</label>
+                                {{ form.type_emploi }}
+                                {% if form.type_emploi.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.type_emploi.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3 required-field">
+                                <label for="{{ form.date_debut.id_for_label }}" class="form-label">{{ form.date_debut.label }}</label>
+                                {{ form.date_debut }}
+                                {% if form.date_debut.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.date_debut.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3" id="date_fin_field">
+                                <label for="{{ form.date_fin.id_for_label }}" class="form-label">{{ form.date_fin.label }}</label>
+                                {{ form.date_fin }}
+                                {% if form.date_fin.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.date_fin.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3 form-check form-switch">
+                            {{ form.en_cours }}
+                            <label class="form-check-label" for="{{ form.en_cours.id_for_label }}">{{ form.en_cours.label }}</label>
+                            {% if form.en_cours.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.en_cours.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.description.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">Décrivez vos responsabilités, réalisations et compétences acquises.</div>
+                        </div>
+                        
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-success me-2">
+                                <i class="fas fa-save me-1"></i> Enregistrer
+                            </button>
+                            <a href="{% url 'experience_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const enCoursCheckbox = document.getElementById('{{ form.en_cours.id_for_label }}');
+        const dateFinField = document.getElementById('date_fin_field');
+        const dateFinInput = document.getElementById('{{ form.date_fin.id_for_label }}');
+        
+        function toggleDateFin() {
+            if (enCoursCheckbox.checked) {
+                dateFinField.style.display = 'none';
+                dateFinInput.disabled = true;
+            } else {
+                dateFinField.style.display = 'block';
+                dateFinInput.disabled = false;
+            }
+        }
+        
+        // Initial state
+        toggleDateFin();
+        
+        // Add event listener
+        enCoursCheckbox.addEventListener('change', toggleDateFin);
+        
+        // Add Bootstrap classes to form elements
+        const formInputs = document.querySelectorAll('input, select, textarea');
+        formInputs.forEach(input => {
+            if (input.type !== 'checkbox' && input.type !== 'hidden') {
+                input.classList.add('form-control');
+            }
+        });
+        
+        // Style the checkbox
+        if (enCoursCheckbox) {
+            enCoursCheckbox.classList.add('form-check-input');
+        }
+        
+        // Style the select elements
+        const selectElements = document.querySelectorAll('select');
+        selectElements.forEach(select => {
+            select.classList.add('form-select');
+        });
+        
+        // Style the textarea
+        const textarea = document.querySelector('textarea');
+        if (textarea) {
+            textarea.classList.add('form-control');
+            textarea.rows = 5;
+        }
+    });
+</script>
+{% endblock %}

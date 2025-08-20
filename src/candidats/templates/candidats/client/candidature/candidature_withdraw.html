@@ -1,0 +1,51 @@
+{% extends 'base_candidate.html' %}
+{% load static %}
+
+{% block title %}Retirer la Candidature{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i> Confirmation de retrait
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p>Êtes-vous sûr de vouloir retirer votre candidature pour l'offre suivante ?</p>
+                    
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading">{{ candidature.offre.titre }}</h5>
+                        <p class="mb-1"><strong>Entreprise:</strong> {{ candidature.offre.entreprise.nom }}</p>
+                        <p class="mb-1"><strong>Statut actuel:</strong> 
+                            <span class="badge bg-{% if candidature.statut == 'ENV' %}info{% elif candidature.statut == 'REL' %}primary{% elif candidature.statut == 'ENT' %}warning{% elif candidature.statut == 'ACC' %}success{% else %}secondary{% endif %}">
+                                {{ candidature.get_statut_display }}
+                            </span>
+                        </p>
+                        <p class="mb-0"><strong>Postulé le:</strong> {{ candidature.date_postulation|date:"d/m/Y" }}</p>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Attention:</strong> Cette action est irréversible. Vous ne pourrez plus accéder aux détails de cette candidature.
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-end">
+                            <a href="{% url 'candidature_detail' candidature.pk %}" class="btn btn-secondary me-2">
+                                <i class="fas fa-arrow-left me-1"></i> Retour aux détails
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-times me-1"></i> Confirmer le retrait
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

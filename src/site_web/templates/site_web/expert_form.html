@@ -1,0 +1,254 @@
+{% extends 'site_web/layout.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="contact-hero py-5" style="background: linear-gradient(135deg, var(--primary-blue) 0%, #08315F 100%);">
+  <div class="container text-white text-center">
+    <h1 class="display-5 fw-bold mb-3">Contactez un expert Antares</h1>
+    <p class="lead">Une réponse personnalisée sous 48H</p>
+  </div>
+</section>
+
+<!-- Main Grid Section -->
+<section class="container my-5">
+  <div class="row g-4">
+    <!-- Colonne Formulaire -->
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-lg h-100">
+        <div class="card-header bg-primary-blue py-3">
+          <h2 class="h4 mb-0">
+            <i class="bi bi-person-badge me-2" ></i>
+            <strong style="color: #08315F;">Formulaire expert</strong>
+          </h2>
+        </div>
+        
+        <div class="card-body p-4">
+          {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-4">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="post" id="expertContactForm" novalidate>
+            {% csrf_token %}
+            
+            <!-- Ligne 1 -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label small ">Prénom</label>
+                {{ form.first_name }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small">Nom</label>
+                {{ form.last_name }}
+              </div>
+            </div>
+            
+            <!-- Ligne 2 -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label small required">Email</label>
+                {{ form.email }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small">Téléphone</label>
+                {{ form.phone }}
+              </div>
+            </div>
+            
+            <!-- Ligne 3 -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label small">Entreprise</label>
+                {{ form.company }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small">Secteur d'activité</label>
+                {{ form.sector }}
+              </div>
+            </div>
+            
+            <!-- Message -->
+            <div class="mb-3">
+              <label class="form-label small required">Votre demande experte</label>
+              {{ form.message }}
+              <div class="form-text small mt-2">
+                Décrivez votre besoin en précisant : objectifs, contraintes et délais
+              </div>
+            </div>
+            
+            <!-- Consentement -->
+            <div class="form-check mb-4">
+              <input class="form-check-input" type="checkbox" required id="privacyCheck" required>
+              
+              <label class="form-check-label small" for="privacyCheck">
+                J'accepte que mes données soient utilisées pour traiter ma demande
+              </label>
+            </div>
+            
+            <!-- Bouton -->
+            <button type="submit" class="btn btn-primary w-100 py-3" style="background-color: var(--accent-orange); border: none;">
+              <i class="bi bi-send-fill me-2"></i>Envoyer à un expert
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Colonne Informations -->
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-sm ">
+        <div class="card-header bg-light-blue py-3">
+          <h3 class="h5 mb-0" style="color: var(--primary-blue);">
+            <i class="bi bi-info-circle me-2"></i>
+            Conseils pour une réponse optimale
+          </h3>
+        </div>
+        
+        <div class="card-body">
+          <div class="d-flex flex-column h-100">
+            <!-- Bloc Conseil -->
+            <div class="mb-4">
+              <div class="d-flex mb-3">
+                <div class="me-3 text-primary-blue">
+                  <i class="bi bi-check-circle-fill fs-4"></i>
+                </div>
+                <div>
+                  <h4 class="h6">Informations à fournir</h4>
+                  <ul class="small">
+                    <li>Contexte de votre demande</li>
+                    <li>Objectifs précis</li>
+                    <li>Contraintes techniques/budgétaires</li>
+                    <li>Délais souhaités</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Bloc Process -->
+            <div class="mb-4">
+              <div class="d-flex mb-3">
+                <div class="me-3 text-primary-blue">
+                  <i class="bi bi-clock-fill fs-4"></i>
+                </div>
+                <div>
+                  <h4 class="h6">Notre processus</h4>
+                  <ul class="small">
+                    <li>Analyse sous 48H ouvrées</li>
+                    <li>Premier contact par votre expert dédié</li>
+                    <li>Proposition de solution sur mesure</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Bloc Contact -->
+            <div class="mt-auto">
+              <div class="alert alert-light border-start border-4 border-accent-orange">
+                <div class="d-flex">
+                  <div class="me-3 text-accent-orange">
+                    <i class="bi bi-telephone-outbound-fill fs-4"></i>
+                  </div>
+                  <div>
+                    <h4 class="h6 mb-2">Contact urgent ?</h4>
+                    <p class="small mb-1">Appelez directement notre service :</p>
+                    <a href="tel:+22320292040" class="btn btn-sm btn-outline-primary">
+                      <i class="bi bi-phone me-1"></i> +223 20 29 20 40
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Summernote CSS/JS -->
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+
+<style>
+  .form-label.required:after {
+    content: " *";
+    color: #dc3545;
+  }
+  
+  .form-control:focus {
+    border-color: var(--accent-orange);
+    box-shadow: 0 0 0 0.25rem rgba(250, 131, 1, 0.25);
+  }
+  
+  /* Style pour Summernote */
+  .note-editor {
+    border-radius: 0.375rem;
+    border: 1px solid #ced4da;
+  }
+  
+  .note-editor.note-frame .note-statusbar {
+    background-color: #f8f9fa;
+  }
+  
+  .note-editor.note-frame .note-editing-area .note-editable {
+    padding: 1rem;
+    min-height: 200px;
+    color: #212529;
+  }
+  
+  .note-editor.note-frame .note-toolbar {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    padding: 0.5rem;
+  }
+  
+  .note-btn {
+    background: white;
+    border: 1px solid #dee2e6 !important;
+  }
+</style>
+
+<script>
+// Initialisation de Summernote
+$(document).ready(function() {
+  $('#id_message').summernote({
+    placeholder: 'Décrivez votre besoin précis...',
+    height: 200,
+    toolbar: [
+      ['style', ['bold', 'italic', 'underline']],
+      ['para', ['ul', 'ol']],
+      ['insert', ['link']],
+      ['view', ['codeview']]
+    ],
+    callbacks: {
+      onInit: function() {
+        // Ajoute une classe au conteneur pour le style
+        $('.note-editor').addClass('form-control');
+      }
+    }
+  });
+
+  // Validation améliorée
+  document.getElementById('expertContactForm').addEventListener('submit', function(e) {
+    const form = e.target;
+    if (!form.checkValidity()) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      form.classList.add('was-validated');
+      
+      const invalidField = form.querySelector(':invalid');
+      if (invalidField) {
+        invalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        invalidField.focus();
+      }
+    }
+  }, false);
+});
+</script>
+{% endblock %}

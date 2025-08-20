@@ -1,0 +1,45 @@
+{% extends 'base_candidate.html' %}
+{% load static %}
+
+{% block title %}Supprimer le Diplôme{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i> Confirmation de suppression
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p>Êtes-vous sûr de vouloir supprimer le diplôme suivant ?</p>
+                    
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading">{{ diplome.intitule }}</h5>
+                        <p class="mb-0">{{ diplome.etablissement }} - {{ diplome.get_niveau_display }}</p>
+                    </div>
+                    
+                    <p class="text-danger">
+                        <i class="fas fa-exclamation-circle me-1"></i>
+                        Cette action est irréversible.
+                    </p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-end">
+                            <a href="{% url 'diplome_list' %}" class="btn btn-secondary me-2">
+                                <i class="fas fa-times me-1"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-1"></i> Confirmer la suppression
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

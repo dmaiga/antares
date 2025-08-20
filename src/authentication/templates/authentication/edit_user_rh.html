@@ -1,0 +1,61 @@
+{% extends 'authentication/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-4">
+  <h3>Modifier les informations RH de {{ user_cible.get_full_name }}</h3>
+
+  <form method="POST" enctype="multipart/form-data" class="mt-4">
+    {% csrf_token %}
+    {% if form.errors %}
+      <div class="alert alert-danger">
+        <strong>Erreurs :</strong>
+        {{ form.errors }}
+      </div>
+    {% endif %}
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="{{ form.role.id_for_label }}">Rôle</label>
+            {{ form.role }}
+          </div>
+          <div class="col-md-6">
+            <label for="{{ form.statut.id_for_label }}">Statut</label>
+            {{ form.statut }}
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="{{ form.poste_occupe.id_for_label }}">Poste occupé</label>
+            {{ form.poste_occupe }}
+          </div>
+          <div class="col-md-6">
+            <label for="{{ form.department.id_for_label }}">Département</label>
+            {{ form.department }}
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="{{ form.start_date.id_for_label }}">Date d'embauche</label>
+            {{ form.start_date }}
+          </div>
+          <div class="col-md-6">
+            <label for="{{ form.end_date.id_for_label }}">Date de fin</label>
+            {{ form.end_date }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-3 text-end">
+      <button type="submit" class="btn btn-primary">💾 Enregistrer</button>
+      <a href="{% url 'dashboard-rh' %}" class="btn btn-secondary">Retour</a>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

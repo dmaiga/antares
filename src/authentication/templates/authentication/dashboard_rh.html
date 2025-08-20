@@ -1,0 +1,354 @@
+{% extends 'authentication/base.html' %}
+{% load static %}
+{% load todo_extras %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard RH - Performance des équipes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        /* Styles essentiels seulement */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container-fluid {
+            padding: 15px;
+        }
+        
+        /* Tableau agrandi et accroché en haut */
+        .performance-summary-card {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+        
+        .summary-table {
+            width: 100%;
+            font-size: 1rem; /* Taille de police augmentée */
+            border-collapse: collapse;
+        }
+        
+        .summary-table th, 
+        .summary-table td {
+            padding: 12px 10px; /* Cellules plus grandes */
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .summary-table th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+        }
+        
+        /* Filtres compacts */
+        .filter-card {
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .filter-form {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            margin-bottom: 0;
+            min-width: 180px;
+        }
+        
+        /* Cartes employés */
+        
+        /* Indicateurs de performance */
+        .performance-excellent { color: #2e7d32; } /* >86% - Vert */
+        .performance-good { color: #689f38; } /* 86% - Vert clair */
+        .performance-average { color: #ff8f00; } /* <86% et >=50% - Jaune */
+        .performance-poor { color: #d32f2f; } /* <50% - Rouge */
+        
+        /* Classes pour les cellules de pourcentage */
+        .percent-red { color: #d32f2f; } /* <50% */
+        .percent-yellow { color: #ff8f00; } /* <86% */
+        .percent-green { color: #2e7d32; } /* >=86% */
+        .percent-light-green { color: #689f38; } /* >86% et <=100% - Vert clair */
+        
+    .employee-cards {
+        margin-top: 20px;
+    }
+    
+    .employee-card {
+        border-radius: 10px;
+        overflow: hidden;
+        transition: transform 0.2s;
+    }
+    
+   
+    
+    .employee-photo {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border: 2px solid #dee2e6;
+    }
+    
+    .employee-photo-placeholder {
+        width: 60px;
+        height: 60px;
+        background: #f5f5f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        font-size: 1.5rem;
+    }
+    
+    .performance-section {
+        background: #f8f9fa;
+        padding: 12px;
+        border-radius: 8px;
+    }
+    
+    .info-section {
+        margin-top: 15px;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        padding: 6px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .info-item i {
+        color: #1976d2;
+        min-width: 24px;
+    }
+    
+    /* Couleurs de performance */
+    .performance-badge-excellent {
+        background-color: #e6f7e6;
+        color: #2e7d32;
+        border: 1px solid #2e7d32;
+    }
+    
+    .performance-badge-good {
+        background-color: #f0f9e6;
+        color: #689f38;
+        border: 1px solid #689f38;
+    }
+    
+    .performance-badge-average {
+        background-color: #fff8e6;
+        color: #ff8f00;
+        border: 1px solid #ff8f00;
+    }
+    
+    .performance-badge-poor {
+        background-color: #ffebee;
+        color: #d32f2f;
+        border: 1px solid #d32f2f;
+    }
+    
+    .bg-excellent { background-color: #2e7d32; }
+    .bg-good { background-color: #689f38; }
+    .bg-average { background-color: #ff8f00; }
+    .bg-poor { background-color: #d32f2f; }
+    .percent-red {
+        background-color: #ffebee;
+        color: #c62828;
+        font-weight: bold;
+    }
+    .percent-yellow {
+        background-color: #fff8e1;
+        color: #f57f17;
+        font-weight: bold;
+    }
+    .percent-green {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+        font-weight: bold;
+    }
+    .percent-light-green {
+        background-color: #e8f5e9;
+        color: #1b5e20;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+   
+<div class="container-fluid">
+
+    <!-- Tableau synthèse des performances -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-table me-2"></i>
+                Synthèse des performances - Semaine du {{ jours_semaine.0|date:"d M" }} au {{ jours_semaine.4|date:"d M Y" }}
+            </h5>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="min-width: 200px;">Employé</th>
+                        {% for day in jours_semaine %}
+                        <th>{{ day|date:"l"|capfirst }}</th>
+                        {% endfor %}
+                        <th>Moyenne</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stat in stats %}
+                    {% if stat.user.role in 'employe,stagiaire' %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                {% if stat.user.photo %}
+                                <img src="{{ stat.user.photo.url }}" class="rounded-circle" 
+                                     style="width: 36px; height: 36px; object-fit: cover;">
+                                {% else %}
+                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" 
+                                     style="width: 36px; height: 36px;">
+                                    <i class="bi bi-person text-muted"></i>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <div>{{ stat.user.get_full_name }}</div>
+                                    <small class="text-muted">{{ stat.user.poste_occupe }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        {% for day in stat.days %}
+                        <td class="align-middle text-center {{ day.css_class }}">
+                            {{ day.percentage }}%
+                        </td>
+                        {% endfor %}
+                        <td class="align-middle text-center fw-bold {{ stat.weekly_class }}">
+                            {{ stat.weekly_avg }}%
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% empty %}
+                    <tr>
+                        <td colspan="{{ jours_semaine|length|add:2 }}" class="text-center py-4">
+                            <div class="d-flex flex-column align-items-center">
+                                <i class="bi bi-exclamation-circle fs-3 text-muted mb-2"></i>
+                                <p class="text-muted mb-0">Aucun employé ou stagiaire trouvé</p>
+                                <small class="text-muted">Vérifiez vos filtres ou ajoutez des utilisateurs</small>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+    <!-- Filtres compacts -->
+    <div class="filter-card">
+        <form method="get" class="filter-form">
+            <div class="filter-group">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Rôle</label>
+                <select name="role" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd;">
+                    <option value="">Tous</option>
+                    <option value="employe" {% if filters.role == 'employe' %}selected{% endif %}>Employé</option>
+                    <option value="stagiaire" {% if filters.role == 'stagiaire' %}selected{% endif %}>Stagiaire</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Statut</label>
+                <select name="statut" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd;">
+                    <option value="">Tous</option>
+                    <option value="actif" {% if filters.statut == 'actif' %}selected{% endif %}>Actif</option>
+                    <option value="pause" {% if filters.statut == 'pause' %}selected{% endif %}>En pause</option>
+                    <option value="termine" {% if filters.statut == 'termine' %}selected{% endif %}>Terminé</option>
+                </select>
+            </div>
+            
+            <button type="submit" style="background: #1976d2; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">
+                <i class="bi bi-funnel-fill"></i> Appliquer
+            </button>
+        </form>
+    </div>
+    
+
+</div>
+    <!-- Cartes employés simplifiées -->
+        <!-- Cartes employés simplifiées -->
+    <div class="employee-cards row g-3">
+    {% for stat in stats %}
+    <div class="col-md-6 col-lg-4">
+        <div class="employee-card card h-100 shadow-sm">
+            <!-- En-tête avec photo et info de base -->
+            <div class="card-header bg-light">
+                <div class="d-flex align-items-center gap-3">
+                    {% if stat.user.photo %}
+                    <img src="{{ stat.user.photo.url }}" class="employee-photo rounded-circle">
+                    {% else %}
+                    <div class="employee-photo-placeholder rounded-circle">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    {% endif %}
+                    <div>
+                        <h5 class="mb-0">{{ stat.user.get_full_name }}</h5>
+                        <p class="mb-0 text-primary fw-medium">{{ stat.user.poste_occupe }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Corps de la carte -->
+            <div class="card-body">
+                
+<!-- Informations -->
+                <div class="card" style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <table style="width: 100%; font-size: 0.9rem; border-collapse: collapse;">
+        <tr style="border-bottom: 1px solid #f0f0f0;">
+            <td style="padding: 8px 0; color: #7f8c8d;">Statut:</td>
+            <td style="padding: 8px 0; font-weight: 500;">{{ stat.user.get_statut_display }}</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f0f0f0;">
+            <td style="padding: 8px 0; color: #7f8c8d; width: 50%;">Fiche de poste:</td>
+            <td style="padding: 8px 0; font-weight: 500;">{{ stat.user.fiche_poste|default:"-" }}</td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #f0f0f0;">
+            <td style="padding: 8px 0; color: #7f8c8d;">Téléphone:</td>
+            <td style="padding: 8px 0; font-weight: 500;">{{ stat.user.telephone_pro|default:"-" }}</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f0f0f0;">
+            <td style="padding: 8px 0; color: #7f8c8d;">Quartier:</td>
+            <td style="padding: 8px 0; font-weight: 500;">{{ stat.user.quartier|default:"-" }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; color: #7f8c8d;">Contact urgence:</td>
+            <td style="padding: 8px 0; font-weight: 500;">{{ stat.user.contact_urgence|default:"-" }}</td>
+        </tr>
+    </table>
+</div>
+            </div>
+            <!-- Pied de carte -->
+            <div class="card-footer bg-white border-0">
+                <a href="{% url 'historique-employe' stat.user.id %}" 
+                   class="btn btn-outline-primary w-100">
+                    <i class="bi bi-clock-history me-1"></i> Voir historique complet
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
+{% endblock %}

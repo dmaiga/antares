@@ -1,0 +1,485 @@
+{% extends 'site_web/layout.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="contact-hero" style="background: linear-gradient(135deg, var(--primary-blue) 0%, #08315F 100%);">
+  <div class="container text-white text-center">
+    <h1 class="display-5 fw-bold mb-3">Contactez Antares RH</h1>
+    <p class="lead mb-0">Votre partenaire en solutions ressources humaines</p>
+  </div>
+</section>
+
+<!-- Contact Info Section -->
+<section class="bg-light mb-3">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center p-4">
+            <div class="icon-circle bg-primary-blue text-white mx-auto mb-3">
+              <i class="bi bi-telephone fs-4"></i>
+            </div>
+            <h3 class="h5">Contact téléphonique</h3>
+            <ul class="list-unstyled small">
+              <li>+223 20 29 20 40</li>
+              <li>+223 44 50 07 41</li>
+              <li>+223 77 05 90 97 (WhatsApp)</li>
+            </ul>
+            <a href="tel:+22320292040" class="btn btn-outline-primary btn-sm mt-2">
+              <i class="bi bi-telephone-outbound me-1"></i>Appeler
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center p-4">
+            <div class="icon-circle bg-primary-blue text-white mx-auto mb-3">
+              <i class="bi bi-clock fs-4"></i>
+            </div>
+            <h3 class="h5">Horaires d'ouverture</h3>
+            <ul class="list-unstyled small">
+              <li><strong>Lun-Ven:</strong> 8h00-17h00</li>
+              <li><strong>Samedi:</strong> 9h-13h</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center p-4">
+            <div class="icon-circle bg-primary-blue text-white mx-auto mb-3">
+              <i class="bi bi-envelope fs-4"></i>
+            </div>
+            <h3 class="h5">Email</h3>
+            <p>
+              <i class="bi bi-envelope-at me-2"></i>info@antares-rh.com
+            </p>
+            <p>
+              <i class="bi bi-clock me-2"></i>Réponse sous 72H
+            </p>
+            <a href="mailto:info@antares-rh.com" class="btn btn-outline-primary btn-sm">
+              <i class="bi bi-send me-1"></i>Envoyer un email
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Message d'incitation -->
+<section class="bg-light-blue py-1">
+  <div class="container">
+    <div class="alert alert-light border-start border-4 border-accent-orange mb-0">
+      <h3 class="h4" style="color: var(--primary-blue);">
+        <i class="bi bi-lightbulb me-2"></i>Comment obtenir une réponse optimale ?
+      </h3>
+      <p>Pour nous permettre de répondre au mieux à votre demande, nous vous remercions de bien vouloir nous fournir des informations détaillées sur :</p>
+      <ul>
+        <li>L'objectif précis de votre demande</li>
+        <li>Vos attentes spécifiques</li>
+        <li>Tout élément contextuel important</li>
+      </ul>
+      <p class="mb-0">Plus vos indications seront complètes, plus nous serons en mesure de vous proposer une solution adaptée à vos besoins.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Main Content -->
+<main class="container my-5">
+  <!-- Messages de notification -->
+  {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-4">
+      <div class="d-flex align-items-center">
+        <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill{% else %}bi-exclamation-circle-fill{% endif %} me-2"></i>
+        <div>{{ message }}</div>
+      </div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="row g-4">
+    <!-- SECTION 1 : FORMULAIRE -->
+    <section class="col-lg-7">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-primary-blue py-3">
+          <h2 class="h4 mb-0">
+            <i class="bi bi-envelope-paper me-2"></i>
+            <strong style="color: #0A4B8C;">Formulaire de contact</strong>
+          </h2>
+        </div>
+        
+        <div class="card-body p-4">
+          <form method="post" id="contactForm" novalidate>
+            {% csrf_token %}
+            
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="id_first_name" class="form-label small">Prénom</label>
+                {{ form.first_name }}
+              </div>
+              
+              <div class="col-md-6">
+                <label for="id_last_name" class="form-label small">Nom</label>
+                {{ form.last_name }}
+              </div>
+            </div>
+            
+            <div class="row g-3 mb-3">
+              <div class="col-12">
+                <label for="id_email" class="form-label small required">Email</label>
+                {{ form.email }}
+              </div>
+            </div>
+            
+            <div class="row g-3 mb-3">
+              <div class="col-12">
+                <label for="id_subject" class="form-label small required">Titre</label>
+                {{ form.subject }}
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="id_message" class="form-label small required">Votre message</label>
+              {{ form.message }}
+              <div class="form-text small mt-2">
+                Décrivez votre demande en détail pour une réponse précise
+              </div>
+            </div>
+            
+            <div class="form-check mb-4">
+              <input class="form-check-input" type="checkbox" required id="acceptConditions" name="accept_conditions" required>
+             
+              <label class="form-check-label small" for="acceptConditions">
+                J'accepte que mes données soient utilisées pour traiter ma demande
+              </label>
+              <div class="form-text small mt-1">
+                <i class="bi bi-info-circle me-1"></i>Vos données ne seront utilisées que pour répondre à votre demande
+              </div>
+              <div id="conditionsError" class="invalid-feedback" style="display: none;">
+                <i class="bi bi-exclamation-circle me-1"></i>Vous devez accepter les conditions pour soumettre le formulaire
+              </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary w-100 py-3" style="background-color: var(--accent-orange); border: none;">
+              <i class="bi bi-send-fill me-2"></i>Envoyer ma demande
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2 : INFORMATIONS COMPLÉMENTAIRES -->
+    <section class="col-lg-5">
+      <!-- Carte Google Maps -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-0">
+          <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3859.109578283803!2d-7.992290524167799!3d12.645481487664643!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xe51cded6fffe91f%3A0x65e2fba1c1e232be!2sJXF7%2BWXP%2C%20Unnamed%20Road%2C%20Bamako!5e0!3m2!1sfr!2sml!4v1721463808457!5m2!1sfr!2sml"
+            width="100%"
+            height="300"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
+        </div>
+        <div class="card-footer bg-white py-3">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-geo-alt-fill fs-5 me-3" style="color: var(--primary-blue);"></i>
+            <div>
+              <strong>ANTARES</strong><br>
+              <small>HAMDALLAYE ACI - IMMEUBLE BALDE, BLOC 1 - BAMAKO</small>
+            </div>
+          </div>
+          <a href="https://maps.app.goo.gl/uBvJixHfNDs3CbpL8" class="btn btn-outline-primary mt-3 w-100" target="_blank">
+            <i class="bi bi-map me-2"></i>Voir sur la carte
+          </a>
+        </div>
+      </div>
+      
+      <!-- Bloc Contact Urgent -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light-blue py-3">
+          <h3 class="h5 mb-0" style="color: var(--primary-blue);">
+            <i class="bi bi-info-circle me-2"></i>
+            Assistance immédiate
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-light border-start border-4 border-accent-orange">
+            <div class="d-flex">
+              <div class="me-3 text-accent-orange">
+                <i class="bi bi-telephone-outbound-fill fs-4"></i>
+              </div>
+              <div>
+                <h4 class="h6">Contact urgent ?</h4>
+                <p class="small mb-1">Appelez directement notre service :</p>
+                <a href="tel:+22320292040" class="btn btn-sm btn-outline-primary w-100">
+                  <i class="bi bi-phone me-1"></i> +223 20 29 20 40
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+
+   <!-- SECTION 5 : FAQ ÉTENDUE -->
+  <section class="mt-5 pt-4">
+    <div class="text-center mb-3">
+      <h2 class="h3" style="color: var(--primary-blue);">
+        <i class="bi bi-question-circle me-2"></i>Questions fréquentes
+      </h2>
+      <p class="text-muted">Trouvez rapidement des réponses à vos interrogations</p>
+    </div>
+    
+    <div class="accordion shadow-sm" id="faqAccordion">
+      <!-- Question 1 -->
+      <div class="accordion-item">
+        <h3 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+            <i class="bi bi-clock-history me-2" style="color: var(--accent-orange);"></i>
+            Quel est le délai moyen de réponse ?
+          </button>
+        </h3>
+        <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+          <div class="accordion-body small">
+            Nous nous engageons à répondre à toutes les demandes dans un délai maximum de <strong>48 heures ouvrables</strong>. Pour les demandes urgentes, merci de le préciser dans votre message et d'utiliser notre numéro de téléphone.
+          </div>
+        </div>
+      </div>
+      
+      <!-- Question 2 -->
+      <div class="accordion-item">
+        <h3 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+            <i class="bi bi-person-lines-fill me-2" style="color: var(--accent-orange);"></i>
+            Quelles informations fournir pour un recrutement ?
+          </button>
+        </h3>
+        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+          <div class="accordion-body small">
+            Pour une demande optimale, merci de nous indiquer :
+            <ul class="mt-2">
+              <li>Le type de profil recherché (compétences, expérience)</li>
+              <li>Le secteur d'activité</li>
+              <li>Les conditions de travail proposées</li>
+              <li>Vos délais de recrutement</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Question 3 -->
+      <div class="accordion-item">
+        <h3 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+            <i class="bi bi-shield-lock me-2" style="color: var(--accent-orange);"></i>
+            Comment sont protégées mes données ?
+          </button>
+        </h3>
+        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+          <div class="accordion-body small">
+            Nous appliquons une <strong>politique stricte de confidentialité</strong> conforme à la réglementation sur la protection des données. Vos informations ne sont jamais partagées avec des tiers sans votre consentement explicite.
+          </div>
+        </div>
+      </div>
+
+      <!-- Question 4 -->
+      <div class="accordion-item">
+        <h3 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+            <i class="bi bi-currency-euro me-2" style="color: var(--accent-orange);"></i>
+            Quels sont vos tarifs pour les services RH ?
+          </button>
+        </h3>
+        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+          <div class="accordion-body small">
+            Nos tarifs sont adaptés à chaque demande et dépendent de plusieurs facteurs :
+            <ul class="mt-2">
+              <li>Nature et complexité du service</li>
+              <li>Durée de l'accompagnement</li>
+              <li>Spécificités de votre secteur</li>
+            </ul>
+            <p class="mt-2 mb-0">Nous proposons une étude gratuite de votre besoin pour vous fournir un devis personnalisé.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Question 5 -->
+      <div class="accordion-item">
+        <h3 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+            <i class="bi bi-file-earmark-text me-2" style="color: var(--accent-orange);"></i>
+            Quels documents préparer pour un premier contact ?
+          </button>
+        </h3>
+        <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+          <div class="accordion-body small">
+            Selon votre demande, il peut être utile de préparer :
+            <ul class="mt-2">
+              <li><strong>Pour les entreprises :</strong> Fiche de poste, organigramme</li>
+              <li><strong>Pour les candidats :</strong> CV, lettre de motivation</li>
+              <li><strong>Pour les consultants :</strong> Références, domaines d'expertise</li>
+            </ul>
+            <p class="mt-2 mb-0">Ces documents peuvent être envoyés ultérieurement si nécessaire.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="text-center mt-4">
+      <a href="#" class="btn btn-outline-primary">
+        <i class="bi bi-journal-text me-2"></i>Voir toutes les questions fréquentes
+      </a>
+    </div>
+
+  
+  </section>
+</main>
+
+<!-- SECTION 4 : CTA FINAL -->
+<section class="py-5 bg-light-blue mt-5">
+  <div class="container text-center">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <h2 class="h3 mb-4" style="color: var(--primary-blue);">Vous préférez échanger directement ?</h2>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+          <a href="tel:+22320292040" class="btn btn-primary px-4" style="background-color: var(--accent-orange); border: none;">
+            <i class="bi bi-telephone-outbound me-2"></i>Nous appeler
+          </a>
+          <a href="#" class="btn btn-outline-primary px-4">
+            <i class="bi bi-calendar-check me-2"></i>Prendre rendez-vous
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Summernote CSS/JS -->
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+
+<style>
+  :root {
+    --primary-blue: #0A4B8C;
+    --light-blue: #E6F0FA;
+    --accent-orange: #FA8301;
+  }
+
+  .contact-hero {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .icon-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+  }
+  
+  .required:after {
+    content: " *";
+    color: #dc3545;
+  }
+  
+  .bg-light-blue {
+    background-color: var(--light-blue);
+  }
+
+  /* Summernote styles */
+  .note-editor {
+    border-radius: 0.375rem;
+    border: 1px solid #ced4da !important;
+  }
+  
+  .note-editor.note-frame .note-toolbar {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .note-editor.note-frame .note-editable {
+    padding: 1rem;
+    min-height: 200px;
+  }
+  
+  .note-btn {
+    background: white !important;
+    border: 1px solid #dee2e6 !important;
+  }
+
+  .is-invalid {
+    border-color: #dc3545 !important;
+  }
+
+  .invalid-feedback {
+    color: #dc3545;
+    font-size: 0.875em;
+  }
+
+  @media (max-width: 767.98px) {
+    .contact-hero {
+      padding: 2rem 0;
+    }
+  }
+</style>
+
+<script>
+$(document).ready(function() {
+  // Initialisation de Summernote
+  $('#id_message').summernote({
+    placeholder: 'Décrivez votre demande en détail...',
+    height: 200,
+    toolbar: [
+      ['style', ['bold', 'italic', 'underline']],
+      ['para', ['ul', 'ol']],
+      ['insert', ['link']],
+      ['view', ['codeview']]
+    ],
+    callbacks: {
+      onInit: function() {
+        $('.note-editor').addClass('form-control');
+      }
+    }
+  });
+
+  // Gestion de la validation de la checkbox
+  const contactForm = document.getElementById('contactForm');
+  const acceptCheckbox = document.getElementById('acceptConditions');
+  const conditionsError = document.getElementById('conditionsError');
+
+  contactForm.addEventListener('submit', function(e) {
+    if (!acceptCheckbox.checked) {
+      e.preventDefault();
+      acceptCheckbox.classList.add('is-invalid');
+      conditionsError.style.display = 'block';
+      
+      // Scroll vers l'erreur
+      acceptCheckbox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  });
+
+  // Reset de l'erreur quand on coche
+  acceptCheckbox.addEventListener('change', function() {
+    if (this.checked) {
+      this.classList.remove('is-invalid');
+      conditionsError.style.display = 'none';
+    }
+  });
+});
+</script>
+{% endblock %}

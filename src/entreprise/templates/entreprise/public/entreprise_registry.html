@@ -1,0 +1,423 @@
+{% extends 'site_web/layout.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section Register -->
+<section class="register-hero py-5" style="background: linear-gradient(rgba(13, 59, 102, 0.9), rgba(13, 59, 102, 0.9))">
+  <div class="container py-5 text-white">
+    <div class="row align-items-center">
+      <div class="col-lg-8 mx-auto text-center">
+        <h1 class="display-4 fw-bold mb-4">Inscription Entreprise</h1>
+        <p class="lead mb-4">Rejoignez notre plateforme pour accéder à des talents qualifiés et optimiser votre recrutement</p>
+        <a href="#registration" class="btn btn-orange btn-lg px-4">
+          <i class="bi bi-building-add me-2"></i> S'inscrire maintenant
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Avantages Entreprise -->
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold" style="color: var(--primary-blue);">5 bonnes raisons de nous choisir</h2>
+      <p class="lead text-muted">Notre plateforme simplifie et accélère votre processus de recrutement</p>
+    </div>
+    
+    <div class="row g-4">
+      <!-- Avantage 1 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm hover-effect">
+          <div class="card-body text-center p-4">
+            <div class="icon-square bg-primary-blue text-white rounded-circle mb-3 mx-auto" style="width: 70px; height: 70px; line-height: 70px;">
+              <i class="bi bi-people-fill fs-4"></i>
+            </div>
+            <h5 class="fw-bold">Accès à des talents qualifiés</h5>
+            <p class="text-muted">Base de données de profils vérifiés et pré-sélectionnés selon vos critères</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Avantage 2 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm hover-effect">
+          <div class="card-body text-center p-4">
+            <div class="icon-square bg-primary-blue text-white rounded-circle mb-3 mx-auto" style="width: 70px; height: 70px; line-height: 70px;">
+              <i class="bi bi-lightning-charge-fill fs-4"></i>
+            </div>
+            <h5 class="fw-bold">Validation en 48h max</h5>
+            <p class="text-muted">Notre équipe traite votre demande en moins de 2 jours ouvrés</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Avantage 3 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm hover-effect">
+          <div class="card-body text-center p-4">
+            <div class="icon-square bg-primary-blue text-white rounded-circle mb-3 mx-auto" style="width: 70px; height: 70px; line-height: 70px;">
+              <i class="bi bi-shield-lock fs-4"></i>
+            </div>
+            <h5 class="fw-bold">Données sécurisées</h5>
+            <p class="text-muted">Protection maximale de vos informations conformément au RGPD</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Avantage 4 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm hover-effect">
+          <div class="card-body text-center p-4">
+            <div class="icon-square bg-primary-blue text-white rounded-circle mb-3 mx-auto" style="width: 70px; height: 70px; line-height: 70px;">
+              <i class="bi bi-graph-up fs-4"></i>
+            </div>
+            <h5 class="fw-bold">Tableau de bord complet</h5>
+            <p class="text-muted">Suivez toutes vos candidatures en temps réel avec nos outils analytiques</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Avantage 5 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm hover-effect">
+          <div class="card-body text-center p-4">
+            <div class="icon-square bg-primary-blue text-white rounded-circle mb-3 mx-auto" style="width: 70px; height: 70px; line-height: 70px;">
+              <i class="bi bi-headset fs-4"></i>
+            </div>
+            <h5 class="fw-bold">Support dédié</h5>
+            <p class="text-muted">Un conseiller RH à votre disposition pour vous accompagner</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Processus d'inscription -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6 mb-4 mb-lg-0">
+        <img src="{% static 'site_web/images/entreprise/externalisation.jpg' %}" 
+             alt="Processus inscription entreprise" 
+             class="img-fluid rounded-3 shadow w-100 h-100 object-fit-cover"
+             style="max-height: 500px;">
+      </div>
+      <div class="col-lg-6">
+        <h2 class="fw-bold mb-4" style="color: var(--primary-blue);">Comment s'inscrire ?</h2>
+        
+        <div class="process-steps">
+          <div class="d-flex mb-4">
+            <div class="flex-shrink-0 bg-primary-blue rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+              1
+            </div>
+            <div class="flex-grow-1 ms-4">
+              <h5 class="fw-bold">Formulaire en ligne</h5>
+              <p class="mb-0">Remplissez notre formulaire simplifié en 5 minutes</p>
+            </div>
+          </div>
+          
+          <div class="d-flex mb-4">
+            <div class="flex-shrink-0 bg-primary-blue  rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+              2
+            </div>
+            <div class="flex-grow-1 ms-4">
+              <h5 class="fw-bold">Validation express</h5>
+              <p class="mb-0">Notre équipe valide votre dossier sous 48h maximum</p>
+            </div>
+          </div>
+          
+          <div class="d-flex">
+            <div class="flex-shrink-0 bg-primary-blue rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+              3
+            </div>
+            <div class="flex-grow-1 ms-4">
+              <h5 class="fw-bold">Accès immédiat</h5>
+              <p class="mb-0">Publiez vos offres et gérez votre ressources humaines</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Formulaire d'inscription -->
+<section id="registration" class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="card border-0 shadow-lg overflow-hidden">
+          <div class="card-header bg-primary-blue ">
+            <h2 class="h3 mb-0 text-center " style="color: var(--primary-blue);">
+              <i class="bi bi-building me-2"  style="color: var(--primary-blue);"></i> Formulaire d'inscription Entreprise
+            </h2>
+          </div>
+          
+          <div class="card-body p-4 p-md-5">
+            <form method="post" enctype="multipart/form-data" class="row g-4">
+              {% csrf_token %}
+              
+              <!-- Section Représentant -->
+              <div class="col-12">
+                <div class="border-bottom pb-3 mb-4">
+                  <h3 class="h5 fw-bold" style="color: var(--primary-blue);">
+                    <i class="bi bi-person-badge me-2"></i> Informations du représentant
+                  </h3>
+                </div>
+              </div>
+              
+              {% for field in form %}
+              {% if field.name == 'email' or field.name == 'first_name' or field.name == 'last_name' or field.name == 'telephone_pro' %}  
+              <div class="col-md-6">
+                    <div class="form-floating">
+                      {{ field }}
+                      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                      {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                      {% endif %}
+                      {% for error in field.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+              
+              <!-- Section Entreprise -->
+              <div class="col-12 mt-4">
+                <div class="border-bottom pb-3 mb-4">
+                  <h3 class="h5 fw-bold" style="color: var(--primary-blue);">
+                    <i class="bi bi-building me-2"></i> Informations de l'entreprise
+                  </h3>
+                </div>
+              </div>
+              
+              
+              {% for field in form %}
+  {% if field.name == 'email' or field.name == 'first_name' or field.name == 'last_name' or field.name == 'telephone_pro' %}
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="{{ field.id_for_label }}" class="form-label">
+                        {{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}
+                      </label>
+                      {{ field }}
+                      {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                      {% endif %}
+                      {% for error in field.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+              
+              <!-- Champ Description -->
+              <div class="col-12">
+                <div class="mb-3">
+                  <label for="{{ form.description.id_for_label }}" class="form-label">
+                    {{ form.description.label }}
+                  </label>
+                  {{ form.description }}
+                </div>
+              </div>
+              
+              <!-- Logo -->
+              <div class="col-12">
+                <div class="mb-4">
+                  <label for="{{ form.logo.id_for_label }}" class="form-label">
+                    {{ form.logo.label }}
+                  </label>
+                  <div class="input-group">
+                    {{ form.logo }}
+                  </div>
+                  <small class="form-text text-muted">Format recommandé : PNG ou JPG (max 2MB)</small>
+                </div>
+              </div>
+              
+              <!-- Conditions -->
+              <div class="col-12">
+                <div class="form-check">
+                  {{ form.accepte_cgv_cgu }}
+                  <label class="form-check-label" for="{{ form.accepte_cgv_cgu.id_for_label }}">
+                    J'accepte les <a href="#" target="_blank" style="color: var(--primary-blue);">conditions générales</a> et la <a href="#" target="_blank" style="color: var(--primary-blue);">politique de confidentialité</a> <span class="text-danger">*</span>
+                  </label>
+                  {% for error in form.accepte_cgv_cgu.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+              
+              <!-- Bouton de soumission -->
+              <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-primary btn-lg w-100 py-3">
+                  <i class="bi bi-building-check me-2"></i> Finaliser l'inscription
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold" style="color: var(--primary-blue);">Questions fréquentes</h2>
+      <p class="lead text-muted">Trouvez rapidement les réponses à vos questions</p>
+    </div>
+    
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="accordion" id="faqAccordion">
+          <!-- Question 1 -->
+          <div class="accordion-item border-0 shadow-sm mb-3">
+            <h3 class="accordion-header" id="headingOne">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                Combien de temps prend la validation du compte ?
+              </button>
+            </h3>
+            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                Notre équipe traite toutes les demandes d'inscription en moins de <strong>48 heures ouvrables</strong>. Vous recevrez un email de confirmation une fois votre compte activé.
+              </div>
+            </div>
+          </div>
+          
+          <!-- Question 2 -->
+          <div class="accordion-item border-0 shadow-sm mb-3">
+            <h3 class="accordion-header" id="headingTwo">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                Quels documents dois-je fournir ?
+              </button>
+            </h3>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                Aucun document n'est requis pour l'inscription initiale. Cependant, pour certaines offres sensibles, nous pourrons vous demander des justificatifs supplémentaires (Kbis, attestation d'assurance...).
+              </div>
+            </div>
+          </div>
+          
+          <!-- Question 3 -->
+          <div class="accordion-item border-0 shadow-sm mb-3">
+            <h3 class="accordion-header" id="headingThree">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                Puis-je modifier les informations après inscription ?
+              </button>
+            </h3>
+            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                Oui, vous pourrez modifier toutes les informations de votre entreprise et de votre compte à tout moment depuis votre espace client.
+              </div>
+            </div>
+          </div>
+          
+          <!-- Question 4 -->
+          <div class="accordion-item border-0 shadow-sm">
+            <h3 class="accordion-header" id="headingFour">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                Comment contacter le support si j'ai des problèmes ?
+              </button>
+            </h3>
+            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                Notre équipe support est disponible par email à <a href="mailto:support@antares-rh.com">support@antares-rh.com</a> ou par téléphone au <a href="tel:+22320292040">+223 20 29 20 40</a> du lundi au vendredi, de 8h à 18h.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Support Section -->
+<section class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 text-center">
+        <div class="card border-0 shadow-sm bg-primary-blue  py-5">
+          <div class="card-body">
+            <h3 class="h2 mb-4"  style="color: var(--primary-blue);">Prêt à transformer votre Gestion des Ressources Humaines ?</h3>
+            <p class="lead mb-5"  style="color: var(--primary-blue);">Notre équipe est disponible pour répondre à toutes vos questions</p>
+            
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+              <a href="mailto:contact@antares-rh.com" class="btn btn-light btn-lg px-4">
+                <i class="bi bi-envelope me-2"></i> Nous écrire
+              </a>
+              <a href="tel:+22320292040" class="btn btn-outline-light px-4"  style="color: #FA8301;">
+                <i class="bi bi-telephone me-2"></i> Nous appeler
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Styles -->
+<style>
+  .register-hero {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .hover-effect {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(13, 59, 102, 0.1);
+  }
+  
+  .hover-effect:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(13, 59, 102, 0.1) !important;
+  }
+  
+  .icon-square {
+    transition: all 0.3s ease;
+  }
+  
+  .card:hover .icon-square {
+    transform: rotate(15deg);
+  }
+  
+  .process-steps {
+    position: relative;
+    padding-left: 15px;
+  }
+  
+  .process-steps::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--primary-blue) 0%, rgba(10, 75, 140, 0.3) 100%);
+  }
+  
+  .accordion-button:not(.collapsed) {
+    background-color: rgba(10, 75, 140, 0.05);
+    color: var(--primary-blue);
+    font-weight: 600;
+  }
+  
+  .accordion-button:focus {
+    box-shadow: 0 0 0 0.25rem rgba(10, 75, 140, 0.25);
+  }
+  
+  @media (max-width: 992px) {
+    .process-steps::before {
+      display: none;
+    }
+  }
+</style>
+
+<!-- Summernote Media -->
+{{ form.media }}
+{% endblock %}

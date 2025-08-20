@@ -1,0 +1,452 @@
+{% extends 'site_web/layout.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section Candidat améliorée -->
+<section class="candidat-hero" style="background: linear-gradient(rgba(13, 59, 102, 0.9), rgba(13, 59, 102, 0.8))">
+  <div class="container py-5 text-white text-center">  <!-- Ajout de text-center -->
+    <div class="row justify-content-center">  <!-- Centrage du contenu -->
+      <div class="col-lg-8">  <!-- Largeur augmentée pour meilleure lisibilité -->
+        <h1 class="display-4 fw-bold mb-4">Votre carrière commence ici</h1>
+        <p class="lead mb-4">Antares  vous connecte aux meilleures opportunités en adéquation avec votre profil</p>
+        <div class="d-flex flex-wrap gap-3 justify-content-center">  <!-- Centrage des boutons -->
+          <a href="#registration" class="btn btn-orange btn-lg px-4">
+            <i class="bi bi-person-plus me-2"></i> Créer mon compte
+          </a>
+          <a href="#advantages" class="btn btn-outline-light btn-lg px-4">
+            <i class="bi bi-info-circle me-2"></i> En savoir plus
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+<!-- Avantages Candidat améliorés -->
+<section id="advantages" class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold" style="color: var(--primary-blue);">Pourquoi choisir Antares RH ?</h2>
+      <p class="lead text-muted">Notre expertise en gestion des talents au service de votre carrière</p>
+    </div>
+    
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100 border-0 shadow-sm hover-effect">
+          <div class="card-body p-4">
+            <div class="icon-square bg-light-orange text-white rounded-circle mb-3" style="width: 50px; height: 50px; line-height: 50px;">
+              <i class="bi bi-bullseye fs-5"></i>
+            </div>
+            <h5 class="fw-bold">Matching intelligent</h5>
+            <p class="text-muted">Notre algorithme vous propose les offres correspondant précisément à votre profil</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100 border-0 shadow-sm hover-effect">
+          <div class="card-body p-4">
+            <div class="icon-square bg-light-orange text-white rounded-circle mb-3" style="width: 50px; height: 50px; line-height: 50px;">
+              <i class="bi bi-person-video3 fs-5"></i>
+            </div>
+            <h5 class="fw-bold">Coaching RH</h5>
+            <p class="text-muted">Bénéficiez de conseils personnalisés pour optimiser votre candidature</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100 border-0 shadow-sm hover-effect">
+          <div class="card-body p-4">
+            <div class="icon-square bg-light-orange text-white rounded-circle mb-3" style="width: 50px; height: 50px; line-height: 50px;">
+              <i class="bi bi-shield-check fs-5"></i>
+            </div>
+            <h5 class="fw-bold">Confidentialité</h5>
+            <p class="text-muted">Votre profil reste invisible aux employeurs actuels si vous le souhaitez</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100 border-0 shadow-sm hover-effect">
+          <div class="card-body p-4">
+            <div class="icon-square bg-light-orange text-white rounded-circle mb-3" style="width: 50px; height: 50px; line-height: 50px;">
+              <i class="bi bi-graph-up fs-5"></i>
+            </div>
+            <h5 class="fw-bold">Suivi analytique</h5>
+            <p class="text-muted">Visualisez le statut de vos candidatures et votre visibilité</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Processus de candidature -->
+<section class="py-5" style="background-color: var(--light-blue);">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6 order-lg-2">
+        <img src="{% static 'site_web/images/candidat/candidat_1.jpg' %}" 
+        loading="lazy"
+        alt="Processus candidat" class="img-fluid">
+      </div>
+      <div class="col-lg-6 order-lg-1">
+        <h2 class="fw-bold mb-4" style="color: var(--primary-blue);">Comment ça marche ?</h2>
+        
+        <div class="process-steps">
+          <div class="d-flex mb-4">
+            <div class="flex-shrink-0   rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;"  style="color: #FA8301;">
+              1
+            </div>
+            <div class="flex-grow-1 ms-4">
+              <h5 class="fw-bold">Créez votre profil</h5>
+              <p class="mb-0">Complétez votre profil en 5 minutes seulement</p>
+            </div>
+          </div>
+          
+          <div class="d-flex mb-4">
+            <div class="flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;" style="color: #FA8301;">
+              2
+            </div>
+            <div class="flex-grow-1 ms-4">
+              <h5 class="fw-bold">Validation RH</h5>
+              <p class="mb-0">Nos experts améliorent votre visibilité</p>
+            </div>
+          </div>
+          
+          <div class="d-flex mb-4">
+            <div class="flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center" style="color: #FA8301;">
+              3
+            </div>
+            <div class="flex-grow-1 ms-4">
+              <h5 class="fw-bold">Recevez des offres</h5>
+              <p class="mb-0">Des opportunités personnalisées vous sont proposées</p>
+            </div>
+          </div>
+          
+          <div class="d-flex">
+            <div class="flex-shrink-0   rounded-circle d-flex align-items-center justify-content-center" style="color: #FA8301;">
+              4
+            </div>
+            <div class="flex-grow-1 ms-4">
+              <h5 class="fw-bold">Postulez en 1 clic</h5>
+              <p class="mb-0">Envoyez votre candidature directement aux recruteurs</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="registration" class="py-5 bg-light">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-lg">
+          <div class="card-header bg-primary-blue py-3">
+            <h3 class="mb-0 text-center" style="color: var(--primary-blue);">
+              <i class="bi bi-person-badge me-2"></i> Créer votre compte candidat
+            </h3>
+          </div>
+
+          <!-- Messages Django -->
+          {% if messages %}
+            <div class="mt-3">
+              {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <div class="card-body p-4 p-md-5">
+            
+            <form method="post" id="registerForm" class="row g-3">
+              {% csrf_token %}
+              
+              <!-- Champs cachés -->
+              {{ form.role }}
+              
+              <!-- Champs visibles -->
+              <div class="col-md-6">
+                <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                  Prénom <span class="text-danger">*</span>
+                </label>
+                {{ form.first_name }}
+              </div>
+
+              <div class="col-md-6">
+                <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                  Nom <span class="text-danger">*</span>
+                </label>
+                {{ form.last_name }}
+              </div>
+
+              <div class="col-12">
+                <label for="{{ form.email.id_for_label }}" class="form-label">
+                  Email <span class="text-danger">*</span>
+                </label>
+                {{ form.email }}
+                <div class="form-text">Utilisé pour vous connecter</div>
+              </div>
+
+              <div class="col-12">
+                <label for="{{ form.telephone.id_for_label }}" class="form-label">
+                  Téléphone
+                </label>
+                {{ form.telephone }}
+              </div>
+
+              <div class="col-md-6">
+                <label for="{{ form.password1.id_for_label }}" class="form-label">
+                  Mot de passe <span class="text-danger">*</span>
+                </label>
+                {{ form.password1 }}
+                <div class="form-text">Minimum 8 caractères</div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="{{ form.password2.id_for_label }}" class="form-label">
+                  Confirmation <span class="text-danger">*</span>
+                </label>
+                {{ form.password2 }}
+              </div>
+
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="accepte_newsletter" id="newsletter">
+                  <label class="form-check-label" for="newsletter">
+                    Je souhaite recevoir les offres exclusives par email
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="cgu_acceptees" id="terms" required>
+                  <label class="form-check-label" for="terms">
+                    J'accepte les <a href="#">conditions générales</a> et la <a href="#">politique de confidentialité</a>
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-orange w-100 py-3 fw-bold">
+                  <i class="bi bi-person-plus me-2"></i> Finaliser mon inscription
+                </button>
+              </div>
+
+              <div class="col-12 text-center mt-3">
+                <p>Déjà membre ? <a href="{% url 'login' %}?type=candidate" style="color: var(--primary-blue);">Connectez-vous à votre espace</a></p>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Offres récentes -->
+<section class="py-5">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="fw-bold" style="color: var(--primary-blue);">Offres qui pourraient vous intéresser</h2>
+      <a href="{% url 'jobs' %}" class="btn btn-outline-primary">
+        Voir toutes les offres <i class="bi bi-arrow-right ms-2"></i>
+      </a>
+    </div>
+    
+    {% if featured_jobs %}
+    <div class="row g-4">
+      {% for job in featured_jobs %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm hover-effect">
+          <div class="card-body position-relative">
+            <!-- Badge Type -->
+            <div class="position-absolute top-0 end-0 mt-3 me-3">
+              <span class="badge rounded-pill 
+                {% if job.type_offre == 'emploi' %}bg-success
+                {% elif job.type_offre == 'appel_offre' %}bg-success
+                {% else %}bg-warning text-dark{% endif %}">
+                {{ job.get_type_offre_display }}
+              </span>
+            </div>
+            
+            <!-- Titre et Société -->
+            <h5 class="fw-bold mb-2" style="color: var(--primary-blue);">{{ job.titre }}</h5>
+            <p class="text-muted mb-3">
+              <i class="bi bi-building me-2"></i>{{ job.societe }}
+            </p>
+            
+            <!-- Localisation -->
+            {% if job.lieu %}
+            <p class="text-muted mb-3">
+              <i class="bi bi-geo-alt me-2"></i>{{ job.lieu }}
+            </p>
+            {% endif %}
+            
+            <!-- Exigences condensées -->
+            <div class="mb-3">
+              <h6 class="fw-bold small" style="color: var(--accent-orange);">
+                <i class="bi bi-award me-1"></i>PROFIL RECHERCHÉ
+              </h6>
+              <ul class="small text-muted mb-0">
+                {% if job.niveau_etude %}
+                <li>{{ job.niveau_etude }}</li>
+                {% endif %}
+                {% if job.experience_requise %}
+                <li>{{ job.experience_requise }}</li>
+                {% endif %}
+              </ul>
+            </div>
+            
+            <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+              <small class="text-muted">
+                <i class="bi bi-clock me-1"></i>
+                {% if job.date_limite %}
+                  Clôture : {{ job.date_limite|date:"d/m/Y" }}
+                {% else %}
+                  Publié le : {{ job.date_publication|date:"d/m/Y" }}
+                {% endif %}
+              </small>
+              <a href="{% url 'public-job-offer-detail' job.pk %}" class="btn btn-sm btn-orange">
+                Postuler <i class="bi bi-send ms-1"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+      <i class="bi bi-info-circle me-2"></i> Aucune offre disponible actuellement.
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+
+<style>
+   :root {
+      --secondary-blue: #2D76B6;
+      --light-gray: #F4F4F9;
+      --dark-gray: #333333;
+      --light-blue: #E6F0FA; 
+      --accent-orange: #FA8301; /* Version plus sombre de l'orange */
+      --primary-blue: #0A4B8C;  /* Version plus sombre du bleu */
+    }
+    
+  .hover-effect {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(13, 59, 102, 0.1);
+  }
+  
+  .hover-effect:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(13, 59, 102, 0.1) !important;
+    border-color: rgba(13, 59, 102, 0.2);
+  }
+  
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .candidat-hero {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .hover-effect {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(13, 59, 102, 0.1);
+  }
+  
+  .hover-effect:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(13, 59, 102, 0.1) !important;
+  }
+  
+  .icon-square {
+    transition: all 0.3s ease;
+  }
+  
+  .card:hover .icon-square {
+    transform: rotate(15deg);
+  }
+  
+  .bg-light-orange {
+    background-color: #FF7A45;
+  }
+  
+  .process-steps {
+    position: relative;
+    padding-left: 20px;
+  }
+  
+  .process-steps::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--primary-blue);
+    opacity: 0.2;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialisation du slider de témoignages
+    new Splide('#testimonial-slider', {
+      type: 'loop',
+      perPage: 3,
+      perMove: 1,
+      gap: '30px',
+      pagination: false,
+      breakpoints: {
+        992: {
+          perPage: 2
+        },
+        768: {
+          perPage: 1
+        }
+      }
+    }).mount();
+  });
+
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('registerForm');
+  const password1 = document.getElementById('{{ form.password1.id_for_label }}');
+  const password2 = document.getElementById('{{ form.password2.id_for_label }}');
+  
+  form.addEventListener('submit', function(e) {
+    let isValid = true;
+    
+    // Validation mot de passe
+    if (password1.value.length < 8) {
+      alert('Le mot de passe doit contenir au moins 8 caractères');
+      isValid = false;
+    }
+    
+    if (password1.value !== password2.value) {
+      alert('Les mots de passe ne correspondent pas');
+      isValid = false;
+    }
+    
+    if (!isValid) {
+      e.preventDefault();
+    }
+  });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,219 @@
+{% extends 'site_web/layout.html' %}
+
+{% block content %}
+<section class="login-hero ">
+  <div class="container  text-center">
+    <h1 class="display-4 fw-bold " style="color:var(--primary-blue) ;">Espace Candidats & Entreprises</h1>
+    <p class="lead" style="color: var(--accent-orange);">Accédez à votre espace personnel</p>
+  </div>
+</section>
+
+<section class=" bg-light">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <!-- Messages d'erreur -->
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs nav-fill mb-4" id="loginTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="candidat-tab" data-bs-toggle="tab" data-bs-target="#candidat" type="button" role="tab">
+              <i class="bi bi-person-badge me-2"></i> Candidat
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="entreprise-tab" data-bs-toggle="tab" data-bs-target="#entreprise" type="button" role="tab">
+              <i class="bi bi-building me-2"></i> Entreprise
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="consultant-tab" data-bs-toggle="tab" data-bs-target="#consultant" type="button" role="tab">
+              <i class="bi bi-person-vcard me-2"></i> Consultant
+            </button>
+          </li>
+        </ul>
+        
+        <!-- Tab Content -->
+        <div class="tab-content bg-white p-4 rounded-bottom shadow-sm" id="loginTabsContent">
+          <!-- Candidat Tab -->
+          <div class="tab-pane fade show active" id="candidat" role="tabpanel">
+            <h3 class="mb-4 text-center">Espace Candidat</h3>
+            <form method="POST">
+              {% csrf_token %}
+              <input type="hidden" name="user_type" value="candidat">
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" name="email" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Mot de passe</label>
+                <input type="password" class="form-control" name="password" required>
+              </div>
+              <button type="submit" class="btn btn-primary w-100 py-2">
+                Se connecter
+              </button>
+            </form>
+          </div>
+          
+          <!-- Entreprise Tab -->
+          <div class="tab-pane fade" id="entreprise" role="tabpanel">
+            <h3 class="mb-4 text-center">Espace Entreprise</h3>
+            <form method="POST">
+              {% csrf_token %}
+              <input type="hidden" name="user_type" value="entreprise">
+               <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" name="email" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Mot de passe</label>
+                <input type="password" class="form-control" name="password" required>
+              </div>
+              <button type="submit" class="btn btn-primary w-100 py-2">
+                Se connecter
+              </button>
+            </form>
+          </div>
+          
+          <!-- Consultant Tab -->
+          <div class="tab-pane fade" id="consultant" role="tabpanel">
+            <h3 class="mb-4 text-center">Espace Consultant</h3>
+            <form method="POST">
+              {% csrf_token %}
+              <input type="hidden" name="user_type" value="consultant">
+                <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" name="email" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Mot de passe</label>
+                <input type="password" class="form-control" name="password" required>
+              </div>
+              <button type="submit" class="btn btn-primary w-100 py-2">
+                Se connecter
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Additional Help Section -->
+<section class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 text-center">
+        <h3 class="mb-4" style="color: var(--primary-blue);">Besoin d'aide pour vous connecter ?</h3>
+        <div class="row g-4 mt-3">
+          <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <i class="bi bi-question-circle fs-1 mb-3" style="color: var(--accent-orange);"></i>
+                <h5>Centre d'aide</h5>
+                <p>Consultez notre FAQ pour trouver des réponses</p>
+                <a href="#help.html" class="btn btn-outline-primary btn-sm">Accéder</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <i class="bi bi-envelope fs-1 mb-3" style="color: var(--accent-orange);"></i>
+                <h5>Support email</h5>
+                <p>Contactez notre support technique par email</p>
+                <a href="mailto:info@antares-rh.com" class="btn btn-outline-primary btn-sm">Nous écrire</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <i class="bi bi-telephone fs-1 mb-3" style="color: var(--accent-orange);"></i>
+                <h5>Assistance téléphonique</h5>
+                <p>Appelez-nous du lundi au vendredi</p>
+                <a href="tel:+22320292040" class="btn btn-outline-primary btn-sm">+223 20 29 20 40</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .login-hero {
+    min-height: 350px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .nav-tabs .nav-link {
+    color: var(--primary-blue);
+    padding: 1rem;
+    border-bottom: 3px solid transparent;
+  }
+  
+  .nav-tabs .nav-link.active {
+    color: var(--accent-orange);
+    background-color: transparent;
+    border-color: transparent transparent var(--accent-orange) transparent;
+    font-weight: 500;
+  }
+  
+  .nav-tabs .nav-link:hover:not(.active) {
+    border-color: transparent transparent #dee2e6 transparent;
+  }
+  
+  .tab-content {
+    border: 1px solid #dee2e6;
+    border-top: none;
+  }
+  
+  @media (max-width: 767.98px) {
+    .nav-tabs .nav-link {
+      padding: 0.75rem 0.5rem;
+      font-size: 0.9rem;
+    }
+  }
+</style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<script>
+// Script pour pré-remplir l'email si présent dans l'URL
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const email = urlParams.get('email');
+    const userType = urlParams.get('type');
+    
+    if (email) {
+        // Trouver tous les champs email et les pré-remplir
+        const emailInputs = document.querySelectorAll('input[type="email"]');
+        emailInputs.forEach(input => {
+            input.value = email;
+        });
+    }
+    
+    if (userType) {
+        // Activer l'onglet correspondant
+        const tabButton = document.querySelector(`[data-bs-target="#${userType}"]`);
+        if (tabButton) {
+            const tab = new bootstrap.Tab(tabButton);
+            tab.show();
+        }
+    }
+});
+</script>
+
+{% endblock %}
