@@ -4,46 +4,128 @@ from .models import JobOffer
 from django_summernote.widgets import SummernoteWidget
 
 class JobOfferForm(forms.ModelForm):
-    # Common settings for list fields
-    LIST_FIELD_CONFIG = {
-        'mission_principale': {'rows': 3, 'label': "Missions principales"},
-        'taches': {'rows': 5, 'label': "Tâches"},
-        'competences_qualifications': {'rows': 5, 'label': "Compétences requises"},
-        'conditions': {'rows': 3, 'label': "Conditions"},
-        'profil_recherche': {'rows': 5, 'label': "Profil recherché"}
-    }
+    # Utilisez Summernote pour tous les champs de contenu
+    mission_principale = forms.CharField(
+        widget=SummernoteWidget(attrs={
+            'summernote': {
+                'toolbar': [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph', 'style']],
+                    ['insert', ['link', 'hr']],
+                    ['view', ['fullscreen', 'codeview', 'help']]
+                ],
+                'height': '200px',
+                'styleWithSpan': False,
+            }
+        }),
+        label="Missions principales",
+        required=False
+    )
+    
+    taches = forms.CharField(
+        widget=SummernoteWidget(attrs={
+            'summernote': {
+                'toolbar': [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph', 'style']],
+                    ['insert', ['link', 'hr']],
+                    ['view', ['fullscreen', 'codeview', 'help']]
+                ],
+                'height': '300px',
+                'styleWithSpan': False,
+            }
+        }),
+        label="Tâches",
+        required=False
+    )
+
+    
+    competences_qualifications = forms.CharField(
+        widget=SummernoteWidget(attrs={
+            'summernote': {
+                'toolbar': [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph', 'style']],
+                    ['insert', ['link', 'hr']],
+                    ['view', ['fullscreen', 'codeview', 'help']]
+                ],
+                'height': '200px',
+                'styleWithSpan': False,
+            }
+        }),
+        label="Compétences qualifications",
+        required=False
+    )
+    
+    conditions = forms.CharField(
+        widget=SummernoteWidget(attrs={
+            'summernote': {
+                'toolbar': [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph', 'style']],
+                    ['insert', ['link', 'hr']],
+                    ['view', ['fullscreen', 'codeview', 'help']]
+                ],
+                'height': '200px',
+                'styleWithSpan': False,
+            }
+        }),
+        label="Conditions",
+        required=False
+    )
+    
+    profil_recherche = forms.CharField(
+        widget=SummernoteWidget(attrs={
+            'summernote': {
+                'toolbar': [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph', 'style']],
+                    ['insert', ['link', 'hr']],
+                    ['view', ['fullscreen', 'codeview', 'help']]
+                ],
+                'height': '200px',
+                'styleWithSpan': False,
+            }
+        }),
+        label="Profil recherché",
+        required=False
+    )
+    
+    comment_postuler = forms.CharField(
+        widget=SummernoteWidget(attrs={
+            'summernote': {
+                'toolbar': [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph', 'style']],
+                    ['insert', ['link', 'hr']],
+                    ['view', ['fullscreen', 'codeview', 'help']]
+                ],
+                'height': '200px',
+                'styleWithSpan': False,
+            }
+        }),
+        label="Comment postuler",
+        required=False
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
-        # Configure list fields
-        for field_name, config in self.LIST_FIELD_CONFIG.items():
-            self.fields[field_name] = forms.CharField(
-                widget=forms.Textarea(attrs={
-                    'rows': config['rows'],
-                    'placeholder': f"Une entrée par ligne\nExemple:\n- Première {config['label'].lower()}\n- Deuxième {config['label'].lower()}"
-                }),
-                label=config['label'],
-                required=False
-            )
-        
-        # Special fields
-        self.fields['comment_postuler'].widget = SummernoteWidget(attrs={
-            'summernote': {
-                'toolbar': [
-                    ['style', ['bold', 'italic', 'underline']],
-                    ['para', ['ul', 'ol']],
-                    ['insert', ['link']]
-                ],
-                'height': '250px',
-            }
-        })
         
         # Common attributes
         for field in self.fields.values():
             field.required = False
             if not isinstance(field.widget, (forms.CheckboxInput, forms.FileInput, SummernoteWidget)):
                 field.widget.attrs.setdefault('class', 'form-control')
+        
+        # Configuration spécifique pour nombre_candidat (TextField)
+        self.fields['nombre_candidat'].widget.attrs.update({
+            'placeholder': '1, Beaucoup, Plusieurs, etc.',
+            'class': 'form-control'
+        })
+        
+        self.fields['secteur'].widget.attrs.update({
+            'class': 'form-select select2'  
+        })
         
         # Specific attributes
         self.fields['visible_sur_site'].widget.attrs['class'] = 'form-check-input'
@@ -57,9 +139,10 @@ class JobOfferForm(forms.ModelForm):
         help_texts = {
             'reference': "Format: ANT/STA/00002025",
             'fichier_pdf': "PDF optionnel (max. 5MB)",
+            'nombre_candidat': "Nombre Candidat EX: '1','Plusieurs', '2 à 3'",
+            'secteur': "Sélectionnez le secteur d'activité principal",
         }
 
     def clean(self):
         cleaned_data = super().clean()
-        # Additional custom validation can be added here 
         return cleaned_data

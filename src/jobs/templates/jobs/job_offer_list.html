@@ -38,6 +38,10 @@
         background-color: #3b82f6;
         border-color: #3b82f6;
     }
+    .btn-group-sm > .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
 </style>
 {% endblock %}
 
@@ -52,33 +56,44 @@
         </div>
         
         <div class="card-body">
+            
+
             <form method="get" class="mb-4">
-                <div class="row g-3">
-                    <div class="col-md-6">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label">Recherche</label>
                         <div class="input-group">
                             <input type="text" 
                                    name="q" 
                                    class="form-control" 
-                                   placeholder="Rechercher..." 
+                                   placeholder="Référence, titre, société..." 
                                    value="{{ search_query }}">
                             <button class="btn btn-outline-secondary" type="submit">
                                 <i class="bi bi-search"></i>
                             </button>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="btn-group" role="group">
-                            <a href="?status=all" 
-                               class="btn btn-outline-secondary {% if status_filter == 'all' %}active{% endif %}">
-                                Toutes
-                            </a>
+                    <div class="col-md-4">
+                        <label class="form-label">Statut</label>
+                        <select name="status" class="form-select" onchange="this.form.submit()">
+                            <option value="all" {% if status_filter == 'all' %}selected{% endif %}>Tous les statuts</option>
                             {% for status in status_choices %}
-                            <a href="?status={{ status.0 }}" 
-                               class="btn btn-outline-secondary {% if status_filter == status.0 %}active{% endif %}">
+                            <option value="{{ status.0 }}" {% if status_filter == status.0 %}selected{% endif %}>
                                 {{ status.1 }}
-                            </a>
+                            </option>
                             {% endfor %}
-                        </div>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Type</label>
+                        <select name="type" class="form-select" onchange="this.form.submit()">
+                            <option value="all" {% if type_filter == 'all' %}selected{% endif %}>Tous les types</option>
+                            {% for type in type_choices %}
+                            <option value="{{ type.0 }}" {% if type_filter == type.0 %}selected{% endif %}>
+                                {{ type.1 }}
+                            </option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
             </form>
@@ -100,15 +115,17 @@
                     <tbody>
                         {% for offer in offers %}
                         <tr>
-                            <td>{{ offer.reference }}</td>
                             <td>
-                                <a href="{% url 'job-offer-detail' offer.pk %}">
+                                <strong>{{ offer.reference }}</strong>
+                            </td>
+                            <td>
+                                <a href="{% url 'job-offer-detail' offer.pk %}" class="text-decoration-none">
                                     {{ offer.titre|truncatechars:40 }}
                                 </a>
                             </td>
                             <td>{{ offer.societe|default:"-"|truncatechars:20 }}</td>
                             <td>
-                                <span class="badge badge-type bg-{% if offer.type_offre == 'emploi' %}info{% else %}secondary{% endif %}">
+                                <span class="badge badge-type bg-{% if offer.type_offre == 'emploi' %}info{% elif offer.type_offre == 'appel_offre' %}warning{% else %}secondary{% endif %}">
                                     {{ offer.get_type_offre_display }}
                                 </span>
                             </td>
@@ -120,20 +137,69 @@
                             <td>{{ offer.date_publication|date:"d/m/Y" }}</td>
                             <td>
                                 {% if offer.date_limite %}
-                                    {{ offer.date_limite|date:"d/m/Y" }}
+                                    <span class="{% if offer.statut == 'expire' %}text-danger{% endif %}">
+                                        {{ offer.date_limite|date:"d/m/Y" }}
+                                    </span>
                                 {% else %}
                                     -
                                 {% endif %}
                             </td>
                             <td class="text-end">
-                                <div class="d-flex justify-content-end">
-                                    <!-- Actions -->
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <!-- Voir -->
+                                    <a href="{% url 'job-offer-detail' offer.pk %}" 
+                                       class="btn btn-outline-primary action-btn" 
+                                       title="Voir les détails">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    
+                                    <!-- Modifier -->
+                                    <a href="{% url 'job-offer-update' offer.pk %}" 
+                                       class="btn btn-outline-secondary action-btn" 
+                                       title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    
+                                    <!-- Publier/Dépublier -->
+                                    {% if offer.visible_sur_site and offer.statut != 'expire' %}
+                                    <a href="{% url 'job-offer-unpublish' offer.pk %}" 
+                                       class="btn btn-outline-warning action-btn" 
+                                       title="Dépublier"
+                                       onclick="return confirm('Dépublier cette offre ?')">
+                                        <i class="bi bi-eye-slash"></i>
+                                    </a>
+                                    {% elif not offer.visible_sur_site %}
+                                    <a href="{% url 'job-offer-publish' offer.pk %}" 
+                                       class="btn btn-outline-success action-btn" 
+                                       title="Publier"
+                                       onclick="return confirm('Publier cette offre ?')">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% endif %}
+                                    
+                                    <!-- Supprimer -->
+                                    <form method="post" action="{% url 'job-offer-delete' offer.pk %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" 
+                                                class="btn btn-outline-danger action-btn" 
+                                                title="Supprimer"
+                                                onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette offre ?')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="8" class="text-center py-4">Aucune offre disponible</td>
+                            <td colspan="8" class="text-center py-4">
+                                <i class="bi bi-inbox display-4 text-muted d-block mb-2"></i>
+                                Aucune offre disponible
+                                {% if status_filter != 'all' or search_query %}
+                                <br>
+                                <small class="text-muted">Essayez de modifier vos filtres de recherche</small>
+                                {% endif %}
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -147,14 +213,14 @@
                     {% if offers.has_previous %}
                     <li class="page-item">
                         <a class="page-link" 
-                           href="?page=1&status={{ status_filter }}&q={{ search_query }}" 
+                           href="?page=1&status={{ status_filter }}&type={{ type_filter }}&q={{ search_query }}" 
                            aria-label="First">
                             <span aria-hidden="true">&laquo;&laquo;</span>
                         </a>
                     </li>
                     <li class="page-item">
                         <a class="page-link" 
-                           href="?page={{ offers.previous_page_number }}&status={{ status_filter }}&q={{ search_query }}" 
+                           href="?page={{ offers.previous_page_number }}&status={{ status_filter }}&type={{ type_filter }}&q={{ search_query }}" 
                            aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
@@ -169,7 +235,7 @@
                         {% elif num > offers.number|add:'-3' and num < offers.number|add:'3' %}
                         <li class="page-item">
                             <a class="page-link" 
-                               href="?page={{ num }}&status={{ status_filter }}&q={{ search_query }}">
+                               href="?page={{ num }}&status={{ status_filter }}&type={{ type_filter }}&q={{ search_query }}">
                                 {{ num }}
                             </a>
                         </li>
@@ -179,14 +245,14 @@
                     {% if offers.has_next %}
                     <li class="page-item">
                         <a class="page-link" 
-                           href="?page={{ offers.next_page_number }}&status={{ status_filter }}&q={{ search_query }}" 
+                           href="?page={{ offers.next_page_number }}&status={{ status_filter }}&type={{ type_filter }}&q={{ search_query }}" 
                            aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
                     <li class="page-item">
                         <a class="page-link" 
-                           href="?page={{ offers.paginator.num_pages }}&status={{ status_filter }}&q={{ search_query }}" 
+                           href="?page={{ offers.paginator.num_pages }}&status={{ status_filter }}&type={{ type_filter }}&q={{ search_query }}" 
                            aria-label="Last">
                             <span aria-hidden="true">&raquo;&raquo;</span>
                         </a>
@@ -202,12 +268,23 @@
 
 {% block extra_js %}
 <script>
-    // Confirmation avant suppression
-    document.querySelectorAll('.btn-outline-danger').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            if (!confirm('Êtes-vous sûr de vouloir supprimer cette offre ?')) {
-                e.preventDefault();
-            }
+    // Confirmation avant les actions critiques
+    document.addEventListener('DOMContentLoaded', function() {
+        // Confirmation pour la suppression
+        const deleteForms = document.querySelectorAll('form[action*="delete"]');
+        deleteForms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                if (!confirm('Êtes-vous sûr de vouloir supprimer cette offre ? Cette action est irréversible.')) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        // Auto-submit des filtres
+        document.querySelectorAll('select[name="status"], select[name="type"]').forEach(select => {
+            select.addEventListener('change', function() {
+                this.form.submit();
+            });
         });
     });
 </script>

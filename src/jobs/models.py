@@ -10,7 +10,13 @@ from django.utils.safestring import mark_safe
 from bs4 import BeautifulSoup
 import bleach
 
-
+from django.db import models
+from django.utils import timezone
+from django.core.exceptions import ValidationError
+from authentication.models import User
+from django.utils.safestring import mark_safe
+import bleach
+from django_summernote.models import AbstractAttachment
 
 class JobType(models.TextChoices):
     EMPLOI = "emploi", "Offre d'emploi"
@@ -23,15 +29,38 @@ class JobStatus(models.TextChoices):
     EXPIRE = "expire", "Expiré"
     ARCHIVE = "archive", "Archivé"
 
+#21_08
+
+
+
+#21_08
+
 class JobOffer(models.Model):
+    class SectorChoices(models.TextChoices):
+        AGRICULTURE = "agriculture", "Agriculture & Agro-alimentaire"
+        MINES = "mines", "Mines & Industries"
+        BTP = "btp", "BTP & Construction"
+        ENERGIE = "energie", "Énergie & Eau"
+        COMMERCE = "commerce", "Commerce & Vente"
+        FINANCE = "finance", "Finance & Assurance"
+        TELECOM = "telecom", "Télécoms & Digital"
+        SANTE = "sante", "Santé & Social"
+        EDUCATION = "education", "Éducation & Formation"
+        TOURISME = "tourisme", "Tourisme & Hôtellerie"
+        TRANSPORT = "transport", "Transport & Logistique"
+        ONG = "ong", "ONG & Coopération"
+        ADMINISTRATION = "administration", "Administration"
+        SERVICES = "services", "Services divers"
+        AUTRE = "autre", "Autre"
+
     # Core fields
     reference = models.CharField(max_length=100, unique=True)
     titre = models.CharField(max_length=255)
-    type_offre = models.CharField(max_length=20, choices=JobType.choices, default=JobType.EMPLOI)
-    societe = models.CharField(max_length=255, default='Antares')
-    nombre_candidat = models.PositiveIntegerField(default=1, verbose_name="Nombre de candidats")
+    type_offre = models.CharField(max_length=50, choices=JobType.choices, default=JobType.EMPLOI)
+    societe = models.CharField(max_length=255, default='Antares Sarl')
+    nombre_candidat = models.CharField(blank=True,null=True,default='1', verbose_name="Nombre de candidats")
 
-    # Content fields (automatically converted to lists)
+    # Content fields (HTML content from Summernote)
     mission_principale = models.TextField(blank=True)
     taches = models.TextField(blank=True)
     profil_recherche = models.TextField(blank=True)
@@ -44,8 +73,8 @@ class JobOffer(models.Model):
     contact = models.EmailField(blank=True)
     salaire = models.CharField(max_length=100, blank=True)
     niveau_etude = models.CharField(max_length=300, blank=True, verbose_name="Niveau d'étude requis")
-    experience_requise = models.CharField(max_length=300,blank=True,    verbose_name="Expérience requise",help_text="Ex: '3 ans minimum'")
-    secteur = models.CharField(max_length=255, blank=True)
+    experience_requise = models.CharField(max_length=300,blank=True,verbose_name="Expérience requise",help_text="Ex: '3 ans minimum'")
+    secteur =models.CharField(max_length=50,choices=SectorChoices.choices,default=SectorChoices.AUTRE)
     fichier_pdf = models.FileField(upload_to='offres_pdfs/', blank=True)
 
     # Dates
@@ -70,23 +99,6 @@ class JobOffer(models.Model):
         return f"{self.reference} - {self.titre}"
     
     def save(self, *args, **kwargs):
-        # Auto-convert text fields to HTML lists with better formatting
-        list_fields = [
-            'mission_principale', 
-            'taches',
-            'competences_qualifications',
-            'conditions',
-            'profil_recherche'
-        ]
-        
-        for field in list_fields:
-            text = getattr(self, field, '')
-            if text and not text.strip().startswith('<ul>'):
-                lines = [line.strip() for line in text.split('\n') if line.strip()]
-                html_content = "<ul style='margin-bottom: 1rem; padding-left: 1.5rem;'>"
-                html_content += "".join(f"<li style='margin-bottom: 0.5rem; line-height: 1.5;'>{line}</li>" for line in lines)
-                html_content += "</ul>"
-                setattr(self, field, html_content)
         
         # Auto-set status
         today = timezone.now().date()
@@ -107,8 +119,8 @@ class JobOffer(models.Model):
         if not html_content:
             return ''
         
-        allowed_tags = ['a', 'p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'div']
-        allowed_attributes = {'a': ['href', 'title', 'target', 'rel']}
+        allowed_tags = ['a', 'p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'div', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr']
+        allowed_attributes = {'a': ['href', 'title', 'target', 'rel'], '*': ['style']}
         
         return mark_safe(bleach.clean(
             html_content,
@@ -117,7 +129,17 @@ class JobOffer(models.Model):
             strip=True
         ))
     
-
+    def get_plain_text_preview(self, field_name, max_length=150):
+        """Extrait un aperçu texte pour les métadonnées"""
+        html_content = getattr(self, field_name, '')
+        if not html_content:
+            return ''
+        
+        # Supprime les balises HTML
+        text_content = strip_tags(html_content)
+        if len(text_content) > max_length:
+            return text_content[:max_length] + '...'
+        return text_content
 
 from django.db import models
 from django_summernote.models import AbstractAttachment

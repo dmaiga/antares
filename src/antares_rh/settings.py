@@ -9,10 +9,20 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+"""
+Note for me 
+active le cache avec les decorateurs et cherche les pages a cache
+desactive le debug 
+CSRF_TRUSTED_ORIGINS  pour un reel deployemet
+secret_key in .env
+"""
 from pathlib import Path
 import os 
 import dj_database_url
+import environ
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 #serveur email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -20,18 +30,17 @@ DEFAULT_FROM_EMAIL = 'noreply@antares-rh.test'
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-9m%eny%^*d9+b8y^qj6@c##c*xe5-+$#!ar+@c8^c4ko_qk8x7'
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-
+SECRET_KEY = "7mj1au7*5p@uzm_jyj=93mjzm!e^4guc%f_@32g+@d19!&tdhk"
+DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 
@@ -69,9 +78,10 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 
-# Middleware avec cache
+
+
+# MIDDLEWARE SANS le cache global
 MIDDLEWARE = [
-    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -80,8 +90,22 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.cache.FetchFromCacheMiddleware',
 ]
+
+# Middleware avec cache
+# settings.py - Cache configuration
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'antares-rh-cache',
+        'TIMEOUT': 60 * 5,  # 5 minutes
+        'OPTIONS': {
+            'MAX_ENTRIES': 100
+        }
+    }
+}
+
+
 ROOT_URLCONF = 'antares_rh.urls'
 
 TEMPLATES = [
@@ -110,24 +134,10 @@ WSGI_APPLICATION = 'antares_rh.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': BASE_DIR / 'db.sqlite3',
-#    }
-#}
-#
-#if 'DATABASE_URL' in os.environ:
-#    DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
-import environ
-
-# ROOT_DIR = racine du projet (un cran plus haut que src)
-ROOT_DIR = BASE_DIR.parent 
 #NEON
 # Initialise django-environ
-env = environ.Env()
-environ.Env.read_env(os.path.join(ROOT_DIR, ".env"))
+
 DATABASES = {
     'default': dj_database_url.config(
         default=env("DATABASE_URL"),
@@ -183,21 +193,23 @@ STATICFILES_DIRS = [
 # Configuration Whitenoise pour les fichiers statiques
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': os.path.join(BASE_DIR, 'cache'),
-        'TIMEOUT': 60 * 60 * 24 * 30,
-        'OPTIONS': {
-            'MAX_ENTRIES': 1000
-        }
-    }
-}
+#CACHES = {
+#    'default': {
+#        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+#        'LOCATION': os.path.join(BASE_DIR, 'cache'),
+#        'TIMEOUT': 60 * 60 * 24 * 30,
+#        'OPTIONS': {
+#            'MAX_ENTRIES': 1000
+#        }
+#    }
+#}
+#
+## Cache middleware
+#CACHE_MIDDLEWARE_ALIAS = 'default'
+#CACHE_MIDDLEWARE_SECONDS = 60 * 60 * 24 * 30
+#CACHE_MIDDLEWARE_KEY_PREFIX = 'antares_rh'
+# Cache pour environnement léger - OPTIMISÉ
 
-# Cache middleware
-CACHE_MIDDLEWARE_ALIAS = 'default'
-CACHE_MIDDLEWARE_SECONDS = 60 * 60 * 24 * 30
-CACHE_MIDDLEWARE_KEY_PREFIX = 'antares_rh'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

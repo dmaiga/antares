@@ -219,7 +219,7 @@ def jobs(request):
         jobs = jobs.filter(lieu__icontains=location)
     
     if sector:
-        jobs = jobs.filter(secteur__icontains=sector)
+        jobs = jobs.filter(secteur=sector)
     
     if contract_type:
         jobs = jobs.filter(type_offre=contract_type)
@@ -233,6 +233,7 @@ def jobs(request):
         'search_query': search_query,
         'location': location,
         'sector': sector,
+        'sector_choices': JobOffer.SectorChoices.choices,
         'contract_type': contract_type,
         'hide_expired': hide_expired,
         'status_choices': JobStatus.choices 

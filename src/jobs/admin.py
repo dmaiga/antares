@@ -1,9 +1,19 @@
+
+from django import forms
 from django.contrib import admin
 from .models import JobOffer
 
-class JobOfferAdmin(admin.ModelAdmin):
-    list_display = ('reference', 'titre', 'type_offre', 'statut', 'auteur', 'date_publication')
-    list_filter = ('type_offre', 'statut', 'auteur__role')
-    search_fields = ('reference', 'titre', 'auteur__first_name', 'auteur__last_name')
+class JobOfferForm(forms.ModelForm):
+    class Meta:
+        model = JobOffer
+        fields = '__all__'
+        widgets = {
+            'secteur': forms.Select(choices=JobOffer.SectorChoices.choices),
+        }
 
-admin.site.register(JobOffer, JobOfferAdmin)
+@admin.register(JobOffer)
+class JobOfferAdmin(admin.ModelAdmin):
+    form = JobOfferForm
+    list_display = ['reference', 'titre', 'secteur', 'statut', 'date_publication']
+    list_filter = ['secteur', 'statut', 'type_offre', 'date_publication']
+    search_fields = ['titre', 'reference', 'societe']

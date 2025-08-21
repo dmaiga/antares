@@ -130,25 +130,14 @@
 <div class="col-md-3">
     <select name="sector" class="form-select">
         <option value="">Tous secteurs</option>
-        <option value="Achats" {% if sector == 'Achats' %}selected{% endif %}>Achats</option>
-        <option value="Commercial, vente" {% if sector == 'Commercial, vente' %}selected{% endif %}>Commercial, vente</option>
-        <option value="Gestion, comptabilité, finance" {% if sector == 'Gestion, comptabilité, finance' %}selected{% endif %}>Gestion, comptabilité, finance</option>
-        <option value="Informatique, nouvelles technologies" {% if sector == 'Informatique, nouvelles technologies' %}selected{% endif %}>Informatique, nouvelles technologies</option>
-        <option value="Juridique" {% if sector == 'Juridique' %}selected{% endif %}>Juridique</option>
-        <option value="Management, direction générale" {% if sector == 'Management, direction générale' %}selected{% endif %}>Management, direction générale</option>
-        <option value="Marketing, communication" {% if sector == 'Marketing, communication' %}selected{% endif %}>Marketing, communication</option>
-        <option value="Métiers de la santé et du social" {% if sector == 'Métiers de la santé et du social' %}selected{% endif %}>Métiers de la santé et du social</option>
-        <option value="Métiers des services" {% if sector == 'Métiers des services' %}selected{% endif %}>Métiers des services</option>
-        <option value="Métiers du BTP" {% if sector == 'Métiers du BTP' %}selected{% endif %}>Métiers du BTP</option>
-        <option value="Production, maintenance, qualité" {% if sector == 'Production, maintenance, qualité' %}selected{% endif %}>Production, maintenance, qualité</option>
-        <option value="R&D, gestion de projets" {% if sector == 'R&D, gestion de projets' %}selected{% endif %}>R&D, gestion de projets</option>
-        <option value="RH, formation" {% if sector == 'RH, formation' %}selected{% endif %}>RH, formation</option>
-        <option value="Secrétariat, assistanat" {% if sector == 'Secrétariat, assistanat' %}selected{% endif %}>Secrétariat, assistanat</option>
-        <option value="Télémarketing, téléassistance" {% if sector == 'Télémarketing, téléassistance' %}selected{% endif %}>Télémarketing, téléassistance</option>
-        <option value="Tourisme, hôtellerie, restauration" {% if sector == 'Tourisme, hôtellerie, restauration' %}selected{% endif %}>Tourisme, hôtellerie, restauration</option>
-        <option value="Transport, logistique" {% if sector == 'Transport, logistique' %}selected{% endif %}>Transport, logistique</option>
+        {% for value, label in sector_choices %}
+            <option value="{{ value }}" {% if sector == value %}selected{% endif %}>
+                {{ label }}
+            </option>
+        {% endfor %}
     </select>
 </div>
+
 
             <div class="col-md-2">
                 <button type="submit" class="btn btn-primary w-100">
@@ -256,13 +245,13 @@
                         </div>
                 {% endif %}
                 
-                {% if job.taches %}
+                {% if job.profil_recherche %}
                        <div class="job-content-section">
                             <h5 class="h6 text-muted mb-2">
-                                <strong style="color: #0080FF;">Tâches</strong>
+                                <strong style="color: #0080FF;">Profil recherché</strong>
                             </h5>
                             <div class="taches-content mb-0">
-                                {{ job.taches|safe|truncatewords_html:25 }}
+                                {{ job.profil_recherche|safe|truncatewords_html:45 }}
                             </div>
                         </div>
                 {% endif %}

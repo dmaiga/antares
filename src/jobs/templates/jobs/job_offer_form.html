@@ -43,35 +43,58 @@
         {% csrf_token %}
         {{ form.media }}
         
-        <!-- Section 1: Informations de base -->
-        <div class="form-section">
-            <h2 class="text-xl font-semibold mb-4 border-b pb-2 text-gray-700">Informations générales</h2>
-            <div class="grid md:grid-cols-2 gap-6">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.reference.label }}</label>
-                    {{ form.reference }}
-                    <p class="text-xs text-gray-500 mt-1">{{ form.reference.help_text }}</p>
-                    {% if form.reference.errors %}
-                        <p class="text-xs text-red-500 mt-1">{{ form.reference.errors }}</p>
-                    {% endif %}
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.titre.label }}</label>
-                    {{ form.titre }}
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.type_offre.label }}</label>
-                    {{ form.type_offre }}
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.societe.label }}</label>
+<!-- Dans la Section 1: Informations de base -->
+<div class="form-section">
+    <h2 class="text-xl font-semibold mb-4 border-b pb-2 text-gray-700">Informations générales</h2>
+    <div class="grid md:grid-cols-2 gap-6">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.reference.label }}</label>
+            {{ form.reference }}
+            <p class="text-xs text-gray-500 mt-1">{{ form.reference.help_text }}</p>
+            {% if form.reference.errors %}
+                <p class="text-xs text-red-500 mt-1">{{ form.reference.errors }}</p>
+            {% endif %}
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.titre.label }}</label>
+            {{ form.titre }}
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.type_offre.label }}</label>
+            {{ form.type_offre }}
+        </div>
+        
+        <!-- ✅ AJOUT DU CHAMP SECTEUR -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.secteur.label }}</label>
+            {{ form.secteur }}
+            <p class="text-xs text-gray-500 mt-1">{{ form.secteur.help_text }}</p>
+            {% if form.secteur.errors %}
+                <p class="text-xs text-red-500 mt-1">{{ form.secteur.errors }}</p>
+            {% endif %}
+        </div>
+        
+        <div class="row align-items-end">
+            <div class="col-12 col-sm-6 col-md-5">
+                <div class="mb-2">
+                    <label class="form-label">{{ form.societe.label }}</label>
                     {{ form.societe }}
                 </div>
             </div>
+            <div class="col-12 col-sm-6 col-md-4">
+                <div class="mb-2">
+                    {% if form.nombre_candidat.help_text %}
+                    <label class="form-label">{{ form.nombre_candidat.help_text }}</label>
+                       {% endif %}
+                
+                    {{ form.nombre_candidat }}
+                    </div>
+            </div>
         </div>
+    </div>
+</div>
 
         <!-- Section 2: Description du poste -->
         <div class="form-section">
