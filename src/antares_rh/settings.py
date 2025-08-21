@@ -226,3 +226,13 @@ LOGGING = {
         'level': 'ERROR',
     },
 }
+
+# Configuration CSRF pour Render
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.onrender.com',
+    'http://*.onrender.com',
+]
+
+# Selon votre configuration, peut-être aussi :
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
