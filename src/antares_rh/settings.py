@@ -110,15 +110,31 @@ WSGI_APPLICATION = 'antares_rh.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': BASE_DIR / 'db.sqlite3',
+#    }
+#}
+#
+#if 'DATABASE_URL' in os.environ:
+#    DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
-if 'DATABASE_URL' in os.environ:
-    DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+import environ
+
+# ROOT_DIR = racine du projet (un cran plus haut que src)
+ROOT_DIR = BASE_DIR.parent 
+
+# Initialise django-environ
+env = environ.Env()
+environ.Env.read_env(os.path.join(ROOT_DIR, ".env"))
+DATABASES = {
+    'default': dj_database_url.config(
+        default=env("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True
+    )
+}
 
 
 # Password validation
