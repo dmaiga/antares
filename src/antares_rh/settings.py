@@ -124,7 +124,7 @@ import environ
 
 # ROOT_DIR = racine du projet (un cran plus haut que src)
 ROOT_DIR = BASE_DIR.parent 
-
+#NEON
 # Initialise django-environ
 env = environ.Env()
 environ.Env.read_env(os.path.join(ROOT_DIR, ".env"))
