@@ -94,11 +94,12 @@ MIDDLEWARE = [
 
 # Middleware avec cache
 # settings.py - Cache configuration
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'antares-rh-cache',
-        'TIMEOUT': 60 * 5,  # 5 minutes
+        'TIMEOUT': 60 * 5, 
         'OPTIONS': {
             'MAX_ENTRIES': 100
         }
@@ -193,22 +194,6 @@ STATICFILES_DIRS = [
 # Configuration Whitenoise pour les fichiers statiques
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-#CACHES = {
-#    'default': {
-#        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-#        'LOCATION': os.path.join(BASE_DIR, 'cache'),
-#        'TIMEOUT': 60 * 60 * 24 * 30,
-#        'OPTIONS': {
-#            'MAX_ENTRIES': 1000
-#        }
-#    }
-#}
-#
-## Cache middleware
-#CACHE_MIDDLEWARE_ALIAS = 'default'
-#CACHE_MIDDLEWARE_SECONDS = 60 * 60 * 24 * 30
-#CACHE_MIDDLEWARE_KEY_PREFIX = 'antares_rh'
-# Cache pour environnement léger - OPTIMISÉ
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -261,6 +246,6 @@ CSRF_TRUSTED_ORIGINS = [
     'http://*.onrender.com',
 ]
 
-# Selon votre configuration, peut-être aussi :
+# Selon  configuration :
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True

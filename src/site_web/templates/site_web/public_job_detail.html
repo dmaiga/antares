@@ -258,7 +258,7 @@
                     </p>
                     <p><strong><i class="bi bi-cash-coin"></i> Salaire :</strong> {{ job.salaire|default:"Non spécifié" }}</p>
                     {% if job.secteur %}
-                    <p><strong><i class="bi bi-grid"></i> Secteur :</strong> {{ job.secteur }}</p>
+                    <p><strong><i class="bi bi-grid"></i> Secteur :</strong> {{ job.secteur|upper }}</p>
                     {% endif %}
                     <p><strong><i class="bi bi-people"></i> Postes disponibles :</strong> {{ job.nombre_candidat }}</p>
                 </div>

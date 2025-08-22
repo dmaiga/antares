@@ -26,10 +26,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('',site_web.views.home,name='home'),
     #19_08
-    #path('auth/login', authentication.views.login_page, name='login'),
     path('login/externe/', authentication.views.login_externe, name='login'),
     path('login/interne/', authentication.views.login_interne, name='login_interne'),
- #   path('login/', RedirectView.as_view(url='/login/externe/', permanent=False)),
     
     #19_08
     path('auth/', include('authentication.urls')),

@@ -327,3 +327,5 @@ class InscriptionCandidatForm(UserCreationForm):
                 date_inscription=timezone.now()
             )
         return user
+    
+#

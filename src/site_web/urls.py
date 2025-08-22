@@ -16,19 +16,14 @@ urlpatterns = [
     #_____________________________________________________
     path('home', views.home, name='home'),
     path('about/', views.about, name='about'),
-
     path('jobs/', views.jobs, name='jobs'),
-  
     path('teams', views.teams, name='teams'),
-     path('appointment', views.appointment, name='appointment'),
-
+    path('appointment', views.appointment, name='appointment'),
     path('candidat/inscription/', views.candidat_register, name='candidate-registry'),
    
-    #path('recruteur_info/', views.recruteur_info, name='recruteur-info'),
     
     path('rejoindre_team/', views.rejoindre_team, name='rejoindre-team'),
-
-
+    
 
 
 

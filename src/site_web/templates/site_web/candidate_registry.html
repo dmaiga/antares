@@ -4,134 +4,65 @@
 {% block content %}
 <!-- Hero Section Candidat améliorée -->
 <section class="candidat-hero" style="background: linear-gradient(rgba(13, 59, 102, 0.9), rgba(13, 59, 102, 0.8))">
-  <div class="container py-5 text-white text-center">  <!-- Ajout de text-center -->
-    <div class="row justify-content-center">  <!-- Centrage du contenu -->
-      <div class="col-lg-8">  <!-- Largeur augmentée pour meilleure lisibilité -->
-        <h1 class="display-4 fw-bold mb-4">Votre carrière commence ici</h1>
-        <p class="lead mb-4">Antares  vous connecte aux meilleures opportunités en adéquation avec votre profil</p>
-        <div class="d-flex flex-wrap gap-3 justify-content-center">  <!-- Centrage des boutons -->
+  <div class="container py-4 text-white text-center">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <h1 class="display-4 fw-bold mb-4">Trouvez votre prochain emploi avec Antares</h1>
+        <p class="lead mb-4">Rejoignez notre réseau de talents et accédez à des opportunités exclusives dans divers secteurs</p>
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
           <a href="#registration" class="btn btn-orange btn-lg px-4">
-            <i class="bi bi-person-plus me-2"></i> Créer mon compte
-          </a>
-          <a href="#advantages" class="btn btn-outline-light btn-lg px-4">
-            <i class="bi bi-info-circle me-2"></i> En savoir plus
+            <i class="bi bi-person-plus me-2"></i> Inscrivez-vous maintenant
           </a>
         </div>
       </div>
     </div>
   </div>
 </section>
-
-
-
-
-<!-- Avantages Candidat améliorés -->
-<section id="advantages" class="py-5 bg-light">
+<!-- Processus de candidature compact -->
+<section class="py-3" style="background-color: var(--light-blue);">
   <div class="container">
-    <div class="text-center mb-5">
-      <h2 class="fw-bold" style="color: var(--primary-blue);">Pourquoi choisir Antares RH ?</h2>
-      <p class="lead text-muted">Notre expertise en gestion des talents au service de votre carrière</p>
+    <div class="text-center mb-4">
+      <h2 class="fw-bold section-title">Comment ça marche ?</h2>
+      <p class="text-muted">Rejoignez notre réseau en 4 étapes simples</p>
     </div>
     
-    <div class="row g-4">
-      <div class="col-md-6 col-lg-3">
-        <div class="card h-100 border-0 shadow-sm hover-effect">
-          <div class="card-body p-4">
-            <div class="icon-square bg-light-orange text-white rounded-circle mb-3" style="width: 50px; height: 50px; line-height: 50px;">
-              <i class="bi bi-bullseye fs-5"></i>
-            </div>
-            <h5 class="fw-bold">Matching intelligent</h5>
-            <p class="text-muted">Notre algorithme vous propose les offres correspondant précisément à votre profil</p>
+    <div class="row">
+      <!-- Processus en étapes horizontales -->
+      <div class="col-lg-8 mb-4 mb-lg-0">
+        <div class="process-steps-horizontal">
+          <div class="process-step-h">
+            <div class="step-number-h">1</div>
+            <h6>Inscrivez-vous</h6>
+            <p class="small mb-0">Créez votre compte rapidement</p>
+          </div>
+          <div class="process-step-h">
+            <div class="step-number-h">2</div>
+            <h6>Complétez votre profil</h6>
+            <p class="small mb-0">Ajoutez compétences et expériences</p>
+          </div>
+          <div class="process-step-h">
+            <div class="step-number-h">3</div>
+            <h6>Recevez des offres</h6>
+            <p class="small mb-0">Opportunités adaptées à votre profil</p>
+          </div>
+          <div class="process-step-h">
+            <div class="step-number-h">4</div>
+            <h6>Postulez facilement</h6>
+            <p class="small mb-0">Répondez aux offres en un clic</p>
           </div>
         </div>
       </div>
-      <div class="col-md-6 col-lg-3">
-        <div class="card h-100 border-0 shadow-sm hover-effect">
-          <div class="card-body p-4">
-            <div class="icon-square bg-light-orange text-white rounded-circle mb-3" style="width: 50px; height: 50px; line-height: 50px;">
-              <i class="bi bi-person-video3 fs-5"></i>
-            </div>
-            <h5 class="fw-bold">Coaching RH</h5>
-            <p class="text-muted">Bénéficiez de conseils personnalisés pour optimiser votre candidature</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-3">
-        <div class="card h-100 border-0 shadow-sm hover-effect">
-          <div class="card-body p-4">
-            <div class="icon-square bg-light-orange text-white rounded-circle mb-3" style="width: 50px; height: 50px; line-height: 50px;">
-              <i class="bi bi-shield-check fs-5"></i>
-            </div>
-            <h5 class="fw-bold">Confidentialité</h5>
-            <p class="text-muted">Votre profil reste invisible aux employeurs actuels si vous le souhaitez</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-3">
-        <div class="card h-100 border-0 shadow-sm hover-effect">
-          <div class="card-body p-4">
-            <div class="icon-square bg-light-orange text-white rounded-circle mb-3" style="width: 50px; height: 50px; line-height: 50px;">
-              <i class="bi bi-graph-up fs-5"></i>
-            </div>
-            <h5 class="fw-bold">Suivi analytique</h5>
-            <p class="text-muted">Visualisez le statut de vos candidatures et votre visibilité</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Processus de candidature -->
-<section class="py-5" style="background-color: var(--light-blue);">
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-lg-6 order-lg-2">
-        <img src="{% static 'site_web/images/candidat/candidat_1.jpg' %}" 
-        loading="lazy"
-        alt="Processus candidat" class="img-fluid">
-      </div>
-      <div class="col-lg-6 order-lg-1">
-        <h2 class="fw-bold mb-4" style="color: var(--primary-blue);">Comment ça marche ?</h2>
-        
-        <div class="process-steps">
-          <div class="d-flex mb-4">
-            <div class="flex-shrink-0   rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;"  style="color: #FA8301;">
-              1
-            </div>
-            <div class="flex-grow-1 ms-4">
-              <h5 class="fw-bold">Créez votre profil</h5>
-              <p class="mb-0">Complétez votre profil en 5 minutes seulement</p>
-            </div>
-          </div>
-          
-          <div class="d-flex mb-4">
-            <div class="flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;" style="color: #FA8301;">
-              2
-            </div>
-            <div class="flex-grow-1 ms-4">
-              <h5 class="fw-bold">Validation RH</h5>
-              <p class="mb-0">Nos experts améliorent votre visibilité</p>
-            </div>
-          </div>
-          
-          <div class="d-flex mb-4">
-            <div class="flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center" style="color: #FA8301;">
-              3
-            </div>
-            <div class="flex-grow-1 ms-4">
-              <h5 class="fw-bold">Recevez des offres</h5>
-              <p class="mb-0">Des opportunités personnalisées vous sont proposées</p>
-            </div>
-          </div>
-          
+      
+      <!-- Alert section compacte -->
+      <div class="col-lg-4">
+        <div class="alert alert-info compact-alert h-100 mb-0">
           <div class="d-flex">
-            <div class="flex-shrink-0   rounded-circle d-flex align-items-center justify-content-center" style="color: #FA8301;">
-              4
+            <div class="flex-shrink-0">
+              <i class="bi bi-info-circle-fill text-primary-blue"></i>
             </div>
-            <div class="flex-grow-1 ms-4">
-              <h5 class="fw-bold">Postulez en 1 clic</h5>
-              <p class="mb-0">Envoyez votre candidature directement aux recruteurs</p>
+            <div class="flex-grow-1 ms-2">
+              <h6 class="alert-heading mb-1">À savoir</h6>
+              <p class="small mb-0">En vous inscrivant, vous intégrez notre base de talents et serez contacté directement par nos recruteurs pour des opportunités adaptées.</p>
             </div>
           </div>
         </div>
@@ -139,21 +70,53 @@
     </div>
   </div>
 </section>
-
-<section id="registration" class="py-5 bg-light">
+<!-- Formulaire d'inscription amélioré -->
+<section id="registration" class="py-5">
   <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-lg-8">
-        <div class="card border-0 shadow-lg">
-          <div class="card-header bg-primary-blue py-3">
-            <h3 class="mb-0 text-center" style="color: var(--primary-blue);">
+    <div class="row align-items-start">  <!-- Changé de align-items-center à align-items-start -->
+      <div class="col-lg-5 mb-5 mb-lg-0">
+        <h2 class="fw-bold mb-4 section-title">Rejoignez notre réseau de talents</h2>
+        <p class="text-muted mb-4">Inscrivez-vous gratuitement et augmentez vos chances de trouver l'emploi idéal, que ce soit un CDI, CDD ou mission d'intérim.</p>
+        
+        <div class="benefits-list">
+          <div class="d-flex align-items-center mb-3">
+            <div class="benefit-icon bg-light-orange text-white rounded-circle me-3">
+              <i class="bi bi-check2"></i>
+            </div>
+            <span>Accès à des offres exclusives</span>
+          </div>
+          <div class="d-flex align-items-center mb-3">
+            <div class="benefit-icon bg-light-orange text-white rounded-circle me-3">
+              <i class="bi bi-check2"></i>
+            </div>
+            <span>Alertes sur les nouveaux postes</span>
+          </div>
+          <div class="d-flex align-items-center mb-3">
+            <div class="benefit-icon bg-light-orange text-white rounded-circle me-3">
+              <i class="bi bi-check2"></i>
+            </div>
+            <span>Contact direct par nos recruteurs</span>
+          </div>
+          <div class="d-flex align-items-center">
+            <div class="benefit-icon bg-light-orange text-white rounded-circle me-3">
+              <i class="bi bi-check2"></i>
+            </div>
+            <span>Suivi simplifié de vos candidatures</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-7">
+        <div class="card border-0 shadow-lg rounded-3">
+          <div class="card-header bg-primary-blue text-white py-4">
+            <h3 class="mb-0 text-center">
               <i class="bi bi-person-badge me-2"></i> Créer votre compte candidat
             </h3>
           </div>
 
           <!-- Messages Django -->
           {% if messages %}
-            <div class="mt-3">
+            <div class="mt-3 mx-4">
               {% for message in messages %}
                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
                   {{ message }}
@@ -164,61 +127,126 @@
           {% endif %}
 
           <div class="card-body p-4 p-md-5">
-            
             <form method="post" id="registerForm" class="row g-3">
               {% csrf_token %}
               
               <!-- Champs cachés -->
               {{ form.role }}
               
-              <!-- Champs visibles -->
+              <!-- Champs visibles avec gestion d'erreurs -->
               <div class="col-md-6">
                 <label for="{{ form.first_name.id_for_label }}" class="form-label">
                   Prénom <span class="text-danger">*</span>
                 </label>
-                {{ form.first_name }}
+                <input type="text" name="{{ form.first_name.name }}" 
+                       class="form-control {% if form.first_name.errors %}is-invalid{% endif %}" 
+                       id="{{ form.first_name.id_for_label }}" 
+                       value="{{ form.first_name.value|default:'' }}"
+                       required>
+                {% if form.first_name.errors %}
+                  <div class="invalid-feedback">
+                    {{ form.first_name.errors.0 }}
+                  </div>
+                {% endif %}
+                <div class="form-text">Votre prénom</div>
               </div>
 
               <div class="col-md-6">
                 <label for="{{ form.last_name.id_for_label }}" class="form-label">
                   Nom <span class="text-danger">*</span>
                 </label>
-                {{ form.last_name }}
+                <input type="text" name="{{ form.last_name.name }}" 
+                       class="form-control {% if form.last_name.errors %}is-invalid{% endif %}" 
+                       id="{{ form.last_name.id_for_label }}" 
+                       value="{{ form.last_name.value|default:'' }}"
+                       required>
+                {% if form.last_name.errors %}
+                  <div class="invalid-feedback">
+                    {{ form.last_name.errors.0 }}
+                  </div>
+                {% endif %}
+                <div class="form-text">Votre nom de famille</div>
               </div>
 
               <div class="col-12">
                 <label for="{{ form.email.id_for_label }}" class="form-label">
                   Email <span class="text-danger">*</span>
                 </label>
-                {{ form.email }}
-                <div class="form-text">Utilisé pour vous connecter</div>
+                <input type="email" name="{{ form.email.name }}" 
+                       class="form-control {% if form.email.errors %}is-invalid{% endif %}" 
+                       id="{{ form.email.id_for_label }}" 
+                       value="{{ form.email.value|default:'' }}"
+                       required>
+                {% if form.email.errors %}
+                  <div class="invalid-feedback">
+                    {{ form.email.errors.0 }}
+                  </div>
+                {% endif %}
+                <div class="form-text">Nous vous contacterons à cette adresse</div>
               </div>
 
               <div class="col-12">
                 <label for="{{ form.telephone.id_for_label }}" class="form-label">
-                  Téléphone
+                  Téléphone <span class="text-danger">*</span>
                 </label>
-                {{ form.telephone }}
+                <input type="tel" name="{{ form.telephone.name }}" 
+                       class="form-control {% if form.telephone.errors %}is-invalid{% endif %}" 
+                       id="{{ form.telephone.id_for_label }}" 
+                       value="{{ form.telephone.value|default:'' }}"
+                       required>
+                {% if form.telephone.errors %}
+                  <div class="invalid-feedback">
+                    {{ form.telephone.errors.0 }}
+                  </div>
+                {% endif %}
+                <div class="form-text">Format international: +223 XX XX XX XX</div>
               </div>
 
               <div class="col-md-6">
                 <label for="{{ form.password1.id_for_label }}" class="form-label">
                   Mot de passe <span class="text-danger">*</span>
                 </label>
-                {{ form.password1 }}
-                <div class="form-text">Minimum 8 caractères</div>
+                <div class="input-group">
+                  <input type="password" name="{{ form.password1.name }}" 
+                         class="form-control {% if form.password1.errors %}is-invalid{% endif %}" 
+                         id="{{ form.password1.id_for_label }}" 
+                         required>
+                  <button class="btn btn-outline-secondary toggle-password" type="button">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                  {% if form.password1.errors %}
+                    <div class="invalid-feedback">
+                      {{ form.password1.errors.0 }}
+                    </div>
+                  {% endif %}
+                </div>
+                <div class="form-text">8 caractères minimum</div>
               </div>
 
               <div class="col-md-6">
                 <label for="{{ form.password2.id_for_label }}" class="form-label">
-                  Confirmation <span class="text-danger">*</span>
+                  Confirmez le mot de passe <span class="text-danger">*</span>
                 </label>
-                {{ form.password2 }}
+                <div class="input-group">
+                  <input type="password" name="{{ form.password2.name }}" 
+                         class="form-control {% if form.password2.errors %}is-invalid{% endif %}" 
+                         id="{{ form.password2.id_for_label }}" 
+                         required>
+                  <button class="btn btn-outline-secondary toggle-password" type="button">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                  {% if form.password2.errors %}
+                    <div class="invalid-feedback">
+                      {{ form.password2.errors.0 }}
+                    </div>
+                  {% endif %}
+                </div>
+                <div class="form-text">Identique au mot de passe</div>
               </div>
 
               <div class="col-12">
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="accepte_newsletter" id="newsletter">
+                  <input class="form-check-input" type="checkbox" name="accepte_newsletter" id="newsletter" checked>
                   <label class="form-check-label" for="newsletter">
                     Je souhaite recevoir les offres exclusives par email
                   </label>
@@ -229,7 +257,7 @@
                 <div class="form-check">
                   <input class="form-check-input" type="checkbox" name="cgu_acceptees" id="terms" required>
                   <label class="form-check-label" for="terms">
-                    J'accepte les <a href="#">conditions générales</a> et la <a href="#">politique de confidentialité</a>
+                    J'accepte les <a href="#" class="text-primary-blue">conditions générales</a> et la <a href="#" class="text-primary-blue">politique de confidentialité</a>
                   </label>
                 </div>
               </div>
@@ -241,9 +269,8 @@
               </div>
 
               <div class="col-12 text-center mt-3">
-                <p>Déjà membre ? <a href="{% url 'login' %}?type=candidate" style="color: var(--primary-blue);">Connectez-vous à votre espace</a></p>
+                <p>Déjà membre ? <a href="{% url 'login' %}?type=candidate" class="text-primary-blue fw-semibold">Connectez-vous ici</a></p>
               </div>
-
             </form>
           </div>
         </div>
@@ -252,12 +279,95 @@
   </div>
 </section>
 
+<!-- Section Services Antares en cartes -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold section-title">Antares : bien plus qu'un simple recruteur</h2>
+            <p class="lead text-muted">Notre expertise multisectorielle au service de votre carrière</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="service-card shadow-sm hover-effect">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon-container">
+                            <i class="bi bi-people-fill service-icon"></i>
+                        </div>
+                        <h4 class="service-title">Recrutement et sélection</h4>
+                        <p class="service-text">Nous identifions et sélectionnons les candidats les plus adaptés aux postes à pourvoir chez nos clients partenaires.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="service-card shadow-sm hover-effect">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon-container">
+                            <i class="bi bi-mortarboard-fill service-icon"></i>
+                        </div>
+                        <h4 class="service-title">Formation professionnelle</h4>
+                        <p class="service-text">Nous proposons des programmes sur mesure pour renforcer vos compétences techniques et managériales.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="service-card shadow-sm hover-effect">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon-container">
+                            <i class="bi bi-briefcase-fill service-icon"></i>
+                        </div>
+                        <h4 class="service-title">Missions d'intérim</h4>
+                        <p class="service-text">Nous gérons des volumes importants de recrutements temporaires dans divers secteurs d'activité.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="service-card shadow-sm hover-effect">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon-container">
+                            <i class="bi bi-gear-fill service-icon"></i>
+                        </div>
+                        <h4 class="service-title">Conseil en gestion RH</h4>
+                        <p class="service-text">Nous accompagnons les entreprises dans la structuration de leurs services ressources humaines.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="service-card shadow-sm hover-effect">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon-container">
+                            <i class="bi bi-clipboard-check-fill service-icon"></i>
+                        </div>
+                        <h4 class="service-title">Audit RH</h4>
+                        <p class="service-text">Nous analysons les pratiques RH et recommandons des améliorations pour optimiser la gestion des talents.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="service-card shadow-sm hover-effect">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon-container">
+                            <i class="bi bi-person-check-fill service-icon"></i>
+                        </div>
+                        <h4 class="service-title">Coaching professionnel</h4>
+                        <p class="service-text">Nous accompagnons les professionnels dans leur évolution de carrière et leur développement personnel.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 <!-- Offres récentes -->
 <section class="py-5">
   <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="fw-bold" style="color: var(--primary-blue);">Offres qui pourraient vous intéresser</h2>
-      <a href="{% url 'jobs' %}" class="btn btn-outline-primary">
+      <h2 class="fw-bold section-title">Offres récentes pour vous</h2>
+      <a href="{% url 'jobs' %}" class="btn btn-outline-primary-blue">
         Voir toutes les offres <i class="bi bi-arrow-right ms-2"></i>
       </a>
     </div>
@@ -272,14 +382,14 @@
             <div class="position-absolute top-0 end-0 mt-3 me-3">
               <span class="badge rounded-pill 
                 {% if job.type_offre == 'emploi' %}bg-success
-                {% elif job.type_offre == 'appel_offre' %}bg-success
+                {% elif job.type_offre == 'appel_offre' %}bg-primary-blue
                 {% else %}bg-warning text-dark{% endif %}">
                 {{ job.get_type_offre_display }}
               </span>
             </div>
             
             <!-- Titre et Société -->
-            <h5 class="fw-bold mb-2" style="color: var(--primary-blue);">{{ job.titre }}</h5>
+            <h5 class="fw-bold mb-2 text-primary-blue">{{ job.titre }}</h5>
             <p class="text-muted mb-3">
               <i class="bi bi-building me-2"></i>{{ job.societe }}
             </p>
@@ -293,7 +403,7 @@
             
             <!-- Exigences condensées -->
             <div class="mb-3">
-              <h6 class="fw-bold small" style="color: var(--accent-orange);">
+              <h6 class="fw-bold small text-accent-orange">
                 <i class="bi bi-award me-1"></i>PROFIL RECHERCHÉ
               </h6>
               <ul class="small text-muted mb-0">
@@ -316,7 +426,7 @@
                 {% endif %}
               </small>
               <a href="{% url 'public-job-offer-detail' job.pk %}" class="btn btn-sm btn-orange">
-                Postuler <i class="bi bi-send ms-1"></i>
+                Voir l'offre <i class="bi bi-arrow-right ms-1"></i>
               </a>
             </div>
           </div>
@@ -326,108 +436,313 @@
     </div>
     {% else %}
     <div class="alert alert-info">
-      <i class="bi bi-info-circle me-2"></i> Aucune offre disponible actuellement.
+      <i class="bi bi-info-circle me-2"></i> De nouvelles offres seront bientôt disponibles. Inscrivez-vous pour être informé en premier.
     </div>
     {% endif %}
   </div>
 </section>
 
+<!-- CTA Final -->
+<section class="py-5 bg-primary-blue text-white">
+  <div class="container text-center">
+    <h2 class="fw-bold mb-4">Prêt à booster votre carrière ?</h2>
+    <p class="lead mb-4">Rejoignez notre réseau de talents et multipliez vos chances de trouver l'opportunité idéale</p>
+    <a href="#registration" class="btn btn-light btn-lg px-5 py-3 fw-bold">
+      <i class="bi bi-person-plus me-2"></i> Je m'inscris maintenant
+    </a>
+  </div>
+</section>
 
 <style>
-   :root {
-      --secondary-blue: #2D76B6;
-      --light-gray: #F4F4F9;
-      --dark-gray: #333333;
-      --light-blue: #E6F0FA; 
-      --accent-orange: #FA8301; /* Version plus sombre de l'orange */
-      --primary-blue: #0A4B8C;  /* Version plus sombre du bleu */
-    }
-    
-  .hover-effect {
-    transition: all 0.3s ease;
-    border: 1px solid rgba(13, 59, 102, 0.1);
+  :root {
+    --secondary-blue: #2D76B6;
+    --light-gray: #F4F4F9;
+    --dark-gray: #333333;
+    --light-blue: #E6F0FA; 
+    --accent-orange: #FA8301;
+    --primary-blue: #0A4B8C;
   }
   
-  .hover-effect:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(13, 59, 102, 0.1) !important;
-    border-color: rgba(13, 59, 102, 0.2);
+  .text-primary-blue {
+    color: var(--primary-blue);
   }
   
-  .card-body {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+  .text-accent-orange {
+    color: var(--accent-orange);
   }
-
-  .candidat-hero {
+  
+  .bg-primary-blue {
+    background-color: var(--primary-blue);
+  }
+  
+  .section-title {
+    color: var(--primary-blue);
     position: relative;
-    overflow: hidden;
+    padding-bottom: 15px;
+  }
+  
+  .section-title:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 80px;
+    height: 3px;
+    background: var(--accent-orange);
   }
   
   .hover-effect {
     transition: all 0.3s ease;
-    border: 1px solid rgba(13, 59, 102, 0.1);
   }
   
   .hover-effect:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(13, 59, 102, 0.1) !important;
-  }
-  
-  .icon-square {
-    transition: all 0.3s ease;
-  }
-  
-  .card:hover .icon-square {
-    transform: rotate(15deg);
   }
   
   .bg-light-orange {
-    background-color: #FF7A45;
+    background-color: var(--accent-orange);
   }
   
-  .process-steps {
-    position: relative;
-    padding-left: 20px;
+  .benefit-icon {
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+  }
+  /* Style amélioré pour les services */
+        .service-card {
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .service-icon-container {
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            background: rgba(10, 75, 140, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .service-icon {
+            font-size: 1.8rem;
+            color: var(--primary-blue);
+        }
+        
+        .service-card:hover .service-icon-container {
+            background: var(--primary-blue);
+            transform: rotate(5deg) scale(1.05);
+        }
+        
+        .service-card:hover .service-icon {
+            color: white;
+        }
+        
+        .service-title {
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .service-text {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .display-4 {
+                font-size: 2.2rem;
+            }
+            
+            .section-title:after {
+                width: 60px;
+            }
+        }
+  /* Processus en étapes verticales *//* Processus horizontal compact */
+.process-steps-horizontal {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin: 0 auto;
+  max-width: 800px;
+}
+
+.process-steps-horizontal::before {
+  content: '';
+  position: absolute;
+  top: 25px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--primary-blue);
+  opacity: 0.2;
+  z-index: 1;
+}
+
+.process-step-h {
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  padding: 0 10px;
+}
+
+.step-number-h {
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  border-radius: 50%;
+  background: var(--accent-orange);
+  color: white;
+  font-weight: bold;
+  margin: 0 auto 10px;
+  position: relative;
+}
+
+.process-step-h h6 {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: var(--primary-blue);
+}
+
+/* Alerte compacte */
+.compact-alert {
+  padding: 12px 15px;
+}
+
+.compact-alert .bi {
+  font-size: 1.2rem;
+  margin-top: 2px;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .process-steps-horizontal {
+    flex-wrap: wrap;
+    gap: 20px;
   }
   
-  .process-steps::before {
-    content: '';
-    position: absolute;
-    left: 20px;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: var(--primary-blue);
-    opacity: 0.2;
+  .process-steps-horizontal::before {
+    display: none;
+  }
+  
+  .process-step-h {
+    flex: 0 0 calc(50% - 20px);
+  }
+}
+
+@media (max-width: 576px) {
+  .process-step-h {
+    flex: 0 0 100%;
+  }
+  
+  .process-steps-horizontal {
+    gap: 15px;
+  }
+}
+  
+  /* Améliorations responsive */
+  @media (max-width: 992px) {
+    .display-4 {
+      font-size: 2.2rem;
+    }
+    
+    .section-title:after {
+      width: 60px;
+    }
+    
+    .process-steps-vertical {
+      padding-left: 20px;
+    }
+    
+    .process-steps-vertical::before {
+      left: 15px;
+    }
+    
+    .step-number {
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
+      font-size: 1rem;
+      margin-right: 15px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .process-step {
+      flex-direction: column;
+      text-align: center;
+    }
+    
+    .step-number {
+      margin-right: 0;
+      margin-bottom: 10px;
+    }
+    
+    .process-steps-vertical {
+      padding-left: 0;
+    }
+    
+    .process-steps-vertical::before {
+      display: none;
+    }
   }
 </style>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Initialisation du slider de témoignages
-    new Splide('#testimonial-slider', {
-      type: 'loop',
-      perPage: 3,
-      perMove: 1,
-      gap: '30px',
-      pagination: false,
-      breakpoints: {
-        992: {
-          perPage: 2
-        },
-        768: {
-          perPage: 1
-        }
-      }
-    }).mount();
-  });
-
 document.addEventListener('DOMContentLoaded', function() {
+  // Gestion du défilement en cas d'erreurs de formulaire
+  const formErrors = document.querySelector('.is-invalid');
+  
+  if (formErrors) {
+    // Faire défiler jusqu'au formulaire de manière fluide
+    document.getElementById('registration').scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    });
+    
+    // Mettre le focus sur le premier champ avec erreur
+    setTimeout(function() {
+      const firstErrorField = document.querySelector('.is-invalid');
+      if (firstErrorField) {
+        firstErrorField.focus({ preventScroll: true });
+      }
+    }, 500);
+  }
+  
+  // Fonctionnalité d'affichage/masquage des mots de passe
+  const toggleButtons = document.querySelectorAll('.toggle-password');
+  toggleButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const input = this.parentElement.querySelector('input');
+      const icon = this.querySelector('i');
+      
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+      }
+    });
+  });
+  
+  // Validation du formulaire
   const form = document.getElementById('registerForm');
   const password1 = document.getElementById('{{ form.password1.id_for_label }}');
   const password2 = document.getElementById('{{ form.password2.id_for_label }}');
+  const telephone = document.getElementById('{{ form.telephone.id_for_label }}');
   
   form.addEventListener('submit', function(e) {
     let isValid = true;
@@ -435,11 +750,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // Validation mot de passe
     if (password1.value.length < 8) {
       alert('Le mot de passe doit contenir au moins 8 caractères');
+      password1.focus();
       isValid = false;
     }
     
     if (password1.value !== password2.value) {
       alert('Les mots de passe ne correspondent pas');
+      password2.focus();
+      isValid = false;
+    }
+    
+    // Validation téléphone
+    if (telephone.value && !/^\+?\s*(?:\d[\s\-()]?){8,}$/.test(telephone.value)) {
+      alert('Veuillez entrer un numéro de téléphone valide format International: +223 XX XX XX XX');
+      telephone.focus();
       isValid = false;
     }
     

@@ -319,7 +319,7 @@ from django.contrib import messages
 def candidat_register(request):
     featured_jobs = JobOffer.objects.filter(
         visible_sur_site=True,
-        statut='OUVERT',
+        statut=JobStatus.OUVERT,
         date_limite__gte=timezone.now().date()
     )[:3]
 
@@ -330,7 +330,7 @@ def candidat_register(request):
             
             messages.success(
                 request,
-                f"Inscription réussie ! Vous pouvez maintenant vous connecter."
+                f"Inscription réussie !  Vous pouvez maintenant vous connecter."
             )
             # Redirection vers login avec email pré-rempli
             return redirect(f"{reverse('login')}?email={user.email}&type=candidate")
@@ -341,6 +341,8 @@ def candidat_register(request):
         'form': form,
         'featured_jobs': featured_jobs
     })
+
+#22_08
 
 
 

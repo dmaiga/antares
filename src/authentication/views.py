@@ -446,44 +446,6 @@ def assign_fiche_poste(request, user_id, fiche_id):
     return redirect('edit-user-rh', user_id=user_id)
 
 
-from django.contrib.auth import authenticate, login
-from django.contrib import messages
-
-def login_page(request):
-    form = forms.LoginForm()
-    message = ''
-    
-    if request.method == 'POST':
-        # Récupérer les données du formulaire
-        email = request.POST.get('email') or request.POST.get('username')
-        password = request.POST.get('password')
-        
-        if email and password:
-            user = authenticate(
-                username=email,  # Utiliser l'email comme username
-                password=password,
-            )
-            
-            if user is not None:
-                login(request, user)
-                
-                # Redirections par rôle
-                if user.role in ['admin', 'rh']:
-                    return redirect('dashboard-rh')
-                elif user.role in ['entreprise']:
-                    return redirect('dashboard-client')
-                elif user.role in ['employe', 'stagiaire']:
-                    return redirect('dashboard')
-                elif user.role == 'candidat':
-                    return redirect('dashboard_candidat')
-                else:
-                    return redirect('home')
-            else:
-                message = 'Identifiants invalides.'
-                messages.error(request, "Email ou mot de passe incorrect")
-    
-    return render(
-        request, 'site_web/login.html', context={'form': form, 'message': message})
 
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
