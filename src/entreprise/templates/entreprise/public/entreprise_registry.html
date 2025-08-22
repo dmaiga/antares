@@ -176,9 +176,9 @@
     <div class="row justify-content-center">
       <div class="col-lg-10">
         <div class="card border-0 shadow-lg overflow-hidden">
-          <div class="card-header bg-primary-blue ">
-            <h2 class="h3 mb-0 text-center text-white" >
-              <i class="bi bi-building me-2"  ></i> Formulaire d'inscription Entreprise
+          <div class="card-header bg-primary-blue">
+            <h2 class="h3 mb-0 text-center text-white">
+              <i class="bi bi-building me-2"></i> Formulaire d'inscription Entreprise
             </h2>
           </div>
           
@@ -195,22 +195,54 @@
                 </div>
               </div>
               
-              {% for field in form %}
-              {% if field.name == 'email' or field.name == 'first_name' or field.name == 'last_name' or field.name == 'telephone_pro' %}  
+              <!-- Champs représentant -->
               <div class="col-md-6">
-                    <div class="form-floating">
-                      {{ field }}
-                      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                      {% if field.help_text %}
-                        <small class="form-text text-muted">{{ field.help_text }}</small>
-                      {% endif %}
-                      {% for error in field.errors %}
-                        <div class="invalid-feedback d-block">{{ error }}</div>
-                      {% endfor %}
-                    </div>
-                  </div>
-                {% endif %}
-              {% endfor %}
+                <div class="mb-3">
+                  <label for="{{ form.email.id_for_label }}" class="form-label">
+                    Email professionnel <span class="text-danger">*</span>
+                  </label>
+                  {{ form.email }}
+                  {% for error in form.email.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                    Prénom du représentant <span class="text-danger">*</span>
+                  </label>
+                  {{ form.first_name }}
+                  {% for error in form.first_name.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                    Nom du représentant <span class="text-danger">*</span>
+                  </label>
+                  {{ form.last_name }}
+                  {% for error in form.last_name.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="{{ form.telephone_pro.id_for_label }}" class="form-label">
+                    Téléphone professionnel <span class="text-danger">*</span>
+                  </label>
+                  {{ form.telephone_pro }}
+                  {% for error in form.telephone_pro.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              </div>
               
               <!-- Section Entreprise -->
               <div class="col-12 mt-4">
@@ -221,33 +253,102 @@
                 </div>
               </div>
               
+              <!-- Champs entreprise -->
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="{{ form.nom.id_for_label }}" class="form-label">
+                    Nom de l'entreprise <span class="text-danger">*</span>
+                  </label>
+                  {{ form.nom }}
+                  {% for error in form.nom.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              </div>
               
-              {% for field in form %}
-  {% if field.name == 'email' or field.name == 'first_name' or field.name == 'last_name' or field.name == 'telephone_pro' %}
-                  <div class="col-md-6">
-                    <div class="mb-3">
-                      <label for="{{ field.id_for_label }}" class="form-label">
-                        {{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}
-                      </label>
-                      {{ field }}
-                      {% if field.help_text %}
-                        <small class="form-text text-muted">{{ field.help_text }}</small>
-                      {% endif %}
-                      {% for error in field.errors %}
-                        <div class="invalid-feedback d-block">{{ error }}</div>
-                      {% endfor %}
-                    </div>
-                  </div>
-                {% endif %}
-              {% endfor %}
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="{{ form.secteur_activite.id_for_label }}" class="form-label">
+                    Secteur d'activité <span class="text-danger">*</span>
+                  </label>
+                  {{ form.secteur_activite }}
+                  {% for error in form.secteur_activite.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="{{ form.site_web.id_for_label }}" class="form-label">
+                    Site web
+                  </label>
+                  {{ form.site_web }}
+                  <small class="form-text text-muted">{{ form.site_web.help_text }}</small>
+                  {% for error in form.site_web.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="{{ form.taille_entreprise.id_for_label }}" class="form-label">
+                    Taille de l'entreprise
+                  </label>
+                  {{ form.taille_entreprise }}
+                  {% for error in form.taille_entreprise.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+              
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="{{ form.adresse.id_for_label }}" class="form-label">
+                    Adresse
+                  </label>
+                  {{ form.adresse }}
+                  {% for error in form.adresse.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+              
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="{{ form.ville.id_for_label }}" class="form-label">
+                    Ville
+                  </label>
+                  {{ form.ville }}
+                  {% for error in form.ville.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+              
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="{{ form.pays.id_for_label }}" class="form-label">
+                    Pays
+                  </label>
+                  {{ form.pays }}
+                  {% for error in form.pays.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              </div>
               
               <!-- Champ Description -->
               <div class="col-12">
                 <div class="mb-3">
                   <label for="{{ form.description.id_for_label }}" class="form-label">
-                    {{ form.description.label }}
+                    Description de l'entreprise
                   </label>
                   {{ form.description }}
+                  {% for error in form.description.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
                 </div>
               </div>
               
@@ -255,12 +356,15 @@
               <div class="col-12">
                 <div class="mb-4">
                   <label for="{{ form.logo.id_for_label }}" class="form-label">
-                    {{ form.logo.label }}
+                    Logo de l'entreprise
                   </label>
                   <div class="input-group">
                     {{ form.logo }}
                   </div>
                   <small class="form-text text-muted">Format recommandé : PNG ou JPG (max 2MB)</small>
+                  {% for error in form.logo.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
                 </div>
               </div>
               
@@ -290,7 +394,6 @@
     </div>
   </div>
 </section>
-
 <!-- FAQ Section -->
 <section class="py-5 bg-light">
   <div class="container">

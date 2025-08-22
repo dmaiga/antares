@@ -19,7 +19,7 @@ from .forms import ExpertContactForm, GeneralContactForm
 from django.core.mail import send_mail
 from .forms import ExpertContactForm, GeneralContactForm
 from antares_rh.settings import DEFAULT_FROM_EMAIL
-from .models import ContactRequest
+from .models import ContactRequest,ConsultantQuickApplication
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -45,21 +45,89 @@ from django.core.mail import send_mail
 
 
 #15_O8
+#22_08
+# Ajouter ces imports en haut du fichier
+from django.db import IntegrityError
+from django.contrib.auth import get_user_model
+from django.core.mail import send_mail
+from django.conf import settings
+import secrets
+import string
+from datetime import datetime
 
+# Correction de la fonction create_user_from_consultant
+def create_user_from_consultant(consultant):
+    User = get_user_model()
+    
+    # Vérifier si l'email existe déjà
+    if User.objects.filter(email=consultant.email).exists():
+        try:
+            user = User.objects.get(email=consultant.email)
+            consultant.user = user
+            consultant.save()
+            return user, "EXISTING_USER"
+        except User.DoesNotExist:
+            return None, None
+    
+    # Générer un mot de passe aléatoire
+    alphabet = string.ascii_letters + string.digits
+    password = ''.join(secrets.choice(alphabet) for i in range(12))
+    
+    # Déterminer le rôle - CORRECTION: utiliser 'candidat' partout
+    if consultant.enrollment_type == 'consultant':
+        role = 'consultant'
+        is_active = False  # Doit être validé
+    else:
+        role = 'candidat'  # CORRECTION: 'candidat' au lieu de 'candidate'
+        is_active = True   # Actif immédiatement
+    
+    try:
+        # Créer l'utilisateur
+        user = User.objects.create_user(
+            email=consultant.email,
+            password=password,
+            first_name=consultant.first_name,
+            last_name=consultant.last_name,
+            role=role,
+            is_active=is_active
+        )
+        
+        consultant.user = user
+        consultant.save()
+        
+        return user, password
+        
+    except IntegrityError:
+        return None, None
+
+#
 def consultant_info(request):
     if request.method == 'POST':
         form = ConsultantQuickEnrollmentForm(request.POST, request.FILES)
         formset = MissionFormSet(request.POST)
 
         if form.is_valid() and formset.is_valid():
-            consultant = form.save()
+            consultant = form.save(commit=False)
+            
+            # Déterminer le type d'enregistrement
+            if consultant.experience == ConsultantQuickApplication.ExperienceLevel.EXPERT:
+                consultant.enrollment_type = 'consultant'
+            else:
+                consultant.enrollment_type = 'candidate'  
+                
+            consultant.save()
+            
             formset.instance = consultant
             formset.save()
-            messages.success(request, "Votre inscription a bien été enregistrée !")
+            
+            request.session['last_reference'] = consultant.reference
+            request.session['last_enrollment_type'] = consultant.enrollment_type
+            # Envoyer l'email approprié
             send_consultant_email(consultant)
+            
+            messages.success(request, "Votre inscription a bien été enregistrée !")
             return redirect('consultant-merci')
         else:
-            # Debug: afficher les erreurs dans la console
             print("Form errors:", form.errors)
             print("Formset errors:", formset.errors)
             messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
@@ -72,13 +140,58 @@ def consultant_info(request):
         'formset': formset
     })
 
-
-# Fonction utilitaire pour l'email
+# Correction de la fonction send_consultant_email
 def send_consultant_email(consultant):
-    subject = f"Confirmation de votre inscription"
-    message = f"""Bonjour {consultant.first_name},\n\n
-    Merci pour votre inscription! Votre profil sera examiné sous 48h.\n
-    Cordialement,\nL'équipe Antares """
+    user, password_info = create_user_from_consultant(consultant)
+    
+    # Gestion d'erreur si la création de user échoue
+    if user is None:
+        # Fallback: envoyer un email sans identifiants
+        subject = f"Problème avec votre inscription - {consultant.reference}"
+        message = f"""Bonjour {consultant.first_name},\n\n
+        Merci pour votre inscription (référence: {consultant.reference}).\n
+        Nous rencontrons un problème technique avec votre compte.\n
+        Veuillez nous contacter à {settings.DEFAULT_FROM_EMAIL}.\n\n
+        Cordialement,\nL'équipe Antares """
+        
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [consultant.email])
+        return
+    
+    if consultant.enrollment_type == 'consultant':
+        subject = f"Votre inscription en tant que Consultant - {consultant.reference}"
+        if password_info == "EXISTING_USER":
+            message = f"""Bonjour {consultant.first_name},\n\n
+            Merci pour votre inscription en tant que Consultant (référence: {consultant.reference}).\n
+            Votre profil avec plus de 10 ans d'expérience sera examiné sous 48h.\n
+            Nous évaluerons votre dossier et vous ferons un retour rapidement.\n\n
+            Vous utilisez déjà un compte existant sur notre plateforme.\n\n
+            Cordialement,\nL'équipe Antares """
+        else:
+            message = f"""Bonjour {consultant.first_name},\n\n
+            Merci pour votre inscription en tant que Consultant (référence: {consultant.reference}).\n
+            Votre profil avec plus de 10 ans d'expérience sera examiné sous 48h.\n
+            Nous évaluerons votre dossier et vous ferons un retour rapidement.\n\n
+            Une fois validé, vous pourrez vous connecter avec:\n
+            Email: {consultant.email}\n
+            Mot de passe: {password_info}\n\n
+            Cordialement,\nL'équipe Antares """
+    else:
+        subject = f"Votre inscription en tant que Candidat - {consultant.reference}"
+        if password_info == "EXISTING_USER":
+            message = f"""Bonjour {consultant.first_name},\n\n
+            Merci pour votre inscription (référence: {consultant.reference}).\n
+            Vous avez été enregistré en tant que Candidat.\n\n
+            Vous utilisez déjà un compte existant sur notre plateforme.\n\n
+            Cordialement,\nL'équipe Antares """
+        else:
+            message = f"""Bonjour {consultant.first_name},\n\n
+            Merci pour votre inscription (référence: {consultant.reference}).\n
+            Vous avez été enregistré en tant que Candidat.\n\n
+            Vos identifiants d'accès:\n
+            Email: {consultant.email}\n
+            Mot de passe: {password_info}\n\n
+            Vous pouvez vous connecter dès maintenant sur notre plateforme.\n\n
+            Cordialement,\nL'équipe Antares """
     
     send_mail(
         subject,
@@ -88,13 +201,18 @@ def send_consultant_email(consultant):
         fail_silently=True
     )
 
-
-#15_08
-
 def consultant_merci(request):
-    return render(request, 'site_web/consultant_merci.html')
+    # Récupérer la dernière inscription de la session ou des paramètres
+    reference = request.session.get('last_reference', '')
+    enrollment_type = request.session.get('last_enrollment_type', '')
+    
+    return render(request, 'site_web/consultant_merci.html', {
+        'reference': reference,
+        'enrollment_type': enrollment_type
+    })
 
- 
+
+#22_08 
 #13_08
 #14_08
 

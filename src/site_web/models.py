@@ -54,8 +54,9 @@ class ContactRequest(models.Model):
 from django.db import models
 from django.core.validators import FileExtensionValidator
 from django.utils.text import slugify
-
-
+from datetime import datetime
+from authentication.models import User
+import uuid
 class ConsultantQuickApplication(models.Model):
     class ExperienceLevel(models.TextChoices):
         JUNIOR = 'junior', '1-3 ans'
@@ -93,7 +94,21 @@ class ConsultantQuickApplication(models.Model):
         null=True,
         help_text="Laissez-nous un message si vous souhaitez ajouter des informations"
     )
-    
+    #reference
+    user = models.OneToOneField(
+        User, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        verbose_name="Utilisateur associé"
+    )
+    reference = models.CharField("Référence", max_length=20, unique=True, blank=True)
+    enrollment_type = models.CharField(
+        "Type d'enregistrement",
+        max_length=50,
+        choices=[('consultant', 'Consultant'), ('candidate', 'Candidat')],
+        default='candidate'
+    )
     # Métadonnées
     created_at = models.DateTimeField(auto_now_add=True)
     profile_complete = models.BooleanField(default=False)
@@ -104,7 +119,23 @@ class ConsultantQuickApplication(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} ({self.expertise})"
+        return f"{self.first_name} {self.last_name} ({self.expertise}) - {self.reference}"
+    
+    def save(self, *args, **kwargs):
+        if not self.reference:
+            short_uuid = str(uuid.uuid4())[:8].upper()  # 8 caractères
+            self.reference = f"ANT{short_uuid}"
+        
+        # CORRECTION: cohérence avec les choix du champ
+        if self.experience == self.ExperienceLevel.EXPERT:
+            self.enrollment_type = 'consultant'
+        else:
+            self.enrollment_type = 'candidate' 
+            
+        super().save(*args, **kwargs)
+
+
+
 #15_08
 class Mission(models.Model):
     class MissionExperience(models.TextChoices):

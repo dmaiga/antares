@@ -2,80 +2,79 @@
 {% load static %}
 
 {% block content %}
-<section class="py-5" style="background-color: var(--light-blue);">
+<section class="py-4">
   <div class="container">
     <div class="row justify-content-center">
-      <div class="col-lg-8 text-center">
-        <div class="card border-0 shadow-lg">
-          <div class="card-body">
-            <!-- Icône de confirmation -->
-            <div class="icon-square bg-success text-white rounded-circle mb-4 mx-auto" 
-                 style="width: 80px; height: 80px; line-height: 80px;">
-              <i class="bi bi-check2-all fs-1"></i>
+      <div class="col-lg-6 col-md-8">  {# Reduced width #}
+        <div class="card border-0 shadow-sm mt-4">  {# Reduced margin #}
+          <div class="card-body p-4 text-center">  {# Reduced padding #}
+            
+            {# Success icon - smaller #}
+            <div class="mb-3">
+              <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
             </div>
             
-            <h1 class="display-5 fw-bold mb-3" style="color: var(--primary-blue);">
-              Candidature enregistrée avec succès !
-            </h1>
+            <h3 class="mb-3">Votre demande a bien été reçue</h3>  {# h3 instead of h2 #}
             
-            <p class="lead mb-4">
-              Merci pour votre inscription à notre réseau de consultants experts.
+            {# Reference display #}
+            {% if reference %}
+            <div class="alert alert-info mb-3 py-2">
+              <strong>Référence:</strong> {{ reference }}
+            </div>
+            {% endif %}
+            
+            {# Conditional message based on enrollment type #}
+            {% if enrollment_type == 'consultant' %}
+            <p class="mb-3">
+              Votre profil consultant avec plus de 10 ans d'expérience sera examiné sous 48h.
+              Nous évaluerons votre dossier et vous ferons un retour rapidement.
             </p>
+            <p class="text-muted small mb-3">
+              Vous recevrez un email une fois votre compte validé.
+            </p>
+            {% else %}
+            <p class="mb-3">
+              Vous avez été enregistré en tant que candidat.
+              Vos identifiants d'accès vous ont été envoyés par email.
+            </p>
+            <p class="text-muted small mb-3">
+              Vous pouvez vous connecter dès maintenant sur notre plateforme.
+            </p>
+            {% endif %}
             
-            <div class="alert alert-info text-start">
-              <h3 class="h5 mb-3"><i class="bi bi-info-circle-fill me-2"></i> Prochaines étapes :</h3>
-              <ul class="mb-0">
-                <li>Notre équipe va analyser votre profil sous <strong>72 heures</strong></li>
-                <li>Vous recevrez un email de confirmation</li>
-                <li>Pour les profils éligibles (10+ ans d'expérience), un consultant Antares vous contactera</li>
-              </ul>
-            </div>
-            
-            <div class="my-4 p-4 bg-light rounded">
-              <h3 class="h5 mb-3"><i class="bi bi-person-badge me-2"></i> Votre référence : <code>ANT-CNS-000212</code></h3>
-              <p class="mb-0">Conservez cette référence pour toute communication avec notre équipe.</p>
-            </div>
-            
-            <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
-              <a href="{% url 'home' %}" class="btn btn-outline-primary">
-                <i class="bi bi-house-door me-2"></i> Retour à l'accueil
+            {# Action buttons #}
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+              <a href="{% url 'home' %}" class="btn btn-primary btn-sm">
+                <i class="bi bi-house-door me-1"></i> Accueil
               </a>
-              <a href="{% url 'jobs' %}" class="btn btn-orange">
-                <i class="bi bi-briefcase me-2"></i> Voir nos offres
+              <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-box-arrow-in-right me-1"></i> Connexion
               </a>
             </div>
+            
           </div>
         </div>
         
-        <div class="mt-5 text-center">
-          <h3 class="h5 mb-3">Besoin d'aide ?</h3>
-          <div class="d-flex flex-wrap justify-content-center gap-4">
-            <a href="mailto:consultants@antares-rh.com" class="text-decoration-none">
-              <i class="bi bi-envelope-fill me-2" style="color: var(--accent-orange);"></i>
-              consultants@antares-rh.com
-            </a>
-            <a href="tel:+22320292040" class="text-decoration-none">
-              <i class="bi bi-telephone-fill me-2" style="color: var(--accent-orange);"></i>
-              +223 20 29 20 40
-            </a>
-          </div>
+        {# Additional info - smaller #}
+        <div class="text-center mt-3">
+          <p class="text-muted small">
+            Questions ? Contactez-nous à 
+            <a href="#">contact@antares.com</a>
+          </p>
         </div>
+        
       </div>
     </div>
   </div>
 </section>
 
 <style>
-  .icon-square {
-    transition: transform 0.3s ease;
-  }
-  
-  .card:hover .icon-square {
-    transform: scale(1.1) rotate(-5deg);
-  }
-  
-  .alert-info {
-    border-left: 4px solid var(--accent-orange);
-  }
+.card {
+  border-radius: 12px;
+}
+.btn-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+}
 </style>
 {% endblock %}

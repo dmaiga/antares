@@ -114,7 +114,7 @@ class User(AbstractUser):
         ('employe', 'Employé'),
         ('stagiaire', 'Stagiaire'),
         ('entreprise', 'Entreprise'),
-        ('recruteur', 'Recruteur'),
+        ('consultant', 'Consultant'),
         ('candidat', 'Candidat'),
     ]
 
