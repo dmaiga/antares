@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'whitenoise.runserver_nostatic',
+    'simple_history',
     
     'authentication',
     'documents',
@@ -95,16 +96,16 @@ MIDDLEWARE = [
 # Middleware avec cache
 # settings.py - Cache configuration
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'antares-rh-cache',
-        'TIMEOUT': 60 * 5, 
-        'OPTIONS': {
-            'MAX_ENTRIES': 100
-        }
-    }
-}
+#CACHES = {
+#    'default': {
+#        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+#        'LOCATION': 'antares-rh-cache',
+#        'TIMEOUT': 60 * 5, 
+#        'OPTIONS': {
+#            'MAX_ENTRIES': 100
+#        }
+#    }
+#}
 
 
 ROOT_URLCONF = 'antares_rh.urls'
@@ -139,12 +140,20 @@ WSGI_APPLICATION = 'antares_rh.wsgi.application'
 #NEON
 # Initialise django-environ
 
+#DATABASES = {
+#    'default': dj_database_url.config(
+#        default=env("DATABASE_URL"),
+#        conn_max_age=600,
+#        ssl_require=True
+#    )
+#}
+#
+
 DATABASES = {
-    'default': dj_database_url.config(
-        default=env("DATABASE_URL"),
-        conn_max_age=600,
-        ssl_require=True
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
 

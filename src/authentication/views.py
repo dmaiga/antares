@@ -32,7 +32,7 @@ from django.dispatch import receiver
 from functools import wraps
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
-
+from .models import User, EmployeeProfile
 
 logger = logging.getLogger(__name__)
 
@@ -231,44 +231,47 @@ def detail_fiche_poste(request, fiche_id):
 @user_passes_test(is_rh_or_admin)
 def employees_view(request):
     query = request.GET.get('q', '')
-    department_filter = request.GET.get('department', '')
     role_filter = request.GET.get('role', '')
     statut_filter = request.GET.get('statut', '')
+    department_filter = request.GET.get('department', '')
+    
+    # Start with users who have employee roles
     users = User.objects.filter(role__in=['employe', 'stagiaire']).order_by('last_name')
+    
+    # Apply text search
     if query:
         users = users.filter(
-            Q(username__icontains=query) |
             Q(first_name__icontains=query) |
             Q(last_name__icontains=query) |
-            Q(poste_occupe__icontains=query) |
-            Q(ville__icontains=query)
+            Q(employeeprofile_profile__poste_occupe__icontains=query) |
+            Q(employeeprofile_profile__ville__icontains=query)
         )
     
-    if department_filter:
-        users = users.filter(department__iexact=department_filter)
-    
+    # Apply role filter
     if role_filter:
         users = users.filter(role__iexact=role_filter)
     
+    # Apply status filter (from EmployeeProfile)
     if statut_filter:
-        users = users.filter(statut__iexact=statut_filter)
+        users = users.filter(employeeprofile_profile__statut__iexact=statut_filter)
+    
+    # Apply department filter (from EmployeeProfile)
+    if department_filter:
+        users = users.filter(employeeprofile_profile__department__iexact=department_filter)
 
-    users = users.order_by('first_name')
-
-    # Pour les filtres
-    departments = User.objects.exclude(department='').values_list('department', flat=True).distinct()
+    # Get distinct departments for the filter dropdown
+    departments = EmployeeProfile.objects.exclude(department='').values_list('department', flat=True).distinct()
 
     return render(request, 'authentication/employees_view.html', {
         'users': users,
         'query': query,
         'departments': departments,
         'role_choices': User.ROLE_CHOICES,
-        'statut_choices': User.STATUT_CHOICES,
-        'selected_department': department_filter,
+        'statut_choices': EmployeeProfile.STATUT_CHOICES,  # Use the correct model's choices
         'selected_role': role_filter,
         'selected_statut': statut_filter,
+        'selected_department': department_filter,
     })
-
 
 
 

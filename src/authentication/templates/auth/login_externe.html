@@ -1,41 +1,38 @@
 {% extends 'site_web/layout.html' %}
+{% load static %}
 
 {% block content %}
-<section class="login-hero ">
-  <div class="container  text-center">
-    <h1 class="display-4 fw-bold " style="color:var(--primary-blue) ;">Espace Candidats & Entreprises</h1>
-    <p class="lead" style="color: var(--accent-orange);">Accédez à votre espace personnel</p>
+<!-- Hero Section Login - Version compacte -->
+<section class="login-hero" style="background: linear-gradient(rgba(13, 59, 102, 0.9), rgba(13, 59, 102, 0.9))">
+  <div class="container text-white text-center py-4">
+    <div class="row">
+      <div class="col-lg-8 mx-auto">
+        <h1 class="fw-bold mb-2">Connectez-vous</h1>
+        <p class="mb-0">Accédez à votre espace personnel selon votre profil</p>
+      </div>
+    </div>
   </div>
 </section>
 
-<section class=" bg-light">
+<!-- Login Tabs Section -->
+<section class="py-5 bg-light">
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-lg-8">
-        <!-- Messages d'erreur -->
-        {% if messages %}
-          {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-              {{ message }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-          {% endfor %}
-        {% endif %}
-
         <!-- Tab Navigation -->
         <ul class="nav nav-tabs nav-fill mb-4" id="loginTabs" role="tablist">
           <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="candidat-tab" data-bs-toggle="tab" data-bs-target="#candidat" type="button" role="tab">
-              <i class="bi bi-person-badge me-2"></i> Candidat
+            <button class="nav-link active" id="jobseeker-tab" data-bs-toggle="tab" data-bs-target="#jobseeker" type="button" role="tab">
+              <i class="bi bi-person-badge me-2"></i> Demandeur d'emploi
             </button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" id="entreprise-tab" data-bs-toggle="tab" data-bs-target="#entreprise" type="button" role="tab">
+            <button class="nav-link" id="company-tab" data-bs-toggle="tab" data-bs-target="#company" type="button" role="tab">
               <i class="bi bi-building me-2"></i> Entreprise
             </button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" id="consultant-tab" data-bs-toggle="tab" data-bs-target="#consultant" type="button" role="tab">
+            <button class="nav-link" id="employee-tab" data-bs-toggle="tab" data-bs-target="#employee" type="button" role="tab">
               <i class="bi bi-person-vcard me-2"></i> Consultant
             </button>
           </li>
@@ -43,64 +40,106 @@
         
         <!-- Tab Content -->
         <div class="tab-content bg-white p-4 rounded-bottom shadow-sm" id="loginTabsContent">
-          <!-- Candidat Tab -->
-          <div class="tab-pane fade show active" id="candidat" role="tabpanel">
-            <h3 class="mb-4 text-center">Espace Candidat</h3>
-            <form method="POST">
+          <!-- Demandeur d'emploi Tab -->
+          <div class="tab-pane fade show active" id="jobseeker" role="tabpanel">
+            <h3 class="mb-4 text-center" style="color: var(--primary-blue);">Espace Demandeur d'emploi</h3>
+            <form method="POST" action="{% url 'login' %}">
               {% csrf_token %}
               <input type="hidden" name="user_type" value="candidat">
               <div class="mb-3">
-                <label class="form-label">Email</label>
-                <input type="email" class="form-control" name="email" required>
+                <label for="jobseeker-email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="jobseeker-email" name="email" placeholder="votre@email.com" required>
               </div>
               <div class="mb-3">
-                <label class="form-label">Mot de passe</label>
-                <input type="password" class="form-control" name="password" required>
+                <label for="jobseeker-password" class="form-label">Mot de passe</label>
+                <input type="password" class="form-control" id="jobseeker-password" name="password" placeholder="Votre mot de passe" required>
               </div>
-              <button type="submit" class="btn btn-primary w-100 py-2">
-                Se connecter
+              <div class="mb-3 form-check d-flex justify-content-between align-items-center">
+                <div>
+                  <input type="checkbox" class="form-check-input" id="jobseeker-remember" name="remember">
+                  <label class="form-check-label" for="jobseeker-remember">Rester connecté</label>
+                </div>
+                <a href="#forgot-password" class="text-muted small">Mot de passe oublié ?</a>
+              </div>
+              <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
+                <i class="bi bi-box-arrow-in-right me-2"></i> Se connecter
               </button>
             </form>
+            
+            <div class="mt-4 pt-3 border-top text-center">
+              <p class="mb-2">Pas encore de compte ?</p>
+              <a href="{% url 'candidate-registry' %}" class="btn btn-outline-primary" id="jobseeker-register-btn">
+                <i class="bi bi-person-plus me-2"></i> Créer un compte demandeur
+              </a>
+            </div>
           </div>
           
           <!-- Entreprise Tab -->
-          <div class="tab-pane fade" id="entreprise" role="tabpanel">
-            <h3 class="mb-4 text-center">Espace Entreprise</h3>
-            <form method="POST">
+          <div class="tab-pane fade" id="company" role="tabpanel">
+            <h3 class="mb-4 text-center" style="color: var(--primary-blue);">Espace Entreprise</h3>
+            <form method="POST" action="{% url 'login' %}">
               {% csrf_token %}
               <input type="hidden" name="user_type" value="entreprise">
-               <div class="mb-3">
-                <label class="form-label">Email</label>
-                <input type="email" class="form-control" name="email" required>
+              <div class="mb-3">
+                <label for="company-email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="company-email" name="email" placeholder="contact@entreprise.com" required>
               </div>
               <div class="mb-3">
-                <label class="form-label">Mot de passe</label>
-                <input type="password" class="form-control" name="password" required>
+                <label for="company-password" class="form-label">Mot de passe</label>
+                <input type="password" class="form-control" id="company-password" name="password" placeholder="Votre mot de passe" required>
               </div>
-              <button type="submit" class="btn btn-primary w-100 py-2">
-                Se connecter
+              <div class="mb-3 form-check d-flex justify-content-between align-items-center">
+                <div>
+                  <input type="checkbox" class="form-check-input" id="company-remember" name="remember">
+                  <label class="form-check-label" for="company-remember">Rester connecté</label>
+                </div>
+                <a href="#forgot-password" class="text-muted small">Mot de passe oublié ?</a>
+              </div>
+              <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
+                <i class="bi bi-box-arrow-in-right me-2"></i> Se connecter
               </button>
             </form>
+
+            <div class="mt-4 pt-3 border-top text-center">
+              <p class="mb-2">Votre entreprise n'est pas encore inscrite ?</p>
+              <a href="{% url 'entreprise-registry' %}" class="btn btn-outline-primary" id="company-register-btn">
+                <i class="bi bi-building-add me-2"></i> Créer un compte entreprise
+              </a>
+            </div>
           </div>
           
           <!-- Consultant Tab -->
-          <div class="tab-pane fade" id="consultant" role="tabpanel">
-            <h3 class="mb-4 text-center">Espace Consultant</h3>
-            <form method="POST">
+          <div class="tab-pane fade" id="employee" role="tabpanel">
+            <h3 class="mb-4 text-center" style="color: var(--primary-blue);">Espace Consultant</h3>
+            <form method="POST" action="{% url 'login' %}">
               {% csrf_token %}
-              <input type="hidden" name="user_type" value="consultant">
-                <div class="mb-3">
-                <label class="form-label">Email</label>
-                <input type="email" class="form-control" name="email" required>
+              <input type="hidden" name="user_type" value="employe">
+              <div class="mb-3">
+                <label for="employee-email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="employee-email" name="email" placeholder="prenom.nom@entreprise.com" required>
               </div>
               <div class="mb-3">
-                <label class="form-label">Mot de passe</label>
-                <input type="password" class="form-control" name="password" required>
+                <label for="employee-password" class="form-label">Mot de passe</label>
+                <input type="password" class="form-control" id="employee-password" name="password" placeholder="Votre mot de passe" required>
               </div>
-              <button type="submit" class="btn btn-primary w-100 py-2">
-                Se connecter
+              <div class="mb-3 form-check d-flex justify-content-between align-items-center">
+                <div>
+                  <input type="checkbox" class="form-check-input" id="employee-remember" name="remember">
+                  <label class="form-check-label" for="employee-remember">Rester connecté</label>
+                </div>
+                <a href="#forgot-password" class="text-muted small">Mot de passe oublié ?</a>
+              </div>
+              <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
+                <i class="bi bi-box-arrow-in-right me-2"></i> Se connecter
               </button>
             </form>
+            
+            <div class="mt-4 pt-3 border-top text-center">
+              <p class="mb-2">Pas encore de compte consultant ?</p>
+              <a href="{% url 'consultant-info' %}" class="btn btn-outline-primary" id="employee-register-btn">
+                <i class="bi bi-person-vcard me-2"></i> Activer mon compte
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -153,7 +192,7 @@
 
 <style>
   .login-hero {
-    min-height: 350px;
+    height: 150px; /* Réduit la hauteur */
     display: flex;
     align-items: center;
   }
@@ -185,6 +224,10 @@
       padding: 0.75rem 0.5rem;
       font-size: 0.9rem;
     }
+    
+    .login-hero {
+      height: 130px; /* Encore plus compact sur mobile */
+    }
   }
 </style>
 
@@ -213,6 +256,33 @@ document.addEventListener('DOMContentLoaded', function() {
             tab.show();
         }
     }
+    
+    // Redirection intelligente pour les boutons d'inscription
+    const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
+    tabButtons.forEach(button => {
+        button.addEventListener('shown.bs.tab', function(event) {
+            const target = event.target.getAttribute('data-bs-target');
+            
+            // Mettre à jour les liens d'inscription selon l'onglet actif
+            if (target === '#jobseeker') {
+                document.getElementById('jobseeker-register-btn').style.display = 'inline-block';
+                document.getElementById('company-register-btn').style.display = 'none';
+                document.getElementById('employee-register-btn').style.display = 'none';
+            } else if (target === '#company') {
+                document.getElementById('jobseeker-register-btn').style.display = 'none';
+                document.getElementById('company-register-btn').style.display = 'inline-block';
+                document.getElementById('employee-register-btn').style.display = 'none';
+            } else if (target === '#employee') {
+                document.getElementById('jobseeker-register-btn').style.display = 'none';
+                document.getElementById('company-register-btn').style.display = 'none';
+                document.getElementById('employee-register-btn').style.display = 'inline-block';
+            }
+        });
+    });
+    
+    // Cacher initialement les boutons d'inscription non actifs
+    document.getElementById('company-register-btn').style.display = 'none';
+    document.getElementById('employee-register-btn').style.display = 'none';
 });
 </script>
 

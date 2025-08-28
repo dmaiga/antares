@@ -4,242 +4,319 @@
 {% block title %}Tableau de bord{% endblock %}
 
 {% block content %}
-<div class="container py-3">
-  <!-- En-tête -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h4 mb-0">Tableau de bord</h1>
-    <a href="{% url 'candidat_job_list' %}" class="btn btn-sm btn-orange">
-      <i class="bi bi-search me-1"></i> Voir les offres
-    </a>
+<div class="container py-4">
+  <!-- Message de bienvenue personnalisé -->
+  <div class="alert alert-primary bg-primary-blue border-0 text-white mb-4">
+    <div class="d-flex align-items-center">
+      <div class="flex-grow-1">
+        <h4 class="alert-heading mb-1">Bonjour {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.email }}{% endif %} !</h4>
+        <p class="mb-0">Ensemble, construisons votre avenir professionnel. Votre prochaine opportunité est à portée de main.</p>
+      </div>
+      <div class="flex-shrink-0 ms-3">
+        <i class="bi bi-rocket-takeoff display-6 opacity-75"></i>
+      </div>
+    </div>
   </div>
 
-  <!-- Statistiques rapides -->
-  <div class="row g-3 mb-4">
-    <div class="col-6 col-md-3">
-      <div class="card h-100 border-0 shadow-sm">
-        <div class="card-body text-center">
-          <h5 class="card-title mb-1">{{ diplomes.count }}</h5>
-          <p class="card-text text-muted small">Diplômes</p>
-          <a href="{% url 'diplome_list' %}" class="small text-primary-blue stretched-link">
-            Voir tout <i class="bi bi-arrow-right"></i>
+  <div class="row">
+    <!-- Contenu principal -->
+    <div class="col-lg-9">
+      <!-- Statistiques rapides améliorées -->
+      
+
+      <!-- Offres récentes améliorées -->
+      <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
+          <h5 class="mb-0 fw-bold text-primary-blue">Offres récentes</h5>
+          <a href="{% url 'candidat_job_list' %}" class="btn btn-sm btn-outline-primary">
+            Voir tout <i class="bi bi-arrow-right ms-1"></i>
           </a>
         </div>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card h-100 border-0 shadow-sm">
-        <div class="card-body text-center">
-          <h5 class="card-title mb-1">{{ experiences.count }}</h5>
-          <p class="card-text text-muted small">Expériences</p>
-          <a href="{% url 'experience_list' %}" class="small text-primary-blue stretched-link">
-            Voir tout <i class="bi bi-arrow-right"></i>
-          </a>
-        </div>
-      </div>
-    </div>
-    <!-- Remplacer l'ancienne section compétences par : -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h5 class="mb-0">
-            <i class="fas fa-graduation-cap me-2"></i>
-            Compétences acquises
-        </h5>
-    </div>
-    <div class="card-body">
-        {% if user.diplomes.exists %}
-            <div class="row">
-                {% for diplome in user.diplomes.all %}
-                    {% if diplome.competences_acquises %}
-                        <div class="col-md-6 mb-3">
-                            <h6>{{ diplome.intitule }}</h6>
-                            <div class="bg-light p-3 rounded">
-                                {{ diplome.competences_acquises|safe }}
-                            </div>
+        <div class="card-body p-3">
+          {% if offres_recentes %}
+            <div class="row g-3">
+              {% for offre in offres_recentes %}
+                <div class="col-12 col-md-6">
+                  <div class="card h-100 border-0 shadow-sm job-card">
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title h6 mb-1 text-truncate fw-bold">{{ offre.titre }}</h5>
+                        <span class="badge bg-primary-blue small">{{ offre.get_type_offre_display }}</span>
+                      </div>
+                      <h6 class="card-subtitle mb-2 text-muted small">{{ offre.societe }}</h6>
+                      <p class="card-text text-muted small mb-3 line-clamp-2">
+                        {{ offre.mission_principale|striptags|truncatewords:20 }}
+                      </p>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex flex-wrap gap-1">
+                          {% if offre.deja_postule %}
+                            <span class="badge bg-success small"><i class="bi bi-check-circle me-1"></i>Déjà postulé</span>
+                          {% else %}
+                            <span class="badge bg-secondary small"><i class="bi bi-clock me-1"></i>En attente</span>
+                          {% endif %}
                         </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        {% else %}
-            <p class="text-muted">Ajoutez vos diplômes pour voir vos compétences.</p>
-        {% endif %}
-    </div>
-</div>
-    <div class="col-6 col-md-3">
-      <div class="card h-100 border-0 shadow-sm">
-        <div class="card-body text-center">
-          <h5 class="card-title mb-1">{{ candidatures.count }}</h5>
-          <p class="card-text text-muted small">Candidatures</p>
-          <a href="{% url 'candidature_list' %}" class="small text-primary-blue stretched-link">
-            Voir tout <i class="bi bi-arrow-right"></i>
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Dernières candidatures -->
-  <div class="card mb-4 border-0 shadow-sm">
-    <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
-      <h5 class="mb-0 h6">Mes dernières candidatures</h5>
-      <a href="{% url 'candidature_list' %}" class="btn btn-sm btn-outline-primary">Voir tout</a>
-    </div>
-    <div class="card-body p-3">
-      {% if candidatures %}
-        <div class="table-responsive">
-          <table class="table table-hover table-sm align-middle">
-            <thead>
-              <tr>
-                <th class="d-none d-md-table-cell">Offre</th>
-                <th>Entreprise</th>
-                <th class="d-none d-lg-table-cell">Date</th>
-                <th>Statut</th>
-                <th class="text-end">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for candidature in candidatures|slice:":5" %}
-                <tr>
-                  <td class="d-none d-md-table-cell text-truncate" style="max-width: 150px;">{{ candidature.offre.titre }}</td>
-                  <td class="text-truncate" style="max-width: 120px;">{{ candidature.offre.societe }}</td>
-                  <td class="d-none d-lg-table-cell">{{ candidature.date_postulation|date:"d/m/Y" }}</td>
-                  <td>
-                    <span class="badge 
-                      {% if candidature.statut == 'POST' %}bg-primary
-                      {% elif candidature.statut == 'ENT' %}bg-warning
-                      {% elif candidature.statut == 'ACC' %}bg-success
-                      {% elif candidature.statut == 'REF' %}bg-danger
-                      {% else %}bg-secondary{% endif %}">
-                      {{ candidature.get_statut_display }}
-                    </span>
-                  </td>
-                  <td class="text-end">
-                    <a href="{% url 'candidature_detail' candidature.pk %}" class="btn btn-sm btn-outline-primary">
-                      <i class="bi bi-eye"></i>
-                    </a>
-                  </td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      {% else %}
-        <div class="alert alert-info mb-0 small">
-          Vous n'avez pas encore postulé à des offres.
-          <a href="{% url 'candidat_job_list' %}" class="alert-link">Parcourir les offres</a>
-        </div>
-      {% endif %}
-    </div>
-  </div>
-
-  <!-- Offres récentes -->
-  <div class="card mb-4 border-0 shadow-sm">
-    <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
-      <h5 class="mb-0 h6">Offres récentes</h5>
-      <a href="{% url 'candidat_job_list' %}" class="btn btn-sm btn-outline-primary">Voir tout</a>
-    </div>
-    <div class="card-body p-3">
-      {% if offres_recentes %}
-        <div class="row g-3">
-          {% for offre in offres_recentes|slice:":4" %}
-            <div class="col-12 col-md-6">
-              <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body">
-                  <h5 class="card-title h6 mb-1 text-truncate">{{ offre.titre }}</h5>
-                  <h6 class="card-subtitle mb-2 text-muted small">{{ offre.societe }}</h6>
-                  <p class="card-text text-muted small text-truncate" style="max-height: 3rem;">
-                    {{ offre.mission_principale|striptags|truncatewords:15 }}
-                  </p>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <span class="badge bg-secondary small">{{ offre.get_type_offre_display }}</span>
-                    <div>
-                      <a href="{% url 'public-job-offer-detail' offre.pk %}" class="btn btn-sm btn-outline-primary me-1">
-                        Détails
-                      </a>
-                      {% if offre.deja_postule %}
-                        <span class="badge bg-success small">Déjà postulé</span>
-                      {% else %}
-                        <a href="{% url 'apply_job' offre.id %}" class="btn btn-sm btn-orange">
-                          Postuler
-                        </a>
+                        <div>
+                          <a href="{% url 'candidat_job_detail' offre.pk %}" class="btn btn-sm btn-outline-primary me-1">
+                            <i class="bi bi-eye me-1"></i>Détails
+                          </a>
+                          {% if not offre.deja_postule %}
+                            <a href="{% url 'apply_job' offre.id %}" class="btn btn-sm btn-orange">
+                              <i class="bi bi-send me-1"></i>Postuler
+                            </a>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 small text-muted d-flex justify-content-between">
+                      <span>Publiée le {{ offre.date_publication|date:"d/m/Y" }}</span>
+                      {% if offre.date_limite %}
+                        <span class="text-danger">Clôture : {{ offre.date_limite|date:"d/m/Y" }}</span>
                       {% endif %}
                     </div>
                   </div>
                 </div>
-                <div class="card-footer bg-transparent border-0 small text-muted">
-                  Publiée le {{ offre.date_publication|date:"d/m/Y" }}
-                  {% if offre.date_limite %}
-                    <span class="float-end">Clôture : {{ offre.date_limite|date:"d/m/Y" }}</span>
-                  {% endif %}
-                </div>
-              </div>
+              {% endfor %}
             </div>
-          {% endfor %}
+          {% else %}
+            <div class="text-center py-4">
+              <i class="bi bi-briefcase display-4 text-muted"></i>
+              <p class="text-muted mt-3">Aucune offre disponible pour le moment.</p>
+              <a href="{% url 'candidat_job_list' %}" class="btn btn-orange mt-2">
+                <i class="bi bi-search me-1"></i> Explorer les offres
+              </a>
+            </div>
+          {% endif %}
         </div>
-      {% else %}
-        <div class="alert alert-info mb-0 small">
-          Aucune offre disponible pour le moment.
+      </div>
+
+      <!-- Dernières candidatures améliorées -->
+      <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
+          <h5 class="mb-0 fw-bold text-primary-blue">Mes dernières candidatures</h5>
+          <a href="{% url 'candidature_list' %}" class="btn btn-sm btn-outline-primary">
+            Voir tout <i class="bi bi-arrow-right ms-1"></i>
+          </a>
         </div>
-      {% endif %}
-    </div>
-  </div>
+        <div class="card-body p-3">
+          {% if candidatures %}
+            <div class="table-responsive">
+              <table class="table table-hover table-sm align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th class="d-none d-md-table-cell">Offre</th>
+                    <th>Entreprise</th>
+                    <th class="d-none d-lg-table-cell">Date</th>
+                    <th>Statut</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for candidature in candidatures|slice:":5" %}
+                    <tr>
+                      <td class="d-none d-md-table-cell text-truncate" style="max-width: 150px;">
+                        {{ candidature.offre.titre }}
+                      </td>
+                      <td class="text-truncate fw-medium" style="max-width: 120px;">
+                        {{ candidature.offre.societe }}
+                      </td>
+                      <td class="d-none d-lg-table-cell">
+                        {{ candidature.date_postulation|date:"d/m/Y" }}
+                      </td>
+                      <td>
+                        <span class="badge 
+                          {% if candidature.statut == 'POSTULE' %}bg-primary
+                          {% elif candidature.statut == 'ENTRETIEN1' or candidature.statut == 'ENTRETIEN2' or candidature.statut == 'ENTRETIEN3' %}bg-warning
+                          {% elif candidature.statut == 'ACCEPTE' %}bg-success
+                          {% elif candidature.statut == 'REFUSE' %}bg-danger
+                          {% else %}bg-secondary{% endif %}">
+                          <i class="bi 
+                            {% if candidature.statut == 'POSTULE' %}bi-send
+                            {% elif candidature.statut == 'ENTRETIEN1' or candidature.statut == 'ENTRETIEN2' or candidature.statut == 'ENTRETIEN3' %}bi-calendar
+                            {% elif candidature.statut == 'ACCEPTE' %}bi-check-circle
+                            {% elif candidature.statut == 'REFUSE' %}bi-x-circle
+                            {% else %}bi-question-circle{% endif %} me-1"></i>
+                          {{ candidature.get_statut_display }}
+                        </span>
+                      </td>
+                      <td class="text-end">
+                        <a href="{% url 'candidature_detail' candidature.pk %}" 
+                           class="btn btn-sm btn-outline-primary" title="Voir détails">
+                          <i class="bi bi-eye"></i>
+                        </a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="text-center py-4">
+              <i class="bi bi-file-earmark-text display-4 text-muted"></i>
+              <p class="text-muted mt-3">Vous n'avez pas encore postulé à des offres.</p>
+              <a href="{% url 'candidat_job_list' %}" class="btn btn-orange mt-2">
+                <i class="bi bi-search me-1"></i> Parcourir les offres
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
 
-  <!-- Complétion du profil -->
-  <div class="card border-0 shadow-sm">
-
-      <div class="list-group list-group-flush">
-        <a href="{% url 'edit_profil' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center small py-2">
-          Informations personnelles
-          <span class="badge {% if profil.is_personal_info_complete %}bg-success{% else %}bg-warning{% endif %} rounded-pill">
-            {% if profil.is_personal_info_complete %}Complet{% else %}À compléter{% endif %}
-          </span>
-        </a>
-        <a href="{% url 'diplome_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center small py-2">
-          Diplômes
-          <span class="badge {% if diplomes.exists %}bg-success{% else %}bg-warning{% endif %} rounded-pill">
-            {% if diplomes.exists %}{{ diplomes.count }}{% else %}À ajouter{% endif %}
-          </span>
-        </a>
-        <a href="{% url 'experience_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center small py-2">
-          Expériences
-          <span class="badge {% if experiences.exists %}bg-success{% else %}bg-warning{% endif %} rounded-pill">
-            {% if experiences.exists %}{{ experiences.count }}{% else %}À ajouter{% endif %}
-          </span>
-        </a>
-        <a href="{% url 'competences_consolidees' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center small py-2">
-          Compétences
-          
-          <span class="badge {% if competences.exists %}bg-success{% else %}bg-warning{% endif %} rounded-pill">
-            {% if competences.exists %}{{ competences.count }}{% else %}À ajouter{% endif %}
-          </span>
-        </a>
-        <a href="{% url 'document_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center small py-2">
-          Documents
-          <span class="badge {% if documents.exists %}bg-success{% else %}bg-warning{% endif %} rounded-pill">
-            {% if documents.exists %}{{ documents.count }}{% else %}À ajouter{% endif %}
-          </span>
-        </a>
+      <!-- Compétences principales améliorées -->
+      <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="mb-0 fw-bold text-primary-blue">Mes compétences principales</h5>
+        </div>
+        <div class="card-body">
+          {% if competences %}
+            <div class="d-flex flex-wrap gap-2 mb-3">
+              {% for competence in competences|slice:":12" %}
+                <span class="badge bg-primary-blue p-2">{{ competence.nom }}</span>
+              {% endfor %}
+              {% if competences.count > 12 %}
+                <span class="badge bg-secondary p-2">+{{ competences.count|add:"-12" }} autres</span>
+              {% endif %}
+            </div>
+            <div class="mt-2">
+              <a href="{% url 'competence_list' %}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-pencil me-1"></i> Gérer mes compétences
+              </a>
+            </div>
+          {% else %}
+            <div class="text-center py-3">
+              <i class="bi bi-tools display-4 text-muted"></i>
+              <p class="text-muted mt-3">Aucune compétence enregistrée.</p>
+              <a href="{% url 'competence_list' %}" class="btn btn-orange mt-2">
+                <i class="bi bi-plus-circle me-1"></i> Ajouter des compétences
+              </a>
+            </div>
+          {% endif %}
+        </div>
       </div>
     </div>
-  </div>
-</div>
+
+    <!-- Sidebar droite avec informations sur la plateforme -->
+    <div class="col-lg-3">
+      <!-- Profil candidat -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-primary-blue text-white border-0 py-3">
+          <h5 class="mb-0 fw-bold">Votre espace candidat</h5>
+        </div>
+        <div class="card-body">
+          <p class="card-text">
+            En vous inscrivant, vous intégrez notre base de talents et serez contacté directement 
+            par nos recruteurs pour des opportunités adaptées à votre profil (CDI, CDD, intérim, etc.).
+          </p>
+          <div class="d-grid">
+            <a href="{% url 'edit_profil' %}" class="btn btn-orange">
+              <i class="bi bi-person-gear me-1"></i> Compléter mon profil
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mon dossier -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="mb-0 fw-bold text-primary-blue">Mon dossier</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded">
+            <div>
+              <i class="bi bi-award text-primary-blue me-2"></i>
+              <span>Diplômes</span>
+            </div>
+            <a href="{% url 'diplome_list' %}" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+          
+          <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded">
+            <div>
+              <i class="bi bi-briefcase text-primary-blue me-2"></i>
+              <span>Expériences</span>
+            </div>
+            <a href="{% url 'experience_list' %}" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+          
+          <div class="d-flex justify-content-between align-items-center p-2 bg-light rounded">
+            <div>
+              <i class="bi bi-tools text-primary-blue me-2"></i>
+              <span>Compétences</span>
+            </div>
+            <a href="{% url 'competence_list' %}" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+<style>
+  .stats-card {
+    transition: transform 0.2s;
+  }
+  
+  .stats-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .stats-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .job-card {
+    transition: transform 0.2s;
+  }
+  
+  .job-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+  
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .service-item {
+    transition: background-color 0.2s;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+  }
+  
+  .service-item:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .bg-primary-blue {
+    background-color: #0d6efd; /* Couleur bleue primaire de Bootstrap */
+  }
+  
+  .btn-orange {
+    background-color: #fd7e14;
+    border-color: #fd7e14;
+    color: white;
+  }
+  
+  .btn-orange:hover {
+    background-color: #dc6500;
+    border-color: #dc6500;
+    color: white;
+  }
+</style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-  // Activer les tooltips Bootstrap
   document.addEventListener('DOMContentLoaded', function () {
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
     tooltipTriggerList.forEach(tooltipTriggerEl => {
       new bootstrap.Tooltip(tooltipTriggerEl);
     });
   });
-      document.addEventListener("DOMContentLoaded", () => {
-        const progressBar = document.getElementById("progress-bar");
-        const completion = progressBar.dataset.completion;
-
-        progressBar.style.width = completion + "%";
-        progressBar.setAttribute("aria-valuenow", completion);
-        progressBar.textContent = completion + "%";
-    });
 </script>
 {% endblock %}

@@ -2,16 +2,24 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse
-from authentication.models import User
 from django.utils import timezone
-from jobs.models import JobOffer, JobStatus
+from django.db.models import Exists, OuterRef
+from django.contrib.auth.views import PasswordChangeView
+from django.urls import reverse_lazy
+
+from authentication.models import User
+from jobs.models import JobOffer
 from .models import (
     ProfilCandidat, Diplome, ExperienceProfessionnelle,
-     Document, Candidature
+    Document, Candidature, Adresse, Entretien, Competence,
+    EvaluationEntretien  # NOUVEAU MODÈLE
 )
 from .forms import (
     ProfilCandidatForm, DiplomeForm, ExperienceForm,
-     DocumentForm, CandidatureForm,
+    DocumentForm, CandidatureForm, AdresseForm,
+    UserUpdateForm, CompetenceForm, EntretienForm,
+    EntretienFeedbackForm, EvaluationEntretienForm,  # NOUVEAUX FORMULAIRES
+    SoftDeleteForm  # NOUVEAU FORMULAIRE
 )
 
 def check_candidat(user):
@@ -23,20 +31,17 @@ def get_candidat_profile(user):
     profil, created = ProfilCandidat.objects.get_or_create(user=user)
     return profil
 
-
 # Tableau de bord
-from django.db.models import Exists, OuterRef
-
 @login_required
 def dashboard(request):
     if not check_candidat(request.user):
         return redirect('access_denied')
     
     profil = get_candidat_profile(request.user)
-    profil_form = ProfilCandidatForm(request.POST, request.FILES, instance=profil)
-    # Sous-requête pour vérifier les candidatures -
+    
+    # Sous-requête pour vérifier les candidatures
     candidature_exists = Candidature.objects.filter(
-        candidat=request.user,  # 
+        candidat=request.user,
         offre=OuterRef('pk')
     )
     
@@ -50,22 +55,16 @@ def dashboard(request):
     
     context = {
         'profil': profil,
-        'profil_form': profil_form,
-        'diplomes': request.user.diplomes.all(),
-        'experiences': request.user.experiences.all().order_by('-date_debut'),
-        'competences': profil.competences.all(),  
-        'documents': request.user.documents.all(),
-        'candidatures': request.user.candidatures.all().select_related('offre'),
+        'diplomes': request.user.diplomes.filter(est_supprime=False),
+        'experiences': request.user.experiences.filter(est_supprime=False).order_by('-date_debut'),
+        'competences': profil.competences.filter(est_supprime=False),
+        'documents': request.user.documents.filter(est_supprime=False),
+        'candidatures': request.user.candidatures.filter(est_supprime=False).select_related('offre'),
         'offres_recentes': offres_recentes
     }
     return render(request, 'candidats/client/dashboard.html', context)
 
-# Profil
-#20_08
-from django.contrib.auth.views import PasswordChangeView
-from django.urls import reverse_lazy
-from django.contrib import messages
-
+# Changement de mot de passe
 class CustomPasswordChangeView(PasswordChangeView):
     template_name = 'candidats/client/password_change.html'
     success_url = reverse_lazy('dashboard_candidat')
@@ -74,11 +73,7 @@ class CustomPasswordChangeView(PasswordChangeView):
         messages.success(self.request, "Votre mot de passe a été changé avec succès.")
         return super().form_valid(form)
 
-
-from candidats.forms import ProfilCandidatForm, AdresseForm,UserUpdateForm
-from django.contrib import messages
-from django.shortcuts import render, redirect
-
+# Profil
 @login_required
 def edit_profil(request):
     if not check_candidat(request.user):
@@ -99,11 +94,9 @@ def edit_profil(request):
             profil = profil_form.save(commit=False)
             profil.adresse = adresse
             profil.save()
-            profil_form.save_m2m()  # Sauvegarder les relations ManyToMany (comme competences)
+            profil_form.save_m2m()
             messages.success(request, "Profil mis à jour avec succès")
             return redirect('dashboard_candidat')
-        else:
-            print(user_form.errors, profil_form.errors, adresse_form.errors)  # Pour débogage
     else:
         user_form = UserUpdateForm(instance=user)
         profil_form = ProfilCandidatForm(instance=profil)
@@ -115,14 +108,13 @@ def edit_profil(request):
         'adresse_form': adresse_form
     })
 
-#20_08
 # Diplômes
 @login_required
 def diplome_list(request):
     if not check_candidat(request.user):
         return redirect('access_denied')
     
-    diplomes = request.user.diplomes.all()
+    diplomes = request.user.diplomes.filter(est_supprime=False)
     return render(request, 'candidats/client/diplome/diplome_list.html', {'diplomes': diplomes})
 
 @login_required
@@ -136,6 +128,7 @@ def diplome_create(request):
             diplome = form.save(commit=False)
             diplome.candidat = request.user
             diplome.save()
+            form.save_m2m()  # Pour les compétences
             messages.success(request, "Diplôme ajouté avec succès")
             return redirect('diplome_list')
     else:
@@ -148,7 +141,7 @@ def diplome_update(request, pk):
     if not check_candidat(request.user):
         return redirect('access_denied')
     
-    diplome = get_object_or_404(Diplome, pk=pk, candidat=request.user)
+    diplome = get_object_or_404(Diplome, pk=pk, candidat=request.user, est_supprime=False)
     
     if request.method == 'POST':
         form = DiplomeForm(request.POST, instance=diplome)
@@ -162,26 +155,33 @@ def diplome_update(request, pk):
     return render(request, 'candidats/client/diplome/diplome_form.html', {'form': form})
 
 @login_required
-def diplome_delete(request, pk):
+def diplome_soft_delete(request, pk):
     if not check_candidat(request.user):
         return redirect('access_denied')
     
-    diplome = get_object_or_404(Diplome, pk=pk, candidat=request.user)
+    diplome = get_object_or_404(Diplome, pk=pk, candidat=request.user, est_supprime=False)
     
     if request.method == 'POST':
-        diplome.delete()
-        messages.success(request, "Diplôme supprimé avec succès")
-        return redirect('diplome_list')
+        form = SoftDeleteForm(request.POST)
+        if form.is_valid():
+            diplome.soft_delete()
+            messages.success(request, "Diplôme supprimé avec succès")
+            return redirect('diplome_list')
+    else:
+        form = SoftDeleteForm()
     
-    return render(request, 'candidats/client/diplome/diplome_confirm_delete.html', {'diplome': diplome})
+    return render(request, 'candidats/client/diplome/diplome_confirm_delete.html', {
+        'diplome': diplome,
+        'form': form
+    })
 
-# Expériences
+# Expériences (mêmes modifications que pour les diplômes)
 @login_required
 def experience_list(request):
     if not check_candidat(request.user):
         return redirect('access_denied')
     
-    experiences = request.user.experiences.all().order_by('-date_debut')
+    experiences = request.user.experiences.filter(est_supprime=False).order_by('-date_debut')
     return render(request, 'candidats/client/experience/experience_list.html', {'experiences': experiences})
 
 @login_required
@@ -195,6 +195,7 @@ def experience_create(request):
             experience = form.save(commit=False)
             experience.candidat = request.user
             experience.save()
+            form.save_m2m()  # Pour les compétences
             messages.success(request, "Expérience ajoutée avec succès")
             return redirect('experience_list')
     else:
@@ -207,7 +208,7 @@ def experience_update(request, pk):
     if not check_candidat(request.user):
         return redirect('access_denied')
     
-    experience = get_object_or_404(ExperienceProfessionnelle, pk=pk, candidat=request.user)
+    experience = get_object_or_404(ExperienceProfessionnelle, pk=pk, candidat=request.user, est_supprime=False)
     
     if request.method == 'POST':
         form = ExperienceForm(request.POST, instance=experience)
@@ -221,28 +222,33 @@ def experience_update(request, pk):
     return render(request, 'candidats/client/experience/experience_form.html', {'form': form})
 
 @login_required
-def experience_delete(request, pk):
+def experience_soft_delete(request, pk):
     if not check_candidat(request.user):
         return redirect('access_denied')
     
-    experience = get_object_or_404(ExperienceProfessionnelle, pk=pk, candidat=request.user)
+    experience = get_object_or_404(ExperienceProfessionnelle, pk=pk, candidat=request.user, est_supprime=False)
     
     if request.method == 'POST':
-        experience.delete()
-        messages.success(request, "Expérience supprimée avec succès")
-        return redirect('experience_list')
+        form = SoftDeleteForm(request.POST)
+        if form.is_valid():
+            experience.soft_delete()
+            messages.success(request, "Expérience supprimée avec succès")
+            return redirect('experience_list')
+    else:
+        form = SoftDeleteForm()
     
-    return render(request, 'candidats/client/experience/experience_confirm_delete.html', {'experience': experience})
-#competences
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from .models import Competence
-from .forms import CompetenceForm
+    return render(request, 'candidats/client/experience/experience_confirm_delete.html', {
+        'experience': experience,
+        'form': form
+    })
 
+# Compétences
+@login_required
 def competence_list(request):
-    competences = Competence.objects.all()
+    competences = Competence.objects.filter(est_supprime=False)
     return render(request, 'candidats/client/competence/competence_list.html', {'competences': competences})
 
+@login_required
 def competence_create(request):
     if request.method == 'POST':
         form = CompetenceForm(request.POST)
@@ -254,8 +260,9 @@ def competence_create(request):
         form = CompetenceForm()
     return render(request, 'candidats/client/competence/competence_form.html', {'form': form})
 
+@login_required
 def competence_update(request, pk):
-    competence = get_object_or_404(Competence, pk=pk)
+    competence = get_object_or_404(Competence, pk=pk, est_supprime=False)
     if request.method == 'POST':
         form = CompetenceForm(request.POST, instance=competence)
         if form.is_valid():
@@ -266,46 +273,21 @@ def competence_update(request, pk):
         form = CompetenceForm(instance=competence)
     return render(request, 'candidats/client/competence/competence_form.html', {'form': form})
 
-def competence_delete(request, pk):
-    competence = get_object_or_404(Competence, pk=pk)
-    if request.method == 'POST':
-        competence.delete()
-        messages.success(request, "Compétence supprimée avec succès")
-        return redirect('competence_list')
-    return render(request, 'candidats/client/competence/competence_confirm_delete.html', {'competence': competence})
-
-
 @login_required
-def competences_consolidees(request):
-    if not check_candidat(request.user):
-        return redirect('access_denied')
-    
-    # Récupérer toutes les compétences des diplômes et expériences
-    competences_diplomes = []
-    competences_experiences = []
-    
-    for diplome in request.user.diplomes.all():
-        if diplome.competences_acquises:
-            competences_diplomes.append({
-                'source': f"Diplôme: {diplome.intitule}",
-                'contenu': diplome.competences_acquises,
-                'date': diplome.date_obtention
-            })
-    
-    for experience in request.user.experiences.all():
-        if experience.competences:
-            competences_experiences.append({
-                'source': f"Expérience: {experience.poste} chez {experience.entreprise}",
-                'contenu': experience.competences,
-                'date': experience.date_debut
-            })
-    
-    context = {
-        'competences_diplomes': competences_diplomes,
-        'competences_experiences': competences_experiences
-    }
-    
-    return render(request, 'candidats/client/competences/competences_consolidees.html', context)
+def competence_soft_delete(request, pk):
+    competence = get_object_or_404(Competence, pk=pk, est_supprime=False)
+    if request.method == 'POST':
+        form = SoftDeleteForm(request.POST)
+        if form.is_valid():
+            competence.soft_delete()
+            messages.success(request, "Compétence supprimée avec succès")
+            return redirect('competence_list')
+    else:
+        form = SoftDeleteForm()
+    return render(request, 'candidats/client/competence/competence_confirm_delete.html', {
+        'competence': competence,
+        'form': form
+    })
 
 # Documents
 @login_required
@@ -313,7 +295,7 @@ def document_list(request):
     if not check_candidat(request.user):
         return redirect('access_denied')
     
-    documents = request.user.documents.all()
+    documents = request.user.documents.filter(est_supprime=False)
     return render(request, 'candidats/client/document/document_list.html', {'documents': documents})
 
 @login_required
@@ -339,7 +321,7 @@ def document_update(request, pk):
     if not check_candidat(request.user):
         return redirect('access_denied')
     
-    document = get_object_or_404(Document, pk=pk, candidat=request.user)
+    document = get_object_or_404(Document, pk=pk, candidat=request.user, est_supprime=False)
     
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES, instance=document)
@@ -353,18 +335,25 @@ def document_update(request, pk):
     return render(request, 'candidats/client/document/document_form.html', {'form': form})
 
 @login_required
-def document_delete(request, pk):
+def document_soft_delete(request, pk):
     if not check_candidat(request.user):
         return redirect('access_denied')
     
-    document = get_object_or_404(Document, pk=pk, candidat=request.user)
+    document = get_object_or_404(Document, pk=pk, candidat=request.user, est_supprime=False)
     
     if request.method == 'POST':
-        document.delete()
-        messages.success(request, "Document supprimé avec succès")
-        return redirect('document_list')
+        form = SoftDeleteForm(request.POST)
+        if form.is_valid():
+            document.soft_delete()
+            messages.success(request, "Document supprimé avec succès")
+            return redirect('document_list')
+    else:
+        form = SoftDeleteForm()
     
-    return render(request, 'candidats/client/document/document_confirm_delete.html', {'document': document})
+    return render(request, 'candidats/client/document/document_confirm_delete.html', {
+        'document': document,
+        'form': form
+    })
 
 # Candidatures
 @login_required
@@ -372,17 +361,22 @@ def candidature_list(request):
     if not check_candidat(request.user):
         return redirect('access_denied')
     
-    candidatures = request.user.candidatures.all().select_related('offre')
+    candidatures = request.user.candidatures.filter(est_supprime=False).select_related('offre')
     return render(request, 'candidats/client/candidature/candidature_list.html', {'candidatures': candidatures})
-
 
 @login_required
 def candidature_detail(request, pk):
     if not check_candidat(request.user):
         return redirect('access_denied')
     
-    candidature = get_object_or_404(Candidature, pk=pk, candidat=request.user)
-    return render(request, 'candidats/client/candidature/candidature_detail.html', {'candidature': candidature})
+    candidature = get_object_or_404(Candidature, pk=pk, candidat=request.user, est_supprime=False)
+    entretiens = candidature.entretiens.filter(est_supprime=False)
+    
+    return render(request, 'candidats/client/candidature/candidature_detail.html', {
+        'candidature': candidature,
+        'entretiens': entretiens
+    })
+
 @login_required
 def candidature_create(request, offre_id):
     if not check_candidat(request.user):
@@ -390,18 +384,9 @@ def candidature_create(request, offre_id):
     
     offre = get_object_or_404(JobOffer, pk=offre_id)
     
-    # Vérifier si déjà postulé
-    if Candidature.objects.filter(candidat=request.user, offre=offre).exists():
+    if Candidature.objects.filter(candidat=request.user, offre=offre, est_supprime=False).exists():
         messages.warning(request, "Vous avez déjà postulé à cette offre")
         return redirect('candidature_list')
-    
-    # Récupérer les documents de l'utilisateur
-    cv_documents = request.user.documents.filter(type_document='CV')
-    lm_documents = request.user.documents.filter(type_document='LM')
-    other_documents = request.user.documents.exclude(type_document__in=['CV', 'LM'])
-    
-    # CV par défaut (le plus récent)
-    default_cv = cv_documents.order_by('-date_upload').first()
     
     if request.method == 'POST':
         form = CandidatureForm(request.POST, user=request.user)
@@ -410,41 +395,51 @@ def candidature_create(request, offre_id):
             candidature.candidat = request.user
             candidature.offre = offre
             candidature.save()
-            
+            form.save_m2m()  # Pour les documents supplémentaires
             messages.success(request, "Candidature envoyée avec succès !")
             return redirect('candidature_list')
     else:
         form = CandidatureForm(user=request.user, initial={'offre': offre.pk})
-        if default_cv:
-            form.fields['cv_utilise'].initial = default_cv.pk
     
-    context = {
+    return render(request, 'candidats/client/candidature/postuler_offre.html', {
         'form': form,
-        'offre': offre,
-        'cv_documents': cv_documents,
-        'lm_documents': lm_documents,
-        'other_documents': other_documents,
-        'default_cv_id': default_cv.pk if default_cv else None,
-        'today': timezone.now().date()
-    }
-    
-    return render(request, 'candidats/client/candidature/postuler_offre.html', context)
-
+        'offre': offre
+    })
 
 @login_required
-def candidature_withdraw(request, pk):
+def candidature_soft_delete(request, pk):
     if not check_candidat(request.user):
         return redirect('access_denied')
     
-    candidature = get_object_or_404(Candidature, pk=pk, candidat=request.user)
+    candidature = get_object_or_404(Candidature, pk=pk, candidat=request.user, est_supprime=False)
     
     if request.method == 'POST':
-        candidature.delete()
-        messages.success(request, "Candidature retirée avec succès")
-        return redirect('candidature_list')
+        form = SoftDeleteForm(request.POST)
+        if form.is_valid():
+            candidature.soft_delete()
+            messages.success(request, "Candidature retirée avec succès")
+            return redirect('candidature_list')
+    else:
+        form = SoftDeleteForm()
     
-    return render(request, 'candidats/client/candidature/candidat_withdraw.html', {'candidature': candidature})
+    return render(request, 'candidats/client/candidature/candidature_confirm_delete.html', {
+        'candidature': candidature,
+        'form': form
+    })
 
+# NOUVELLES VIEWS POUR ENTRETIENS ET ÉVALUATIONS
+@login_required
+def entretien_detail(request, pk):
+    if not check_candidat(request.user):
+        return redirect('access_denied')
+    
+    entretien = get_object_or_404(Entretien, pk=pk, candidature__candidat=request.user, est_supprime=False)
+    evaluation = getattr(entretien, 'evaluation', None)
+    
+    return render(request, 'candidats/client/entretien/entretien_detail.html', {
+        'entretien': entretien,
+        'evaluation': evaluation
+    })
 
 # Offres d'emploi
 @login_required
@@ -467,7 +462,8 @@ def candidat_job_detail(request, pk):
     offre = get_object_or_404(JobOffer, pk=pk)
     deja_postule = Candidature.objects.filter(
         candidat=request.user,
-        offre=offre
+        offre=offre,
+        est_supprime=False
     ).exists()
     
     context = {
@@ -479,4 +475,3 @@ def candidat_job_detail(request, pk):
         context['form'] = CandidatureForm(user=request.user, initial={'offre': offre.pk})
     
     return render(request, 'candidats/client/candidat_job_detail.html', context)
-

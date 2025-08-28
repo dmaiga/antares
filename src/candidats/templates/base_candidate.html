@@ -254,12 +254,12 @@
             
             <li class="nav-item">
               <a class="nav-link {% if 'candidature' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'candidature_list' %}">
-              Mes Candidatures
+               Candidatures
               </a>
             </li>
               <li class="nav-item">
-              <a class="nav-link {% if 'home' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'home' %}">
-              Site web
+              <a class="nav-link {% if 'document_list' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'document_list' %}">
+             Documents
               </a>
             </li>
             <li class="nav-item">

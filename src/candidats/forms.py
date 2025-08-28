@@ -2,13 +2,17 @@ from django import forms
 from django.core.validators import FileExtensionValidator, MinValueValidator, MaxValueValidator
 from django_summernote.widgets import SummernoteWidget
 from django.utils import timezone
+from django.conf import settings
 from authentication.models import User
 from .models import (
     ProfilCandidat, Diplome, ExperienceProfessionnelle,
-     Document, Candidature, Adresse, Entretien,Competence
+    Document, Candidature, Adresse, Entretien, Competence,
+    EvaluationEntretien  # NOUVEAU MODÈLE
 )
-#20_08
 
+# ====================================================
+# FORMULAIRES EXISTANTS MODIFIÉS
+# ====================================================
 
 class CompetenceForm(forms.ModelForm):
     class Meta:
@@ -17,7 +21,7 @@ class CompetenceForm(forms.ModelForm):
         widgets = {
             'nom': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Ex: Python, Communication, Anglais,etc..'
+                'placeholder': 'Ex: Python, Communication, Anglais, etc..'
             }),
             'categorie': forms.Select(attrs={
                 'class': 'form-select'
@@ -25,7 +29,7 @@ class CompetenceForm(forms.ModelForm):
             'description': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
-                'placeholder': 'Décrivez la compétence '
+                'placeholder': 'Décrivez la compétence'
             }),
         }
 
@@ -44,11 +48,15 @@ class UserUpdateForm(forms.ModelForm):
 class AdresseForm(forms.ModelForm):
     class Meta:
         model = Adresse
-        fields = ['ligne1',  'ville', 'pays']
+        fields = ['ligne1', 'code_postal', 'ville', 'pays']  # AJOUT: code_postal
         widgets = {
             'ligne1': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Numéro et rue'
+            }),
+            'code_postal': forms.TextInput(attrs={  # NOUVEAU CHAMP
+                'class': 'form-control',
+                'placeholder': 'Code postal'
             }),
             'ville': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -56,14 +64,10 @@ class AdresseForm(forms.ModelForm):
             }),
             'pays': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Mali'
+                'placeholder': 'Pays'
             })
         }
 
-
-from django import forms
-from django.utils import timezone
-from candidats.models import ProfilCandidat
 
 class ProfilCandidatForm(forms.ModelForm):
     class Meta:
@@ -138,7 +142,7 @@ class ProfilCandidatForm(forms.ModelForm):
 class DiplomeForm(forms.ModelForm):
     class Meta:
         model = Diplome
-        exclude = ['candidat']
+        exclude = ['candidat', 'est_supprime']  # EXCLURE: est_supprime
         widgets = {
             'intitule': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -154,7 +158,10 @@ class DiplomeForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Ex: Informatique, Marketing, Finance...'
             }),
-            'pays_obtention': forms.Select(attrs={'class': 'form-select'}),
+            'pays_obtention': forms.TextInput(attrs={  # CHANGÉ: De Select à TextInput
+                'class': 'form-control',
+                'placeholder': 'Pays d\'obtention'
+            }),
             'ville_obtention': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Ville de l\'établissement'
@@ -191,15 +198,9 @@ class DiplomeForm(forms.ModelForm):
                     'placeholder': 'Décrivez votre formation, les matières principales, les projets réalisés...'
                 }
             }),
-            'competences_acquises': SummernoteWidget(attrs={
-                'summernote': {
-                    'toolbar': [
-                        ['style', ['bold', 'italic']],
-                        ['para', ['ul']],
-                    ],
-                    'height': 150,
-                    'placeholder': 'Listez les compétences techniques et transversales acquises...'
-                }
+            'competences': forms.SelectMultiple(attrs={  # CHANGÉ: SummernoteWidget à SelectMultiple
+                'class': 'form-select',
+                'size': 5
             }),
         }
 
@@ -219,7 +220,7 @@ class DiplomeForm(forms.ModelForm):
 class ExperienceForm(forms.ModelForm):
     class Meta:
         model = ExperienceProfessionnelle
-        exclude = ['candidat']
+        exclude = ['candidat', 'est_supprime']  # EXCLURE: est_supprime
         widgets = {
             'poste': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -235,7 +236,10 @@ class ExperienceForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Ville, Pays'
             }),
-            'pays': forms.Select(attrs={'class': 'form-select'}),
+            'pays': forms.TextInput(attrs={  # CHANGÉ: De Select à TextInput
+                'class': 'form-control',
+                'placeholder': 'Pays'
+            }),
             'remote': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'date_debut': forms.DateInput(attrs={
                 'type': 'date',
@@ -268,15 +272,9 @@ class ExperienceForm(forms.ModelForm):
                     'placeholder': 'Décrivez vos missions principales, responsabilités...'
                 }
             }),
-            'competences': SummernoteWidget(attrs={
-                'summernote': {
-                    'toolbar': [
-                        ['style', ['bold', 'italic']],
-                        ['para', ['ul']],
-                    ],
-                    'height': 150,
-                    'placeholder': 'Compétences techniques et soft skills développées...'
-                }
+            'competences': forms.SelectMultiple(attrs={  # CHANGÉ: SummernoteWidget à SelectMultiple
+                'class': 'form-select',
+                'size': 5
             }),
             'realisation': SummernoteWidget(attrs={
                 'summernote': {
@@ -320,8 +318,6 @@ class ExperienceForm(forms.ModelForm):
             )
         
         return cleaned_data
-
-
 
 
 class DocumentForm(forms.ModelForm):
@@ -378,7 +374,7 @@ class CandidatureForm(forms.ModelForm):
                         ['view', ['codeview']],
                     ],
                     'height': 200,
-                    'placeholder': 'Expliquez pourquoi vous êtes intéressé par ce poste et cette entreprise...'
+                    'placeholder': 'Expliquez pourquoi vous êtes intéressé par ce poste ...'
                 }
             }),
             'documents_supplementaires': forms.SelectMultiple(attrs={
@@ -392,21 +388,21 @@ class CandidatureForm(forms.ModelForm):
         if user:
             # Filtrage des documents par type et statut actif
             self.fields['cv_utilise'].queryset = user.documents.filter(
-                type_document='CV', est_actif=True
+                type_document='CV', est_actif=True, est_supprime=False  # AJOUT: est_supprime
             )
             self.fields['lettre_motivation'].queryset = user.documents.filter(
-                type_document='LM', est_actif=True
+                type_document='LM', est_actif=True, est_supprime=False  # AJOUT: est_supprime
             )
             self.fields['documents_supplementaires'].queryset = user.documents.filter(
                 type_document__in=['DIPLOME', 'RECOMMANDATION', 'PORTFOLIO', 'CERTIFICAT'],
-                est_actif=True
+                est_actif=True, est_supprime=False  # AJOUT: est_supprime
             )
 
 
 class EntretienForm(forms.ModelForm):
     class Meta:
         model = Entretien
-        exclude = ['candidature', 'statut', 'date_reelle', 'duree_reelle']
+        exclude = ['candidature', 'statut', 'date_reelle', 'duree_reelle', 'est_supprime']  # EXCLURE: est_supprime
         widgets = {
             'type_entretien': forms.Select(attrs={'class': 'form-select'}),
             'date_prevue': forms.DateTimeInput(attrs={
@@ -542,3 +538,106 @@ class EntretienFeedbackForm(forms.ModelForm):
                 }
             }),
         }
+
+# ====================================================
+# NOUVEAU FORMULAIRE - ÉVALUATION ENTRETIEN
+# ====================================================
+
+class EvaluationEntretienForm(forms.ModelForm):
+    class Meta:
+        model = EvaluationEntretien
+        fields = [
+            'note_technique', 'note_communication', 'note_motivation', 'note_culture',
+            'points_forts', 'points_amelioration', 'recommandation',
+            'recommander', 'niveau_urgence'
+        ]
+        widgets = {
+            'note_technique': forms.Select(attrs={
+                'class': 'form-select',
+                'placeholder': 'Compétences techniques'
+            }),
+            'note_communication': forms.Select(attrs={
+                'class': 'form-select',
+                'placeholder': 'Communication'
+            }),
+            'note_motivation': forms.Select(attrs={
+                'class': 'form-select',
+                'placeholder': 'Motivation'
+            }),
+            'note_culture': forms.Select(attrs={
+                'class': 'form-select',
+                'placeholder': 'Fit culturel'
+            }),
+            'points_forts': SummernoteWidget(attrs={
+                'summernote': {
+                    'toolbar': [
+                        ['style', ['bold']],
+                        ['para', ['ul']],
+                    ],
+                    'height': 150,
+                    'placeholder': 'Points forts observés pendant l\'entretien...'
+                }
+            }),
+            'points_amelioration': SummernoteWidget(attrs={
+                'summernote': {
+                    'toolbar': [
+                        ['style', ['bold']],
+                        ['para', ['ul']],
+                    ],
+                    'height': 150,
+                    'placeholder': 'Points d\'amélioration pour le candidat...'
+                }
+            }),
+            'recommandation': SummernoteWidget(attrs={
+                'summernote': {
+                    'toolbar': [
+                        ['style', ['bold', 'italic']],
+                        ['para', ['ul', 'ol']],
+                    ],
+                    'height': 200,
+                    'placeholder': 'Recommandation et avis global...'
+                }
+            }),
+            'recommander': forms.CheckboxInput(attrs={
+                'class': 'form-check-input',
+            }),
+            'niveau_urgence': forms.Select(attrs={
+                'class': 'form-select',
+            }),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Personnaliser les labels
+        self.fields['note_technique'].label = "Compétences Techniques"
+        self.fields['note_communication'].label = "Communication"
+        self.fields['note_motivation'].label = "Motivation"
+        self.fields['note_culture'].label = "Fit Culturel"
+        self.fields['points_forts'].label = "Points Forts Observés"
+        self.fields['points_amelioration'].label = "Points d'Amélioration"
+        self.fields['recommandation'].label = "Recommandation"
+        self.fields['recommander'].label = "Recommander ce candidat"
+        self.fields['niveau_urgence'].label = "Niveau d'Urgence"
+
+# ====================================================
+# FORMULAIRES DE SUPPRESSION (SOFT DELETE)
+# ====================================================
+
+class SoftDeleteForm(forms.Form):
+    """
+    Formulaire générique pour la suppression logique
+    """
+    confirmation = forms.BooleanField(
+        required=True,
+        label="Je confirme la suppression",
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    raison = forms.CharField(
+        required=False,
+        label="Raison de la suppression (optionnel)",
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 3,
+            'placeholder': 'Pourquoi souhaitez-vous supprimer cet élément ?'
+        })
+    )
