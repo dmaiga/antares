@@ -20,203 +20,214 @@
       --primary-blue: #0A4B8C;
     }
 
+    html, body {
+        height: 100%;
+    }
+
     body {
-      font-family: 'Montserrat', sans-serif;
-      background-color: var(--light-gray);
-      color: var(--dark-gray);
-      line-height: 1.5;
-      font-size: 1.2rem;
+        font-family: 'Montserrat', sans-serif;
+        background-color: var(--light-gray);
+        color: var(--dark-gray);
+        line-height: 1.5;
+        font-size: 1.2rem;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    main {
+        flex: 1 0 auto;
     }
 
     .navbar {
-      background-color: white;
-      box-shadow: 0 1px 8px rgba(13, 59, 102, 0.1);
-      border-bottom: 1px solid var(--light-blue);
-      padding: 0.5rem 1rem;
+        background-color: white;
+        box-shadow: 0 1px 8px rgba(13, 59, 102, 0.1);
+        border-bottom: 1px solid var(--light-blue);
+        padding: 0.5rem 1rem;
     }
 
     .navbar-logo {
-      height: 70px;
-      width: auto;
-      transition: all 0.2s ease;
+        height: 45px;
+        width: auto;
+        transition: all 0.2s ease;
     }
 
     .nav-link {
-      font-weight: 500;
-      padding: 0.5rem 1rem;
-      font-size: 1.2rem;
-      transition: all 0.2s ease;
-      color: var(--primary-blue) !important;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        font-size: 1.2rem;
+        transition: all 0.2s ease;
+        color: var(--primary-blue) !important;
     }
 
     .nav-link:hover,
     .nav-link:focus,
     .nav-link.active {
-      color: var(--accent-orange) !important;
+        color: var(--accent-orange) !important;
     }
 
     .navbar-brand {
-      margin-right: auto;
-      display: flex;
-      align-items: center;
+        margin-right: auto;
+        display: flex;
+        align-items: center;
     }
 
     .btn-orange {
-      background-color: var(--accent-orange);
-      color: white;
-      border: none;
-      font-weight: 400;
-      padding: 0.4rem 1rem;
-      border-radius: 5px;
-      font-size: 0.9rem;
-      transition: all 0.2s ease;
+        background-color: var(--accent-orange);
+        color: white;
+        border: none;
+        font-weight: 400;
+        padding: 0.4rem 1rem;
+        border-radius: 5px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
     }
 
     .btn-orange:hover {
-      background-color: #e0552e;
-      transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(244, 96, 54, 0.2);
+        background-color: #e0552e;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(244, 96, 54, 0.2);
     }
 
     .user-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 1px solid var(--accent-orange);
-      margin-right: 0.5rem;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid var(--accent-orange);
+        margin-right: 0.5rem;
     }
 
     .user-menu .dropdown-toggle::after {
-      display: none;
+        display: none;
     }
 
     .dropdown-menu {
-      min-width: 200px;
-      border: 1px solid rgba(0,0,0,0.05);
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-      font-size: 0.85rem;
+        min-width: 200px;
+        border: 1px solid rgba(0,0,0,0.05);
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        font-size: 0.85rem;
     }
 
     .dropdown-item {
-      padding: 0.4rem 1rem;
-      transition: all 0.2s;
+        padding: 0.4rem 1rem;
+        transition: all 0.2s;
     }
 
     .dropdown-item:hover {
-      background-color: var(--light-blue);
-      color: var(--primary-blue);
+        background-color: var(--light-blue);
+        color: var(--primary-blue);
     }
 
     .dropdown-item .text-muted {
-      font-size: 0.75rem;
+        font-size: 0.75rem;
     }
 
     .navbar-container {
-      display: flex;
-      width: 100%;
-      align-items: center;
+        display: flex;
+        width: 100%;
+        align-items: center;
     }
 
     .navbar-links-container {
-      flex-grow: 1;
-      display: flex;
-      justify-content: center;
+        flex-grow: 1;
+        display: flex;
+        justify-content: center;
     }
 
     .navbar-auth-container {
-      margin-left: auto;
+        margin-left: auto;
     }
 
     footer {
-      background-color: var(--primary-blue);
-      color: white;
-      padding: 1.5rem 0;
-      font-size: 0.85rem;
+        background-color: var(--primary-blue);
+        color: white;
+        padding: 1.5rem 0;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+        margin-top: auto;
     }
 
     footer a {
-      color: white;
-      text-decoration: none;
-      transition: color 0.2s ease;
+        color: white;
+        text-decoration: none;
+        transition: color 0.2s ease;
     }
 
     footer a:hover {
-      color: var(--accent-orange);
+        color: var(--accent-orange);
     }
 
     .container {
-      max-width: 1140px;
+        max-width: 1140px;
+        padding-bottom: 2rem; /* Espace avant le footer */
     }
 
     @media (max-width: 991.98px) {
-      .navbar-logo {
-        height: 40px;
-      }
+        .navbar-logo {
+            height: 40px;
+        }
 
-      .nav-link {
-        font-size: 0.9rem;
-        padding: 0.4rem 0.8rem;
-      }
+        .nav-link {
+            font-size: 0.9rem;
+            padding: 0.4rem 0.8rem;
+        }
 
-      .navbar-collapse {
-        background-color: white;
-        padding: 1rem;
-        border-radius: 0 0 8px 8px;
-        box-shadow: 0 5px 15px rgba(13, 59, 102, 0.1);
-      }
+        .navbar-collapse {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 5px 15px rgba(13, 59, 102, 0.1);
+        }
 
-      .nav-item {
-        border-bottom: 1px solid var(--light-blue);
-      }
+        .nav-item {
+            border-bottom: 1px solid var(--light-blue);
+        }
 
-      .nav-item:last-child {
-        border-bottom: none;
-      }
+        .nav-item:last-child {
+            border-bottom: none;
+        }
 
-      .navbar-toggler {
-        border-color: var(--primary-blue);
-        padding: 0.3rem;
-      }
+        .navbar-toggler {
+            border-color: var(--primary-blue);
+            padding: 0.3rem;
+        }
 
-      .navbar-toggler-icon {
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2813, 59, 102, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-      }
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2813, 59, 102, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
 
-      .dropdown-menu {
-        border: none;
-        box-shadow: none;
-        font-size: 0.8rem;
-      }
+        .dropdown-menu {
+            border: none;
+            box-shadow: none;
+            font-size: 0.8rem;
+        }
 
-      .container {
-        padding-left: 0.75rem;
-        padding-right: 0.75rem;
-      }
+        .container {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
     }
 
     @media (max-width: 576px) {
-      .navbar-brand span {
-        font-size: 0.9rem;
-      }
+        .navbar-brand span {
+            font-size: 0.9rem;
+        }
 
-      .btn-orange {
-        font-size: 0.8rem;
-        padding: 0.3rem 0.8rem;
-      }
+        .btn-orange {
+            font-size: 0.8rem;
+            padding: 0.3rem 0.8rem;
+        }
 
-      .user-avatar {
-        width: 28px;
-        height: 28px;
-      }
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+        }
 
-      footer {
-        padding: 1rem 0;
-      }
 
-      footer p, footer a {
-        font-size: 0.8rem;
-      }
+        footer p, footer a {
+            font-size: 0.1rem;
+        }
     }
   </style>
 </head>
@@ -225,12 +236,11 @@
   <nav class="navbar navbar-expand-lg sticky-top">
     <div class="container navbar-container">
       <!-- Logo à gauche -->
-      <a class="navbar-brand" href="{% url 'home' %}">
+      <a class="navbar-brand" href="{% url 'dashboard_candidat' %}">
         <img src="{% static 'site_web/images/hero/logo_antares.png' %}" 
              alt="Logo Antares" 
              loading="lazy"
              class="navbar-logo">
-    
       </a>
 
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -257,7 +267,7 @@
                Candidatures
               </a>
             </li>
-              <li class="nav-item">
+            <li class="nav-item">
               <a class="nav-link {% if 'document_list' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'document_list' %}">
              Documents
               </a>
@@ -267,7 +277,6 @@
                Profil
               </a>
             </li>
-
           </ul>
         </div>
 
@@ -277,11 +286,8 @@
             {% if user.is_authenticated and user.role == 'candidat' %}
               <li class="nav-item dropdown list-unstyled user-menu">
                 <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <img  src="{% if profil_form.instance.photo %}{{ profil_form.instance.photo.url }}{% endif %}" 
-                       class="user-avatar" alt="">
-
-                      
-
+                  <img src="{% if user.profil_candidat.photo %}{{ user.profil_candidat.photo.url }}{% else %}{% static 'site_web/images/default-avatar.png' %}{% endif %}" 
+                       class="user-avatar" alt="Avatar">
                   <span class="d-none d-md-inline fw-medium">{{ user.first_name|default:user.email }}</span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
@@ -296,9 +302,13 @@
                   <li><a class="dropdown-item" href="{% url 'edit_profil' %}">
                     <i class="bi bi-person-vcard me-2"></i> Mon profil
                   </a></li>
-                  <li><a class="dropdown-item" href="{% url 'candidature_list' %}">
-                    <i class="bi bi-file-earmark-text me-2"></i> Mes candidatures
+                  <li><a class="dropdown-item" href="{% url 'experience_list' %}">
+                    <i class="bi bi-briefcase me-2"></i> Mes expériences
                   </a></li>
+                  <li><a class="dropdown-item" href="{% url 'competence_list' %}">
+                    <i class="bi bi-star me-2"></i> Mes compétences
+                  </a></li>
+                 
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="{% url 'home' %}">
                     <i class="bi bi-house me-2"></i> Site principal
@@ -321,22 +331,24 @@
     </div>
   </nav>
 
-  <!-- Messages Django -->
-  <div class="container mt-3">
-    {% if messages %}
-      <div class="mb-3">
-        {% for message in messages %}
-          <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
+  <!-- Contenu principal -->
+  <main>
+    <div class="container mt-3">
+      {% if messages %}
+        <div class="mb-3">
+          {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
 
-    <!-- Contenu principal -->
-    {% block content %}{% endblock %}
-  </div>
+      <!-- Contenu principal -->
+      {% block content %}{% endblock %}
+    </div>
+  </main>
 
   <!-- Footer -->
   <footer class="bg-primary-blue text-white py-3">
@@ -357,6 +369,6 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   {% block extra_js %}{% endblock %}
   <script src="{% static 'summernote/summernote-lite.min.js' %}"></script>
-<script src="{% static 'summernote/lang/summernote-fr-FR.min.js' %}"></script>
+  <script src="{% static 'summernote/lang/summernote-fr-FR.min.js' %}"></script>
 </body>
 </html>

@@ -160,40 +160,45 @@
           {% endif %}
         </div>
       </div>
-
-      <!-- Compétences principales améliorées -->
+      <!-- Derniers documents uploadés -->
       <div class="card mb-4 border-0 shadow-sm">
-        <div class="card-header bg-white border-0 py-3">
-          <h5 class="mb-0 fw-bold text-primary-blue">Mes compétences principales</h5>
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
+          <h5 class="mb-0 fw-bold text-primary-blue">Mes 5 derniers documents</h5>
+          <a href="{% url 'document_list' %}" class="btn btn-sm btn-outline-primary">
+            Voir tout <i class="bi bi-arrow-right ms-1"></i>
+          </a>
         </div>
         <div class="card-body">
-          {% if competences %}
-            <div class="d-flex flex-wrap gap-2 mb-3">
-              {% for competence in competences|slice:":12" %}
-                <span class="badge bg-primary-blue p-2">{{ competence.nom }}</span>
+          {% if documents_recents %}
+            <ul class="list-group list-group-flush">
+              {% for doc in documents_recents %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <div class="text-truncate" style="max-width: 70%;">
+                    <i class="bi bi-file-earmark-text text-primary-blue me-2"></i>
+                    <span class="fw-medium">{{ doc.nom }}</span>
+                    <small class="text-muted d-block">{{ doc.date_upload|date:"d/m/Y" }} · {{ doc.get_type_document_display }}</small>
+                  </div>
+                  <div class="d-flex gap-2">
+                    <a href="{{ doc.fichier.url }}" target="_blank" class="btn btn-sm btn-outline-primary" title="Voir">
+                      <i class="bi bi-eye"></i>
+                    </a>
+                  </div>
+                </li>
               {% endfor %}
-              {% if competences.count > 12 %}
-                <span class="badge bg-secondary p-2">+{{ competences.count|add:"-12" }} autres</span>
-              {% endif %}
-            </div>
-            <div class="mt-2">
-              <a href="{% url 'competence_list' %}" class="btn btn-sm btn-outline-primary">
-                <i class="bi bi-pencil me-1"></i> Gérer mes compétences
-              </a>
-            </div>
+            </ul>
           {% else %}
-            <div class="text-center py-3">
-              <i class="bi bi-tools display-4 text-muted"></i>
-              <p class="text-muted mt-3">Aucune compétence enregistrée.</p>
-              <a href="{% url 'competence_list' %}" class="btn btn-orange mt-2">
-                <i class="bi bi-plus-circle me-1"></i> Ajouter des compétences
+            <div class="text-center py-4">
+              <i class="bi bi-file-earmark-text display-4 text-muted"></i>
+              <p class="text-muted mt-3">Aucun document n’a encore été ajouté.</p>
+              <a href="{% url 'document_list' %}" class="btn btn-orange mt-2">
+                <i class="bi bi-plus-circle me-1"></i> Ajouter un document
               </a>
             </div>
           {% endif %}
         </div>
       </div>
     </div>
-
+        
     <!-- Sidebar droite avec informations sur la plateforme -->
     <div class="col-lg-3">
       <!-- Profil candidat -->

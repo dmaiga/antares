@@ -1,170 +1,505 @@
 {% extends 'base_candidate.html' %}
 {% load static %}
 
-{% block title %}Postuler à {{ offre.titre }}{% endblock %}
+{% block title %}{{ offre.titre }} - {{ offre.societe }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <nav aria-label="breadcrumb" class="mb-4">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url 'candidat_job_list' %}">Offres d'emploi</a></li>
-                    <li class="breadcrumb-item"><a href="{{ offre.get_absolute_url }}">{{ offre.titre|truncatewords:3 }}</a></li>
-                    <li class="breadcrumb-item active">Postuler</li>
-                </ol>
-            </nav>
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'candidat_job_list' %}" class="text-decoration-none">
+                    <i class="fas fa-arrow-left me-2"></i>Retour aux offres
+                </a>
+            </li>
+            <li class="breadcrumb-item active text-truncate" style="max-width: 200px;">
+                {{ offre.titre }}
+            </li>
+        </ol>
+    </nav>
 
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="card-title mb-0">
-                        <i class="fas fa-paper-plane me-2"></i>Postuler à l'offre
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <!-- Offre Summary -->
-                    <div class="alert alert-info">
-                        <h5 class="alert-heading">{{ offre.titre }}</h5>
-                        <p class="mb-1"><strong>Entreprise:</strong> {{ offre.entreprise.nom }}</p>
-                        <p class="mb-1"><strong>Lieu:</strong> {{ offre.lieu }}</p>
-                        <p class="mb-0"><strong>Type de contrat:</strong> {{ offre.get_type_contrat_display }}</p>
-                    </div>
-
-                    <form method="post">
-                        {% csrf_token %}
-                        
-                        {% if form.non_field_errors %}
-                            <div class="alert alert-danger">
-                                {% for error in form.non_field_errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                        
-                        <div class="mb-3 required-field">
-                            <label for="{{ form.cv.id_for_label }}" class="form-label">{{ form.cv.label }}</label>
-                            {{ form.cv }}
-                            {% if form.cv.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.cv.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                            <div class="form-text">Sélectionnez le CV que vous souhaitez envoyer pour cette candidature.</div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="{{ form.lettre_motivation.id_for_label }}" class="form-label">{{ form.lettre_motivation.label }}</label>
-                            {{ form.lettre_motivation }}
-                            {% if form.lettre_motivation.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.lettre_motivation.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                            <div class="form-text">
-                                Rédigez une lettre de motivation personnalisée pour cette offre. 
-                                <a href="#" data-bs-toggle="modal" data-bs-target="#motivationTips">Conseils d'écriture</a>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Documents joints</label>
-                            <div class="border p-3 rounded">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" checked disabled>
-                                    <label class="form-check-label">
-                                        CV sélectionné
-                                    </label>
-                                </div>
-                                {% if user.documents.all %}
-                                    <div class="mt-2">
-                                        <label class="form-label">Ajouter d'autres documents:</label>
-                                        {% for doc in user.documents.all %}
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="documents" value="{{ doc.pk }}" id="doc_{{ doc.pk }}">
-                                                <label class="form-check-label" for="doc_{{ doc.pk }}">
-                                                    {{ doc.titre }} ({{ doc.get_type_display }})
-                                                </label>
-                                            </div>
-                                        {% endfor %}
-                                    </div>
+    <div class="row">
+        <!-- Contenu principal -->
+        <div class="col-lg-8 col-md-7 mb-4">
+            <!-- Header de l'offre -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-gradient-primary text-white py-4">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+                        <div class="mb-3 mb-md-0">
+                            <h1 class="h3 mb-2 fw-bold">{{ offre.titre }}</h1>
+                            <div class="d-flex flex-wrap align-items-center gap-2">
+                                <span class="badge bg-white text-dark fs-6">
+                                    <i class="fas fa-building me-1"></i>{{ offre.societe }}
+                                </span>
+                                {% if offre.lieu %}
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-map-marker-alt me-1"></i>{{ offre.lieu }}
+                                </span>
                                 {% endif %}
                             </div>
                         </div>
-                        
-                        <div class="form-group mt-4">
-                            <button type="submit" class="btn btn-success me-2">
-                                <i class="fas fa-paper-plane me-1"></i> Envoyer la candidature
+                        <span class="badge bg-light text-dark fs-6 px-3 py-2">
+                            <i class="fas fa-hashtag me-1"></i>{{ offre.reference }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Métadonnées importantes -->
+                <div class="card-body">
+                    <div class="row g-4">
+                        {% if offre.salaire %}
+                        <div class="col-sm-6 col-md-4">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3">
+                                    <i class="fas fa-euro-sign text-primary"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Salaire</small>
+                                    <strong>{{ offre.salaire }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if offre.niveau_etude %}
+                        <div class="col-sm-6 col-md-4">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-success bg-opacity-10 p-3 rounded-circle me-3">
+                                    <i class="fas fa-graduation-cap text-success"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Niveau</small>
+                                    <strong>{{ offre.niveau_etude }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if offre.experience_requise %}
+                        <div class="col-sm-6 col-md-4">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-warning bg-opacity-10 p-3 rounded-circle me-3">
+                                    <i class="fas fa-clock text-warning"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Expérience</small>
+                                    <strong>{{ offre.experience_requise }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="col-sm-6 col-md-4">
+                            <div class="d-flex align-items-center">
+                                <div >
+                                    <i class="fas fa-calendar-plus text-info"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Publication</small>
+                                    <strong>{{ offre.date_publication|date:"d/m/Y" }}</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if offre.date_limite %}
+                        <div class="col-sm-6 col-md-4">
+                            <div class="d-flex align-items-center">
+                                <div >
+                                    <i class="fas fa-calendar-times text-{% if offre.date_limite < today %}danger{% else %}secondary{% endif %}"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Clôture</small>
+                                    <strong class="text-{% if offre.date_limite < today %}danger{% endif %}">
+                                        {{ offre.date_limite|date:"d/m/Y" }}
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="col-sm-6 col-md-4">
+                            <div class="d-flex align-items-center">
+                                <div >
+                                    <i class="fas fa-users text-dark"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Postes</small>
+                                    <strong>{{ offre.nombre_candidat }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section de suivi de candidature (si déjà postulé) -->
+            {% if deja_postule %}
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Suivi de votre candidature</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <div class="bg-{{ candidature.statut|get_status_color }} p-3 rounded-circle">
+                                        <i class="fas fa-{{ candidature.statut|get_status_icon }} text-white"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Statut actuel</small>
+                                    <strong class="text-{{ candidature.statut|get_status_color }}">
+                                        {{ candidature.get_statut_display }}
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <div class="bg-info p-3 rounded-circle">
+                                        <i class="fas fa-calendar text-white"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Date de postulation</small>
+                                    <strong>{{ candidature.date_postulation|date:"d/m/Y" }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if candidature.date_entretien %}
+                    <div class="alert alert-info">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-calendar-check me-2"></i>
+                                <strong>Entretien programmé</strong> le 
+                                {{ candidature.date_entretien|date:"d/m/Y à H:i" }}
+                                ({{ candidature.get_type_entretien_display }})
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm" id="addToCalendar">
+                                <i class="fas fa-calendar-plus me-1"></i>Ajouter au calendrier
                             </button>
-                            <a href="{{ offre.get_absolute_url }}" class="btn btn-secondary">
-                                <i class="fas fa-times me-1"></i> Annuler
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Actions selon le statut -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'candidature_detail' candidature.pk %}" class="btn btn-primary">
+                            <i class="fas fa-eye me-1"></i>Détails complets
+                        </a>
+                        {% if candidature.statut == 'POSTULE' or candidature.statut == 'EN_REVUE' %}
+                        <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#retirerModal">
+                            <i class="fas fa-times me-1"></i>Retirer ma candidature
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Contenu détaillé avec onglets -->
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <ul class="nav nav-tabs nav-justified mb-4" id="offreTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="mission-tab" data-bs-toggle="tab" data-bs-target="#mission" type="button" role="tab">
+                                <i class="fas fa-bullseye me-2"></i>Mission
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="profil-tab" data-bs-toggle="tab" data-bs-target="#profil" type="button" role="tab">
+                                <i class="fas fa-user-tie me-2"></i>Profil
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="competences-tab" data-bs-toggle="tab" data-bs-target="#competences" type="button" role="tab">
+                                <i class="fas fa-cogs me-2"></i>Compétences
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="conditions-tab" data-bs-toggle="tab" data-bs-target="#conditions" type="button" role="tab">
+                                <i class="fas fa-file-contract me-2"></i>Conditions
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="offreTabsContent">
+                        <!-- Mission -->
+                        <div class="tab-pane fade show active" id="mission" role="tabpanel">
+                            {% if offre.mission_principale %}
+                                <div class="content-box">
+                                    {{ offre.mission_principale|safe }}
+                                </div>
+                            {% endif %}
+                            {% if offre.taches %}
+                                <h6 class="mt-4 text-primary">Tâches principales :</h6>
+                                <div class="content-box">
+                                    {{ offre.taches|safe }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Profil -->
+                        <div class="tab-pane fade" id="profil" role="tabpanel">
+                            {% if offre.profil_recherche %}
+                                <div class="content-box">
+                                    {{ offre.profil_recherche|safe }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Compétences -->
+                        <div class="tab-pane fade" id="competences" role="tabpanel">
+                            {% if offre.competences_qualifications %}
+                                <div class="content-box">
+                                    {{ offre.competences_qualifications|safe }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Conditions -->
+                        <div class="tab-pane fade" id="conditions" role="tabpanel">
+                            {% if offre.conditions %}
+                                <div class="content-box">
+                                    {{ offre.conditions|safe }}
+                                </div>
+                            {% endif %}
+                            {% if offre.comment_postuler %}
+                                <h6 class="mt-4 text-primary">Comment postuler :</h6>
+                                <div class="content-box">
+                                    {{ offre.comment_postuler|safe }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Actions -->
+        <div class="col-lg-4 col-md-5">
+            <div class="sticky-top" style="top: 100px; z-index: 1000;">
+                <!-- CTA Principal -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body text-center">
+                        {% if deja_postule %}
+                            <div class="alert alert-success border-0">
+                                <i class="fas fa-check-circle fa-2x mb-3 text-success"></i>
+                                <h6 class="fw-bold">Candidature envoyée</h6>
+                                <p class="small mb-2">Le {{ candidature.date_postulation|date:"d/m/Y" }}</p>
+                                <a href="{% url 'candidature_detail' candidature.pk %}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-eye me-1"></i>Voir ma candidature
+                                </a>
+                            </div>
+                        {% else %}
+                            <a href="{% url 'apply_job' offre.pk %}" class="btn btn-primary btn-lg w-100 mb-3 py-3">
+                                <i class="fas fa-paper-plane me-2"></i>Postuler maintenant
+                            </a>
+                            <p class="text-muted small">
+                                <i class="fas fa-clock me-1"></i>
+                                {% if offre.date_limite %}
+                                    Clôture le {{ offre.date_limite|date:"d/m/Y" }}
+                                {% else %}
+                                    Offre à pourvoir rapidement
+                                {% endif %}
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Informations de contact -->
+                {% if offre.contact or offre.fichier_pdf %}
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informations</h6>
+                    </div>
+                    <div class="card-body">
+                        {% if offre.contact %}
+                        <div class="mb-3">
+                            <h6 class="small text-muted mb-2">Contact</h6>
+                            <a href="mailto:{{ offre.contact }}" class="btn btn-outline-secondary btn-sm w-100 text-start">
+                                <i class="fas fa-envelope me-2"></i>{{ offre.contact }}
                             </a>
                         </div>
-                    </form>
+                        {% endif %}
+                        
+                        {% if offre.fichier_pdf %}
+                        <div>
+                            <h6 class="small text-muted mb-2">Document</h6>
+                            <a href="{{ offre.fichier_pdf.url }}" class="btn btn-outline-primary btn-sm w-100 text-start" target="_blank">
+                                <i class="fas fa-download me-2"></i>Télécharger l'offre PDF
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Partage -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0"><i class="fas fa-share-alt me-2"></i>Partager</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary btn-sm share-btn" data-platform="linkedin">
+                                <i class="fab fa-linkedin me-2"></i>LinkedIn
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm share-btn" data-platform="facebook">
+                                <i class="fab fa-facebook me-2"></i>Facebook
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm share-btn" data-platform="email">
+                                <i class="fas fa-envelope me-2"></i>Email
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal pour les conseils de lettre de motivation -->
-<div class="modal fade" id="motivationTips" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+<!-- Modal pour retirer la candidature -->
+{% if deja_postule %}
+<div class="modal fade" id="retirerModal" tabindex="-1" aria-labelledby="retirerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Conseils pour votre lettre de motivation</h5>
+                <h5 class="modal-title" id="retirerModalLabel">Retirer ma candidature</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">✅ Personnalisez la lettre pour cette offre spécifique</li>
-                    <li class="list-group-item">✅ Mentionnez pourquoi vous êtes intéressé par cette entreprise</li>
-                    <li class="list-group-item">✅ Mettez en avant vos compétences en lien avec le poste</li>
-                    <li class="list-group-item">✅ Soyez concis (300-500 mots maximum)</li>
-                    <li class="list-group-item">✅ Relisez-vous pour corriger les fautes d'orthographe</li>
-                </ul>
+                <p>Êtes-vous sûr de vouloir retirer votre candidature pour le poste de <strong>{{ offre.titre }}</strong> chez <strong>{{ offre.societe }}</strong> ?</p>
+                <p class="text-muted">Cette action est irréversible.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" action="{% url 'withdraw_application' candidature.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Confirmer le retrait</button>
+                </form>
             </div>
         </div>
     </div>
 </div>
+{% endif %}
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add Bootstrap classes to form elements
-        const formInputs = document.querySelectorAll('input, select, textarea');
-        formInputs.forEach(input => {
-            if (input.type !== 'checkbox' && input.type !== 'hidden') {
-                input.classList.add('form-control');
-            }
-        });
-        
-        // Style the select elements
-        const selectElements = document.querySelectorAll('select');
-        selectElements.forEach(select => {
-            select.classList.add('form-select');
-        });
-        
-        // Style the textarea
-        const textarea = document.querySelector('textarea');
-        if (textarea) {
-            textarea.classList.add('form-control');
-            textarea.rows = 8;
-            textarea.placeholder = "Madame, Monsieur,\n\nJe me permets de vous soumettre ma candidature...";
+<style>
+    .breadcrumb {
+        background: transparent;
+        padding: 0;
+        margin-bottom: 2rem;
+    }
+    
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    }
+    
+    .content-box {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border-left: 4px solid #0d6efd;
+    }
+    
+    .nav-tabs .nav-link {
+        border: none;
+        border-bottom: 3px solid transparent;
+        color: #6c757d;
+        padding: 1rem 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-tabs .nav-link.active {
+        border-bottom-color: #0d6efd;
+        color: #0d6efd;
+        background: transparent;
+        font-weight: 600;
+    }
+    
+    .nav-tabs .nav-link:hover {
+        border-bottom-color: #0d6efd;
+        color: #0d6efd;
+    }
+    
+    @media (max-width: 768px) {
+        .nav-tabs {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
         
-        // Style checkboxes
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-            if (!checkbox.disabled) {
-                checkbox.classList.add('form-check-input');
+        .nav-tabs .nav-item {
+            min-width: 120px;
+        }
+        
+        .content-box {
+            padding: 1rem;
+        }
+        
+        .sticky-top {
+            position: relative;
+            top: 0 !important;
+        }
+    }
+</style>
+
+<script>
+    // Partage sur les réseaux sociaux
+    document.querySelectorAll('.share-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const platform = this.dataset.platform;
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent('{{ offre.titre }} - {{ offre.societe }}');
+            
+            let shareUrl;
+            switch(platform) {
+                case 'linkedin':
+                    shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+                    break;
+                case 'facebook':
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+                    break;
+                case 'email':
+                    shareUrl = `mailto:?subject=${title}&body=Je vous partage cette offre: ${url}`;
+                    break;
             }
+            
+            window.open(shareUrl, '_blank');
         });
+    });
+    
+    // Ajouter au calendrier
+    document.getElementById('addToCalendar')?.addEventListener('click', function() {
+        const eventTitle = 'Entretien - {{ offre.titre }} - {{ offre.societe }}';
+        const eventDate = new Date('{{ candidature.date_entretien|date:"c" }}');
+        const eventEndDate = new Date(eventDate.getTime() + 60 * 60 * 1000); // +1 heure
+        
+        const calendarData = [
+            'BEGIN:VCALENDAR',
+            'VERSION:2.0',
+            'BEGIN:VEVENT',
+            'SUMMARY:' + eventTitle,
+            'DTSTART:' + eventDate.toISOString().replace(/-|:|\.\d+/g, ''),
+            'DTEND:' + eventEndDate.toISOString().replace(/-|:|\.\d+/g, ''),
+            'DESCRIPTION:Entretien pour le poste de {{ offre.titre }} chez {{ offre.societe }}',
+            'LOCATION:{{ candidature.type_entretien }}',
+            'END:VEVENT',
+            'END:VCALENDAR'
+        ].join('\n');
+        
+        const blob = new Blob([calendarData], { type: 'text/calendar;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'entretien.ics';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     });
 </script>
 {% endblock %}

@@ -5,17 +5,27 @@
 
 {% block content %}
 <div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">
+    <div class="row">
+        <!-- Formulaire principal -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
                         <i class="fas fa-briefcase me-2"></i>
-                        {% if form.instance.pk %}Modifier l'Expérience{% else %}Ajouter une Nouvelle Expérience{% endif %}
-                    </h3>
+                        {% if form.instance.pk %}Modifier l'expérience{% else %}Nouvelle expérience professionnelle{% endif %}
+                    </h4>
                 </div>
                 <div class="card-body">
-                    <form method="post">
+                    <!-- Conseils contextuels -->
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-lightbulb me-2"></i>Conseil important
+                        </h6>
+                        <p class="mb-2">Ajoutez toutes vos expériences significatives, même les stages et emplois temporaires. Chaque expérience compte !</p>
+                        <small>💡 Plus vous détaillez vos missions et réalisations, plus vous augmentez vos chances de correspondre aux offres.</small>
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         
                         {% if form.non_field_errors %}
@@ -26,171 +36,385 @@
                             </div>
                         {% endif %}
                         
-                        <div class="row">
-                            <div class="col-md-6 mb-3 required-field">
-                                <label for="{{ form.poste.id_for_label }}" class="form-label">{{ form.poste.label }}</label>
-                                {{ form.poste }}
-                                {% if form.poste.errors %}
-                                    <div class="text-danger">
-                                        {% for error in form.poste.errors %}
-                                            {{ error }}
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
+                        <!-- Section 1: Informations de base -->
+                        <div class="card mb-4 border-0 bg-light">
+                            <div class="card-header bg-transparent">
+                                <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informations principales</h6>
                             </div>
-                            
-                            <div class="col-md-6 mb-3 required-field">
-                                <label for="{{ form.entreprise.id_for_label }}" class="form-label">{{ form.entreprise.label }}</label>
-                                {{ form.entreprise }}
-                                {% if form.entreprise.errors %}
-                                    <div class="text-danger">
-                                        {% for error in form.entreprise.errors %}
-                                            {{ error }}
-                                        {% endfor %}
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.poste.id_for_label }}" class="form-label fw-bold">
+                                            Poste occupé *
+                                        </label>
+                                        {{ form.poste }}
+                                        {% if form.poste.errors %}
+                                            <div class="text-danger small">{{ form.poste.errors }}</div>
+                                        {% endif %}
+                                        <div class="form-text">Ex: Développeur Python, Chef de projet marketing</div>
                                     </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.lieu.id_for_label }}" class="form-label">{{ form.lieu.label }}</label>
-                                {{ form.lieu }}
-                                {% if form.lieu.errors %}
-                                    <div class="text-danger">
-                                        {% for error in form.lieu.errors %}
-                                            {{ error }}
-                                        {% endfor %}
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.entreprise.id_for_label }}" class="form-label fw-bold">
+                                            Entreprise *
+                                        </label>
+                                        {{ form.entreprise }}
+                                        {% if form.entreprise.errors %}
+                                            <div class="text-danger small">{{ form.entreprise.errors }}</div>
+                                        {% endif %}
                                     </div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="col-md-6 mb-3 required-field">
-                                <label for="{{ form.type_emploi.id_for_label }}" class="form-label">{{ form.type_emploi.label }}</label>
-                                {{ form.type_emploi }}
-                                {% if form.type_emploi.errors %}
-                                    <div class="text-danger">
-                                        {% for error in form.type_emploi.errors %}
-                                            {{ error }}
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3 required-field">
-                                <label for="{{ form.date_debut.id_for_label }}" class="form-label">{{ form.date_debut.label }}</label>
-                                {{ form.date_debut }}
-                                {% if form.date_debut.errors %}
-                                    <div class="text-danger">
-                                        {% for error in form.date_debut.errors %}
-                                            {{ error }}
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="col-md-6 mb-3" id="date_fin_field">
-                                <label for="{{ form.date_fin.id_for_label }}" class="form-label">{{ form.date_fin.label }}</label>
-                                {{ form.date_fin }}
-                                {% if form.date_fin.errors %}
-                                    <div class="text-danger">
-                                        {% for error in form.date_fin.errors %}
-                                            {{ error }}
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3 form-check form-switch">
-                            {{ form.en_cours }}
-                            <label class="form-check-label" for="{{ form.en_cours.id_for_label }}">{{ form.en_cours.label }}</label>
-                            {% if form.en_cours.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.en_cours.errors %}
-                                        {{ error }}
-                                    {% endfor %}
                                 </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
-                            {{ form.description }}
-                            {% if form.description.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.description.errors %}
-                                        {{ error }}
-                                    {% endfor %}
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.secteur.id_for_label }}" class="form-label">
+                                            Secteur d'activité
+                                        </label>
+                                        {{ form.secteur }}
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.type_contrat.id_for_label }}" class="form-label">
+                                            Type de contrat
+                                        </label>
+                                        {{ form.type_contrat }}
+                                    </div>
                                 </div>
-                            {% endif %}
-                            <div class="form-text">Décrivez vos responsabilités, réalisations et compétences acquises.</div>
+                            </div>
                         </div>
-                        
-                        <div class="form-group mt-4">
-                            <button type="submit" class="btn btn-success me-2">
-                                <i class="fas fa-save me-1"></i> Enregistrer
-                            </button>
-                            <a href="{% url 'experience_list' %}" class="btn btn-secondary">
-                                <i class="fas fa-times me-1"></i> Annuler
+
+                        <!-- Section 2: Localisation et durée -->
+                        <div class="card mb-4 border-0 bg-light">
+                            <div class="card-header bg-transparent">
+                                <h6 class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>Localisation & durée</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.lieu.id_for_label }}" class="form-label">
+                                            Lieu de travail
+                                        </label>
+                                        {{ form.lieu }}
+                                        <div class="form-text">Ex: Paris, France</div>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.pays.id_for_label }}" class="form-label">
+                                            Pays
+                                        </label>
+                                        {{ form.pays }}
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.date_debut.id_for_label }}" class="form-label fw-bold">
+                                            Date de début *
+                                        </label>
+                                        {{ form.date_debut }}
+                                        {% if form.date_debut.errors %}
+                                            <div class="text-danger small">{{ form.date_debut.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3" id="date-fin-container">
+                                        <label for="{{ form.date_fin.id_for_label }}" class="form-label">
+                                            Date de fin
+                                        </label>
+                                        {{ form.date_fin }}
+                                        {% if form.date_fin.errors %}
+                                            <div class="text-danger small">{{ form.date_fin.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="mb-3 form-check form-switch">
+                                    {{ form.en_poste }}
+                                    <label class="form-check-label" for="{{ form.en_poste.id_for_label }}">
+                                        Je travaille toujours ici
+                                    </label>
+                                </div>
+
+                                <div class="mb-3 form-check form-switch">
+                                    {{ form.remote }}
+                                    <label class="form-check-label" for="{{ form.remote.id_for_label }}">
+                                        Télétravail
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 3: Description détaillée -->
+                        <div class="card mb-4 border-0 bg-light">
+                            <div class="card-header bg-transparent">
+                                <h6 class="mb-0"><i class="fas fa-tasks me-2"></i>Description détaillée</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="{{ form.description.id_for_label }}" class="form-label fw-bold">
+                                        Missions et responsabilités *
+                                    </label>
+                                    {{ form.description }}
+                                    {% if form.description.errors %}
+                                        <div class="text-danger small">{{ form.description.errors }}</div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Décrivez vos principales missions, responsabilités et activités quotidiennes.
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.realisation.id_for_label }}" class="form-label">
+                                        Réalisations marquantes
+                                    </label>
+                                    {{ form.realisation }}
+                                    <div class="form-text">
+                                        Ex: Projets menés, objectifs atteints, résultats concrets, innovations...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 4: Informations complémentaires -->
+                        <div class="card mb-4 border-0 bg-light">
+                            <div class="card-header bg-transparent">
+                                <h6 class="mb-0"><i class="fas fa-chart-line me-2"></i>Informations complémentaires</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.salaire.id_for_label }}" class="form-label">
+                                            Salaire annuel brut
+                                        </label>
+                                        {{ form.salaire }}
+                                        <div class="form-text">Optionnel - en euros</div>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.equipe.id_for_label }}" class="form-label">
+                                            Taille de l'équipe
+                                        </label>
+                                        {{ form.equipe }}
+                                        <div class="form-text">Nombre de personnes dans votre équipe</div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.competences.id_for_label }}" class="form-label">
+                                        Compétences utilisées
+                                    </label>
+                                    {{ form.competences }}
+                                    <div class="form-text">
+                                        Sélectionnez les compétences que vous avez développées lors de cette expérience
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.manager.id_for_label }}" class="form-label">
+                                            Manager/Référent
+                                        </label>
+                                        {{ form.manager }}
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.contact_reference.id_for_label }}" class="form-label">
+                                            Contact de référence
+                                        </label>
+                                        {{ form.contact_reference }}
+                                        <div class="form-text">Email ou téléphone</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'experience_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Retour à la liste
                             </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save me-1"></i> 
+                                {% if form.instance.pk %}Mettre à jour{% else %}Ajouter l'expérience{% endif %}
+                            </button>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar conseils -->
+        <div class="col-lg-4">
+            <div  style="top: 100px;">
+                <!-- Conseils pour une bonne expérience -->
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header bg-warning text-dark">
+                        <h6 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Comment bien remplir cette expérience</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <span class="badge bg-primary rounded-pill me-2">1</span>
+                            <small>Soyez précis sur votre poste et vos missions</small>
+                        </div>
+                        <div class="mb-2">
+                            <span class="badge bg-primary rounded-pill me-2">2</span>
+                            <small>Utilisez des verbes d'action (développé, managé, créé...)</small>
+                        </div>
+                        <div class="mb-2">
+                            <span class="badge bg-primary rounded-pill me-2">3</span>
+                            <small>Quantifiez vos résultats quand c'est possible</small>
+                        </div>
+                        <div class="mb-2">
+                            <span class="badge bg-primary rounded-pill me-2">4</span>
+                            <small>Ajoutez les compétences techniques et soft skills</small>
+                        </div>
+                        <div>
+                            <span class="badge bg-primary rounded-pill me-2">5</span>
+                            <small>Mentionnez les outils et technologies utilisés</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exemples concrets -->
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0"><i class="fas fa-star me-2"></i>Exemples de réalisations</h6>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled small">
+                            <li class="mb-2">✓ Augmentation de 25% du trafic web</li>
+                            <li class="mb-2">✓ Réduction des coûts de 15%</li>
+                            <li class="mb-2">✓ Lancement réussi de 3 produits</li>
+                            <li class="mb-2">✓ Management d'une équipe de 5 personnes</li>
+                            <li>✓ Formation de 10 collaborateurs</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Types d'expériences à ajouter -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h6 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Ajoutez aussi...</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" checked disabled>
+                            <label class="form-check-label small">Emplois à temps plein</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" checked disabled>
+                            <label class="form-check-label small">Stages et alternances</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" checked disabled>
+                            <label class="form-check-label small">Emplois temporaires</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" checked disabled>
+                            <label class="form-check-label small">Freelance et indépendant</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" checked disabled>
+                            <label class="form-check-label small">Bénévolat significatif</label>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<style>
+    .required-field label:after {
+        content: " *";
+        color: #dc3545;
+    }
+    
+    .card {
+        border-radius: 10px;
+    }
+    
+    .card-header {
+        border-radius: 10px 10px 0 0;
+    }
+    
+    .form-text {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    .sticky-top {
+        z-index: 1000;
+    }
+    
+    /* Style pour les champs Summernote */
+    .note-editor.note-frame {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .note-editor .note-toolbar {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .note-editor .note-editing-area .note-editable {
+        border-radius: 0 0 8px 8px;
+        min-height: 150px;
+    }
+</style>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const enCoursCheckbox = document.getElementById('{{ form.en_cours.id_for_label }}');
-        const dateFinField = document.getElementById('date_fin_field');
-        const dateFinInput = document.getElementById('{{ form.date_fin.id_for_label }}');
-        
-        function toggleDateFin() {
-            if (enCoursCheckbox.checked) {
-                dateFinField.style.display = 'none';
-                dateFinInput.disabled = true;
-            } else {
-                dateFinField.style.display = 'block';
-                dateFinInput.disabled = false;
-            }
+document.addEventListener('DOMContentLoaded', function() {
+    // Gestion de l'affichage conditionnel de la date de fin
+    const enPosteCheckbox = document.getElementById('{{ form.en_poste.id_for_label }}');
+    const dateFinContainer = document.getElementById('date-fin-container');
+    const dateFinInput = document.getElementById('{{ form.date_fin.id_for_label }}');
+    
+    function toggleDateFin() {
+        if (enPosteCheckbox.checked) {
+            dateFinContainer.style.display = 'none';
+            if (dateFinInput) dateFinInput.disabled = true;
+        } else {
+            dateFinContainer.style.display = 'block';
+            if (dateFinInput) dateFinInput.disabled = false;
         }
-        
-        // Initial state
-        toggleDateFin();
-        
-        // Add event listener
-        enCoursCheckbox.addEventListener('change', toggleDateFin);
-        
-        // Add Bootstrap classes to form elements
-        const formInputs = document.querySelectorAll('input, select, textarea');
-        formInputs.forEach(input => {
-            if (input.type !== 'checkbox' && input.type !== 'hidden') {
-                input.classList.add('form-control');
-            }
-        });
-        
-        // Style the checkbox
-        if (enCoursCheckbox) {
-            enCoursCheckbox.classList.add('form-check-input');
-        }
-        
-        // Style the select elements
-        const selectElements = document.querySelectorAll('select');
-        selectElements.forEach(select => {
-            select.classList.add('form-select');
-        });
-        
-        // Style the textarea
-        const textarea = document.querySelector('textarea');
-        if (textarea) {
-            textarea.classList.add('form-control');
-            textarea.rows = 5;
+    }
+    
+    // Initial state
+    toggleDateFin();
+    
+    // Event listener
+    if (enPosteCheckbox) {
+        enPosteCheckbox.addEventListener('change', toggleDateFin);
+    }
+    
+    // Ajouter des classes Bootstrap aux champs
+    const inputs = document.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        if (!input.classList.contains('form-check-input') && input.type !== 'hidden') {
+            input.classList.add('form-control');
         }
     });
+    
+    // Styles spécifiques pour les selects
+    const selects = document.querySelectorAll('select');
+    selects.forEach(select => {
+        select.classList.add('form-select');
+    });
+    
+    // Ajustement de la hauteur des textareas
+    const textareas = document.querySelectorAll('textarea');
+    textareas.forEach(textarea => {
+        textarea.style.minHeight = '100px';
+    });
+    
+    // Tooltips pour les conseils
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
 </script>
 {% endblock %}

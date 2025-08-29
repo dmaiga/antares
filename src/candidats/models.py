@@ -6,6 +6,7 @@ from django.utils import timezone
 from simple_history.models import HistoricalRecords
 from jobs.models import JobOffer
 
+from django.core.validators import MinValueValidator, MaxValueValidator
 # ====================================================
 # CONSTANTES DE CHOIX
 # ====================================================
@@ -55,14 +56,14 @@ SECTEUR_CHOICES = [
 ]
 
 TYPE_DOCUMENT_CHOICES = [
-    ('CV', 'Curriculum Vitae'),
-    ('LM', 'Lettre de motivation'),
-    ('DIPLOME', 'Diplôme'),
-    ('RECOMMANDATION', 'Lettre de recommandation'),
-    ('PORTFOLIO', 'Portfolio'),
-    ('CERTIFICAT', 'Certificat'),
-    ('AUTRE', 'Autre document'),
-]
+        ('CV', 'Curriculum Vitae'),
+        ('DIPLOME', 'Diplôme/Certificat'),
+        ('PIECE_IDENTITE', 'Pièce d\'identité'),
+        ('ATTESTATION', 'Attestation '),
+        ('RECOMMANDATION', 'Lettre de recommandation'),
+        ('COMPETENCE', 'Certificat de compétence'),
+        ('AUTRE', 'Autre document'),
+    ]
 
 LANGUE_CHOICES = [
     ('FR', 'Français'),
@@ -119,6 +120,30 @@ COMPETENCE_CATEGORIES = [
     ('AUTRE', 'Autre'),
 ]
 
+COMPETENCE_NIVEAUX = [
+    ('DEBUTANT', 'Débutant'),
+    ('INTERMEDIAIRE', 'Intermédiaire'),
+    ('AVANCE', 'Avancé'),
+    ('EXPERT', 'Expert'),
+]
+
+TYPE_PIECE_CHOICES = [
+    ('', 'Sélectionnez un type de pièce'),
+    ('biometrique', 'Carte Biométrique'),
+    ('nina', 'Carte NINA'),
+    ('fiche', 'Fiche Individuelle'),
+    ('passport', 'Passeport'),
+]
+
+SITUATION_FAMILIALE_CHOICES = [
+        ('', 'Sélectionnez une situation'),
+        ('celibataire', 'Célibataire'),
+        ('marie', 'Marié(e)'),
+        ('divorce', 'Divorcé(e)'),
+        ('veuf', 'Veuf/Veuve'),
+       
+    ]
+
 # ====================================================
 # MODÈLES DE BASE
 # ====================================================
@@ -145,17 +170,17 @@ class SoftDeleteModel(models.Model):
         self.save()
 
 class Adresse(models.Model):
-    ligne1 = models.CharField(null=True, blank=True, max_length=255, verbose_name="Adresse ligne 1")
-    code_postal = models.CharField(max_length=10, null=True, blank=True, verbose_name="Code Postal")
+    quartier = models.CharField(null=True, blank=True, max_length=255, verbose_name="Quartier ")
+    
     ville = models.CharField(null=True, blank=True, max_length=100, verbose_name="Ville")
-    pays = models.CharField(null=True, blank=True, max_length=100, default="France", verbose_name="Pays")
+    pays = models.CharField(null=True, blank=True, max_length=100, default="Mali", verbose_name="Pays")
     
     class Meta:
         verbose_name = "Adresse"
         verbose_name_plural = "Adresses"
     
     def __str__(self):
-        return f"{self.ligne1}, {self.code_postal} {self.ville}"
+        return f"{self.quartier}, {self.pays} {self.ville}"
 
 # ====================================================
 # MODÈLES PRINCIPAUX
@@ -163,7 +188,7 @@ class Adresse(models.Model):
 class Competence(models.Model):
     nom = models.CharField(max_length=100, unique=True, verbose_name="Nom de la compétence")
     categorie = models.CharField(max_length=20, choices=COMPETENCE_CATEGORIES, default='AUTRE')
-    description = models.TextField(blank=True)
+    niveau = models.CharField(max_length=15, choices=COMPETENCE_NIVEAUX, default='INTERMEDIAIRE', verbose_name="Niveau")
     est_supprime = models.BooleanField(default=False)
 
     class Meta:
@@ -172,7 +197,7 @@ class Competence(models.Model):
         ordering = ['nom']
 
     def __str__(self):
-        return self.nom
+        return f"{self.nom} ({self.get_niveau_display()})"
 
     def soft_delete(self):
         self.est_supprime = True
@@ -181,26 +206,83 @@ class Competence(models.Model):
 class ProfilCandidat(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, primary_key=True, related_name='profil_candidat')
     photo = models.ImageField(upload_to='candidat/avatars/', null=True, blank=True, verbose_name="Photo de profil")
-    competences = models.ManyToManyField(Competence, blank=True, related_name="candidats")
+
+    # Téléphones
     telephone = models.CharField(max_length=20, validators=[RegexValidator(r'^\+?\s*(?:\d[\s\-()]?){8,}$')], blank=True)
+    telephone_second = models.CharField(
+        max_length=20, 
+        validators=[RegexValidator(r'^\+?\s*(?:\d[\s\-()]?){8,}$')], 
+        blank=True, 
+        verbose_name="Téléphone secondaire"
+    )
+    
     date_naissance = models.DateField(null=True, blank=True)
     genre = models.CharField(max_length=1, choices=GENRE_CHOICES, blank=True)
+    situation_familiale = models.CharField(
+        max_length=20, 
+        choices=SITUATION_FAMILIALE_CHOICES, 
+        blank=True, 
+        verbose_name="Situation familiale"
+    )
     
     adresse = models.ForeignKey(Adresse, on_delete=models.SET_NULL, null=True, blank=True)
     
-    salaire_min = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name="Salaire minimum souhaité")
-    salaire_max = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name="Salaire maximum souhaité")
+    # Pièce d'identité
+    type_piece_identite = models.CharField(
+        max_length=20, 
+        choices=TYPE_PIECE_CHOICES, 
+        blank=True, 
+        verbose_name="Type de pièce d'identité"
+    )
+    numero_piece_identite = models.CharField(
+        max_length=50, 
+        blank=True, 
+        verbose_name="Numéro de la pièce d'identité"
+    )
+    date_delivrance_piece = models.DateField(
+        null=True, 
+        blank=True, 
+        verbose_name="Date de délivrance"
+    )
+    lieu_delivrance_piece = models.CharField(
+        max_length=100, 
+        blank=True, 
+        verbose_name="Lieu de délivrance"
+    )
+    
+    # Remplacement salaire_min/salaire_max par un seul champ
+    pretention_salariale = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        null=True, 
+        blank=True, 
+        verbose_name="Prétention salariale annuelle (FCFA)"
+    )
+    
+    # Mission temporaire
+    mission_temporaire = models.BooleanField(
+        default=False, 
+        verbose_name="Accepte les missions temporaires"
+    )
+    
+    # Remplacement rayon_mobilite par localite_souhaitee
+    localite_souhaitee = models.CharField(
+        max_length=100, 
+        blank=True, 
+        verbose_name="Localité souhaitée"
+    )
     
     linkedin_url = models.URLField(blank=True, verbose_name="Profil LinkedIn")
+    facebook_url = models.URLField(blank=True, verbose_name="Profil Facebook")
+    instagram_url = models.URLField(blank=True, verbose_name="Profil Instagram")  # Correction de la faute
     portfolio_url = models.URLField(blank=True, verbose_name="Portfolio")
     recherche_active = models.BooleanField(default=True, verbose_name="En recherche active")
-    date_debut_recherche = models.DateField(null=True, blank=True, verbose_name="Date de début de recherche")
+  
     
     accepte_newsletter = models.BooleanField(default=False)
     cgu_acceptees = models.BooleanField(default=False)
     disponible = models.BooleanField(default=True, verbose_name="Disponible immédiatement")
-    mobilite_geographique = models.BooleanField(default=False)
-    rayon_mobilite = models.PositiveIntegerField(null=True, blank=True, default=50, verbose_name="Rayon de mobilité (km)")
+    
     
     date_inscription = models.DateTimeField(auto_now_add=True)
     derniere_maj = models.DateTimeField(auto_now=True)
@@ -213,15 +295,13 @@ class ProfilCandidat(models.Model):
     def __str__(self):
         return f"Profil de {self.user.get_full_name()}"
     
+    # Mise à jour de la propriété fourchette_salariale
     @property
     def fourchette_salariale(self):
-        if self.salaire_min and self.salaire_max:
-            return f"{self.salaire_min} - {self.salaire_max} €"
-        elif self.salaire_min:
-            return f"À partir de {self.salaire_min} €"
-        elif self.salaire_max:
-            return f"Jusqu'à {self.salaire_max} €"
+        if self.pretention_salariale:
+            return f"{self.pretention_salariale} FCFA"
         return "Non spécifié"
+    
 
 class Diplome(models.Model):
     candidat = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='diplomes')
@@ -332,31 +412,36 @@ def document_path(instance, filename):
 
 class Document(models.Model):
     candidat = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='documents')
-    type_document = models.CharField(max_length=20, choices=TYPE_DOCUMENT_CHOICES)
-    fichier = models.FileField(upload_to=document_path)
-    nom = models.CharField(max_length=200)
+    type_document = models.CharField(max_length=20, choices=TYPE_DOCUMENT_CHOICES, verbose_name="Type de document")
+    fichier = models.FileField(upload_to=document_path, verbose_name="Fichier")
+    nom = models.CharField(max_length=200, verbose_name="Nom du document")
     
+    # Version automatique si même nom
     version = models.PositiveIntegerField(default=1, verbose_name="Version")
-    langue = models.CharField(max_length=10, choices=LANGUE_CHOICES, default='FR')
-    description = models.TextField(blank=True)
-    mots_cles = models.CharField(max_length=255, blank=True, verbose_name="Mots-clés")
+    langue = models.CharField(max_length=10, choices=LANGUE_CHOICES, default='FR', verbose_name="Langue")
+    description = models.TextField(blank=True, verbose_name="Description", 
+                                  help_text="Décrivez le contenu et l'importance de ce document")
+    mots_cles = models.CharField(max_length=255, blank=True, verbose_name="Mots-clés",
+                                help_text="Mots-clés séparés par des virgules (ex: python, gestion, leadership)")
     
-    est_public = models.BooleanField(default=False, verbose_name="Visible par les recruteurs")
+    # Suppression de est_public puisque c'est vous qui gérez
     est_actif = models.BooleanField(default=True, verbose_name="Document actif")
     est_modele = models.BooleanField(default=False, verbose_name="Modèle de document")
     
-    date_upload = models.DateTimeField(auto_now_add=True)
-    date_maj = models.DateTimeField(auto_now=True)
-    taille_fichier = models.PositiveIntegerField(editable=False, verbose_name="Taille du fichier (octets)")
+    # Dates importantes
+    date_obtention = models.DateField(null=True, blank=True, verbose_name="Date d'obtention",
+                                     help_text="Date à laquelle vous avez obtenu ce document")
+    date_upload = models.DateTimeField(auto_now_add=True, verbose_name="Date d'ajout")
+    date_maj = models.DateTimeField(auto_now=True, verbose_name="Dernière modification")
     
+    taille_fichier = models.PositiveIntegerField(editable=False, verbose_name="Taille du fichier")
     est_supprime = models.BooleanField(default=False)
     
     class Meta:
         verbose_name = "Document"
         verbose_name_plural = "Documents"
         ordering = ['-date_upload']
-        unique_together = ['candidat', 'nom', 'version']
-    
+        unique_together = ['candidat', 'nom', 'version']    
     def __str__(self):
         return f"{self.nom} v{self.version} ({self.get_type_document_display()})"
     
@@ -401,7 +486,22 @@ class Candidature(models.Model):
     
     est_supprime = models.BooleanField(default=False)
     history = HistoricalRecords()
+    date_entretien = models.DateTimeField(null=True, blank=True, verbose_name="Date d'entretien")
+    type_entretien = models.CharField(max_length=20, choices=[
+        ('TELEPHONIQUE', 'Téléphonique'),
+        ('VIDEO', 'Vidéo'),
+        ('PRESENTIEL', 'Présentiel')
+    ], null=True, blank=True)
     
+    # Ajout d'un champ pour évaluation post-entretien
+    evaluation_entretien = models.PositiveIntegerField(
+        null=True, blank=True, 
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        verbose_name="Évaluation de l'entretien (1-5)"
+    )
+    feedback_recruteur = models.TextField(blank=True, verbose_name="Feedback du recruteur")
+
+
     class Meta:
         verbose_name = "Candidature"
         verbose_name_plural = "Candidatures"

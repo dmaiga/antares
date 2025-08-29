@@ -11,12 +11,10 @@
     <!-- Formulaire principal -->
     <div class="col-lg-8">
       <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white border-0">
-          <h5 class="h6 mb-0">Informations personnelles</h5>
-        </div>
         <div class="card-body p-3">
           <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
+            
             <!-- Messages d'erreur globaux -->
             {% if user_form.errors or profil_form.errors or adresse_form.errors %}
               <div class="alert alert-danger">
@@ -26,163 +24,232 @@
               </div>
             {% endif %}
             
-            <!-- Avatar + infos de base -->
-            <div class="row align-items-center mb-3">
-              <div class="col-12 col-md-4 text-center">
-                <div class="mb-2">
-                  <img id="avatar-preview" 
-                       src="{% if profil_form.instance.photo %}{{ profil_form.instance.photo.url }}{% else %}{% static 'images/default-avatar.jpg' %}{% endif %}" 
-                       class="rounded-circle img-thumbnail" 
-                       width="120" 
-                       alt="Photo de profil">
-                </div>
-                <label for="photo-input" class="btn btn-sm btn-outline-primary">
-                  <i class="bi bi-camera me-1"></i> Changer la photo
-                </label>
-                {{ profil_form.photo }}
+            <!-- Section 1: Photo et informations de base -->
+            <div class="card mb-4 border-0 shadow-sm">
+              <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="bi bi-person me-2"></i>Informations personnelles</h6>
               </div>
-              <div class="col-12 col-md-8">
+              <div class="card-body">
+                <div class="row align-items-center mb-3">
+                  <div class="col-12 col-md-4 text-center">
+                    <div class="mb-2">
+                      <img id="avatar-preview" 
+                           src="{% if profil_form.instance.photo %}{{ profil_form.instance.photo.url }}{% else %}{% static 'images/default-avatar.jpg' %}{% endif %}" 
+                           class="rounded-circle img-thumbnail" 
+                           width="120" 
+                           alt="Photo de profil">
+                    </div>
+                    <label for="id_photo" class="btn btn-sm btn-outline-primary">
+                      <i class="bi bi-camera me-1"></i> Changer la photo
+                    </label>
+                    {{ profil_form.photo }}
+                  </div>
+                  <div class="col-12 col-md-8">
+                    <div class="row">
+                      <div class="col-12 col-md-6 mb-2">
+                        <label for="id_first_name" class="form-label small">Prénom</label>
+                        {{ user_form.first_name }}
+                      </div>
+                      <div class="col-12 col-md-6 mb-2">
+                        <label for="id_last_name" class="form-label small">Nom</label>
+                        {{ user_form.last_name }}
+                      </div>
+                    </div>
+                    <div class="mb-2">
+                      <label for="id_email" class="form-label small">Email</label>
+                      {{ user_form.email }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-12 col-md-4 mb-2">
+                    <label for="id_date_naissance" class="form-label small">Date de naissance</label>
+                    {{ profil_form.date_naissance }}
+                  </div>
+                  <div class="col-12 col-md-4 mb-2">
+                    <label for="id_genre" class="form-label small">Genre</label>
+                    {{ profil_form.genre }}
+                  </div>
+                  <div class="col-12 col-md-4 mb-2">
+                    <label for="id_situation_familiale" class="form-label small">Situation familiale</label>
+                    {{ profil_form.situation_familiale }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 2: Coordonnées -->
+            <div class="card mb-4 border-0 shadow-sm">
+              <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="bi bi-telephone me-2"></i>Coordonnées</h6>
+              </div>
+              <div class="card-body">
                 <div class="row">
                   <div class="col-12 col-md-6 mb-2">
-                    <label for="id_first_name" class="form-label small">Prénom</label>
-                    {{ user_form.first_name }}
+                    <label for="id_telephone" class="form-label small">Téléphone principal</label>
+                    {{ profil_form.telephone }}
                   </div>
                   <div class="col-12 col-md-6 mb-2">
-                    <label for="id_last_name" class="form-label small">Nom</label>
-                    {{ user_form.last_name }}
+                    <label for="id_telephone_second" class="form-label small">Téléphone secondaire</label>
+                    {{ profil_form.telephone_second }}
                   </div>
                 </div>
-                <div class="mb-2">
-                  <label for="id_email" class="form-label small">Email</label>
-                  {{ user_form.email }}
+
+               
+                
+                <div class="row">
+                  
+                  <div class="col-12 col-md-4 mb-2">
+                    <label for="id_pays" class="form-label small">Pays</label>
+                    {{ adresse_form.pays }}
+                  </div>
+                  <div class="col-12 col-md-4 mb-2">
+                    <label for="id_ville" class="form-label small">Ville</label>
+                    {{ adresse_form.ville }}
+                  </div>
+                  
+                  
+                <div class="col-12 col-md-4 mb-2">
+                  <label for="quartier" class="form-label small">Quartier</label>
+                  {{ adresse_form.quartier }}
                 </div>
-                <div class="mb-2">
-                  <label for="id_telephone" class="form-label small">Téléphone</label>
-                  {{ profil_form.telephone }}
-                </div>
-              </div>
-            </div>
-
-            <!-- Date de naissance & genre -->
-            <div class="row">
-              <div class="col-12 col-md-6 mb-2">
-                <label for="id_date_naissance" class="form-label small">Date de naissance</label>
-                {{ profil_form.date_naissance }}
-              </div>
-              <div class="col-12 col-md-6 mb-2">
-                <label for="id_genre" class="form-label small">Genre</label>
-                {{ profil_form.genre }}
-              </div>
-            </div>
-
-            <!-- Adresse -->
-            <div class="mb-2">
-              <label for="id_ligne1" class="form-label small">Adresse (Ligne 1)</label>
-              {{ adresse_form.ligne1 }}
-            </div>
-            <div class="mb-2">
-              <label for="id_ligne2" class="form-label small">Adresse (Ligne 2)</label>
-              {{ adresse_form.ligne2 }}
-            </div>
-            <div class="row">
-              <div class="col-12 col-md-4 mb-2">
-                <label for="id_ville" class="form-label small">Ville</label>
-                {{ adresse_form.ville }}
-              </div>
-              <div class="col-12 col-md-4 mb-2">
-                <label for="id_code_postal" class="form-label small">Code postal</label>
-                {{ adresse_form.code_postal }}
-              </div>
-              <div class="col-12 col-md-4 mb-2">
-                <label for="id_pays" class="form-label small">Pays</label>
-                {{ adresse_form.pays }}
-              </div>
-            </div>
-
-            <!-- Salaire -->
-            <div class="row">
-              <div class="col-12 col-md-6 mb-2">
-                <label for="id_salaire_min" class="form-label small">Salaire minimum (€)</label>
-                {{ profil_form.salaire_min }}
-              </div>
-              <div class="col-12 col-md-6 mb-2">
-                <label for="id_salaire_max" class="form-label small">Salaire maximum (€)</label>
-                {{ profil_form.salaire_max }}
-              </div>
-            </div>
-
-            <!-- Disponibilité & mobilité -->
-            <div class="row">
-              <div class="col-12 col-md-6 mb-2">
-                <div class="form-check">
-                  {{ profil_form.disponible }}
-                  <label class="form-check-label small" for="id_disponible">Disponible immédiatement</label>
-                </div>
-              </div>
-              <div class="col-12 col-md-6 mb-2">
-                <div class="form-check">
-                  {{ profil_form.mobilite_geographique }}
-                  <label class="form-check-label small" for="id_mobilite_geographique">Mobilité géographique</label>
                 </div>
               </div>
             </div>
-            <div class="mb-2">
-              <label for="id_rayon_mobilite" class="form-label small">Rayon de mobilité (km)</label>
-              {{ profil_form.rayon_mobilite }}
-            </div>
 
-            <!-- Liens professionnels -->
-            <div class="mb-2">
-              <label for="id_linkedin_url" class="form-label small">Profil LinkedIn</label>
-              {{ profil_form.linkedin_url }}
-            </div>
-            <div class="mb-2">
-              <label for="id_portfolio_url" class="form-label small">Portfolio</label>
-              {{ profil_form.portfolio_url }}
-            </div>
+            <!-- Section 3: Pièce d'identité -->
+            <div class="card mb-4 border-0 shadow-sm">
+              <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="bi bi-card-text me-2"></i>Pièce d'identité</h6>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-12 col-md-6 mb-2">
+                    <label for="id_type_piece_identite" class="form-label small">Type de pièce</label>
+                    {{ profil_form.type_piece_identite }}
+                    {% if profil_form.type_piece_identite.errors %}
+                      <div class="text-danger small">{{ profil_form.type_piece_identite.errors }}</div>
+                    {% endif %}
+                  </div>
+                  <div class="col-12 col-md-6 mb-2">
+                    <label for="id_numero_piece_identite" class="form-label small">Numéro de la pièce</label>
+                    {{ profil_form.numero_piece_identite }}
+                    {% if profil_form.numero_piece_identite.errors %}
+                      <div class="text-danger small">{{ profil_form.numero_piece_identite.errors }}</div>
+                    {% endif %}
+                  </div>
+                </div>
 
-            <!-- Recherche active -->
-            <div class="row">
-              <div class="col-12 col-md-6 mb-2">
-                <div class="form-check">
-                  {{ profil_form.recherche_active }}
-                  <label class="form-check-label small" for="id_recherche_active">En recherche active</label>
+                <div class="row">
+                  <div class="col-12 col-md-6 mb-2">
+                    <label for="id_date_delivrance_piece" class="form-label small">Date de délivrance</label>
+                    {{ profil_form.date_delivrance_piece }}
+                  </div>
+                  <div class="col-12 col-md-6 mb-2">
+                    <label for="id_lieu_delivrance_piece" class="form-label small">Lieu de délivrance</label>
+                    {{ profil_form.lieu_delivrance_piece }}
+                  </div>
                 </div>
               </div>
-              <div class="col-12 col-md-6 mb-2">
-                <label for="id_date_debut_recherche" class="form-label small">Date début recherche</label>
-                {{ profil_form.date_debut_recherche }}
+            </div>
+
+            <!-- Section 4: Préférences professionnelles -->
+            <div class="card mb-4 border-0 shadow-sm">
+              <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="bi bi-briefcase me-2"></i>Préférences professionnelles</h6>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-12 col-md-6 mb-2">
+                    <label for="id_pretention_salariale" class="form-label small">Prétention salariale (FCFA)</label>
+                    {{ profil_form.pretention_salariale }}
+                  </div>
+                  <div class="col-12 col-md-6 mb-2">
+                    <label for="id_localite_souhaitee" class="form-label small">Localité souhaitée</label>
+                    {{ profil_form.localite_souhaitee }}
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-12 col-md-4 mb-2">
+                    <div class="form-check form-switch">
+                      {{ profil_form.disponible }}
+                      <label class="form-check-label small" for="id_disponible">Disponible immédiatement</label>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-4 mb-2">
+                    <div class="form-check form-switch">
+                      {{ profil_form.mission_temporaire }}
+                      <label class="form-check-label small" for="id_mission_temporaire">Missions temporaires</label>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-4 mb-2">
+                    <div class="form-check form-switch">
+                      {{ profil_form.recherche_active }}
+                      <label class="form-check-label small" for="id_recherche_active">En recherche active</label>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <!-- Compétences -->
-            <div class="mb-2">
-              <label for="id_competences" class="form-label small">Compétences</label>
-              {{ profil_form.competences }}
+            <!-- Section 5: Réseaux sociaux et portfolio -->
+            <div class="card mb-4 border-0 shadow-sm">
+              <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="bi bi-link-45deg me-2"></i>Présence en ligne</h6>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-12 col-md-6 mb-2">
+                    <label for="id_linkedin_url" class="form-label small">LinkedIn</label>
+                    {{ profil_form.linkedin_url }}
+                  </div>
+                  <div class="col-12 col-md-6 mb-2">
+                    <label for="id_facebook_url" class="form-label small">Facebook</label>
+                    {{ profil_form.facebook_url }}
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-12 col-md-6 mb-2">
+                    <label for="id_instagram_url" class="form-label small">Instagram</label>
+                    {{ profil_form.instagram_url }}
+                  </div>
+                  <div class="col-12 col-md-6 mb-2">
+                    <label for="id_portfolio_url" class="form-label small">Portfolio</label>
+                    {{ profil_form.portfolio_url }}
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <!-- Newsletter -->
-            <div class="mb-3">
-              <div class="form-check">
-                {{ profil_form.accepte_newsletter }}
-                <label class="form-check-label small" for="id_accepte_newsletter">Recevoir les offres exclusives par email</label>
+            <!-- Section 6: Préférences de communication -->
+            <div class="card mb-4 border-0 shadow-sm">
+              <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="bi bi-envelope me-2"></i>Préférences de communication</h6>
+              </div>
+              <div class="card-body">
+                <div class="form-check form-switch mb-2">
+                  {{ profil_form.accepte_newsletter }}
+                  <label class="form-check-label small" for="id_accepte_newsletter">Recevoir les offres exclusives par email</label>
+                </div>
               </div>
             </div>
 
             <!-- Actions -->
-            <div class="d-flex justify-content-end gap-2">
-              <a href="{% url 'dashboard_candidat' %}" class="btn btn-sm btn-outline-secondary">Annuler</a>
-              <button type="submit" class="btn btn-sm btn-orange">Enregistrer</button>
+            <div class="d-flex justify-content-end gap-2 mt-4">
+              <a href="{% url 'dashboard_candidat' %}" class="btn btn-outline-secondary">Annuler</a>
+              <button type="submit" class="btn btn-orange">Enregistrer les modifications</button>
             </div>
           </form>
         </div>
       </div>
     </div>
 
-    <!-- État de complétion et actions rapides -->
+    <!-- Actions rapides -->
     <div class="col-lg-4">
-      
-      <div class="card border-0 shadow-sm">
+      <div class="card border-0 shadow-sm " style="top: 20px;">
         <div class="card-header bg-white border-0">
           <h5 class="h6 mb-0">Actions rapides</h5>
         </div>
@@ -200,7 +267,7 @@
             <a href="{% url 'document_list' %}" class="btn btn-sm btn-outline-primary text-start">
               <i class="bi bi-file-earmark-text me-2"></i> Gérer mes documents
             </a>
-            <a href="{% url 'password_change' %}" class="btn btn-warning">Changer mon mot de passe</a>
+            <a href="{% url 'password_change' %}" class="btn btn-warning btn-sm">Changer mon mot de passe</a>
           </div>
         </div>
       </div>
@@ -212,6 +279,7 @@
 {% block extra_js %}
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+    // Gestion de l'aperçu de la photo
     const avatarInput = document.getElementById('id_photo');
     const avatarPreview = document.getElementById('avatar-preview');
 
@@ -232,12 +300,23 @@
       });
     }
 
-    const progressBar = document.getElementById("progress-bar");
-    if (progressBar) {
-      const completion = progressBar.dataset.completion;
-      progressBar.style.width = completion + "%";
-      progressBar.setAttribute("aria-valuenow", completion);
-      progressBar.textContent = completion + "%";
+    // Affichage conditionnel pour les champs liés
+    const typePiece = document.getElementById('id_type_piece_identite');
+    const numeroPiece = document.getElementById('id_numero_piece_identite');
+    const dateDelivrance = document.getElementById('id_date_delivrance_piece').closest('.mb-2');
+    const lieuDelivrance = document.getElementById('id_lieu_delivrance_piece').closest('.mb-2');
+    
+    function togglePieceFields() {
+      const hasValue = typePiece.value || numeroPiece.value;
+      dateDelivrance.style.display = hasValue ? 'block' : 'none';
+      lieuDelivrance.style.display = hasValue ? 'block' : 'none';
+    }
+    
+    if (typePiece && numeroPiece) {
+      typePiece.addEventListener('change', togglePieceFields);
+      numeroPiece.addEventListener('input', togglePieceFields);
+      // Initial state
+      togglePieceFields();
     }
   });
 </script>

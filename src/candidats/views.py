@@ -22,6 +22,8 @@ from .forms import (
     SoftDeleteForm  # NOUVEAU FORMULAIRE
 )
 
+from django.http import JsonResponse
+
 def check_candidat(user):
     """Vérifie si l'utilisateur est un candidat"""
     return user.role == 'candidat'
@@ -38,26 +40,24 @@ def dashboard(request):
         return redirect('access_denied')
     
     profil = get_candidat_profile(request.user)
-    
-    # Sous-requête pour vérifier les candidatures
+
     candidature_exists = Candidature.objects.filter(
         candidat=request.user,
         offre=OuterRef('pk')
     )
-    
-    # Annoter les offres avec l'information de candidature
+
     offres_recentes = JobOffer.objects.filter(
         statut='ouvert',
         visible_sur_site=True
     ).annotate(
         deja_postule=Exists(candidature_exists)
     ).order_by('-date_publication')[:5]
-    
+
     context = {
         'profil': profil,
         'diplomes': request.user.diplomes.filter(est_supprime=False),
         'experiences': request.user.experiences.filter(est_supprime=False).order_by('-date_debut'),
-        'competences': profil.competences.filter(est_supprime=False),
+        'documents_recents': request.user.documents.filter(est_supprime=False).order_by('-date_upload')[:5],
         'documents': request.user.documents.filter(est_supprime=False),
         'candidatures': request.user.candidatures.filter(est_supprime=False).select_related('offre'),
         'offres_recentes': offres_recentes
@@ -377,16 +377,23 @@ def candidature_detail(request, pk):
         'entretiens': entretiens
     })
 
+# candidats/views.py
+
 @login_required
-def candidature_create(request, offre_id):
-    if not check_candidat(request.user):
-        return redirect('access_denied')
+def apply_job(request, job_id):
+    # Correction: utiliser visible_sur_site au lieu de est_active
+    offre = get_object_or_404(JobOffer, pk=job_id, visible_sur_site=True)
     
-    offre = get_object_or_404(JobOffer, pk=offre_id)
+    # Vérifier si l'utilisateur a déjà postulé
+    deja_postule = Candidature.objects.filter(
+        candidat=request.user, 
+        offre=offre, 
+        est_supprime=False
+    ).exists()
     
-    if Candidature.objects.filter(candidat=request.user, offre=offre, est_supprime=False).exists():
-        messages.warning(request, "Vous avez déjà postulé à cette offre")
-        return redirect('candidature_list')
+    if deja_postule:
+        messages.warning(request, "Vous avez déjà postulé à cette offre.")
+        return redirect('job_detail', pk=job_id)
     
     if request.method == 'POST':
         form = CandidatureForm(request.POST, user=request.user)
@@ -395,16 +402,48 @@ def candidature_create(request, offre_id):
             candidature.candidat = request.user
             candidature.offre = offre
             candidature.save()
-            form.save_m2m()  # Pour les documents supplémentaires
-            messages.success(request, "Candidature envoyée avec succès !")
-            return redirect('candidature_list')
+            
+            # Sauvegarder les documents supplémentaires (ManyToMany)
+            form.save_m2m()
+            
+            messages.success(request, f"Votre candidature pour '{offre.titre}' a été envoyée avec succès!")
+            return redirect('candidature_detail', pk=candidature.pk)
     else:
-        form = CandidatureForm(user=request.user, initial={'offre': offre.pk})
+        form = CandidatureForm(initial={'offre': offre}, user=request.user)
     
-    return render(request, 'candidats/client/candidature/postuler_offre.html', {
+    context = {
         'form': form,
-        'offre': offre
+        'offre': offre,
+        'deja_postule': deja_postule,
+    }
+    context['upload_url'] = reverse('add_document')
+    context['document_list_url'] = reverse('document_list')
+    
+    return render(request, 'candidats/client/candidature/apply_job.html', context)
+
+@login_required
+def check_documents(request):
+    """Vérifie si l'utilisateur a les documents nécessaires pour postuler"""
+    user = request.user
+    has_cv = user.documents.filter(
+        type_document='CV', 
+        est_actif=True, 
+        est_supprime=False
+    ).exists()
+    
+    has_lm = user.documents.filter(
+        type_document='LM', 
+        est_actif=True, 
+        est_supprime=False
+    ).exists()
+    
+    return JsonResponse({
+        'has_cv': has_cv,
+        'has_lm': has_lm,
+        'cv_count': user.documents.filter(type_document='CV', est_actif=True, est_supprime=False).count(),
+        'lm_count': user.documents.filter(type_document='LM', est_actif=True, est_supprime=False).count(),
     })
+
 
 @login_required
 def candidature_soft_delete(request, pk):
@@ -475,3 +514,6 @@ def candidat_job_detail(request, pk):
         context['form'] = CandidatureForm(user=request.user, initial={'offre': offre.pk})
     
     return render(request, 'candidats/client/candidat_job_detail.html', context)
+
+
+

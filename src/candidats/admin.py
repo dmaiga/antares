@@ -9,9 +9,9 @@ from authentication.models import User
 
 @admin.register(Adresse)
 class AdresseAdmin(admin.ModelAdmin):
-    list_display = ('ligne1', 'ville',  'pays', 'get_coordinates')
+    list_display = ('quartier', 'ville',  'pays', 'get_coordinates')
     list_filter = ('pays', 'ville')
-    search_fields = ('ligne1',  'ville', 'pays')
+    search_fields = ('quartier',  'ville', 'pays')
  
     
     def get_coordinates(self, obj):
@@ -28,7 +28,7 @@ class ProfilCandidatAdmin(admin.ModelAdmin):
     )
     list_filter = (
         'genre', 'recherche_active', 'disponible', 
-        'mobilite_geographique'
+        
     )  # RETIRÉ 'pays' car il n'existe pas dans ProfilCandidat
     search_fields = (
         'user__first_name', 'user__last_name', 'user__email',
@@ -49,7 +49,7 @@ class ProfilCandidatAdmin(admin.ModelAdmin):
         ('Préférences professionnelles', {
             'fields': (
                 'salaire_min', 'salaire_max', 'recherche_active',
-                'date_debut_recherche', 'disponible', 'mobilite_geographique',
+                'date_debut_recherche', 'disponible', 
                 'rayon_mobilite'
             )
         }),
@@ -185,11 +185,11 @@ class ExperienceProfessionnelleAdmin(admin.ModelAdmin):
 class DocumentAdmin(admin.ModelAdmin):
     list_display = (
         'candidat', 'nom', 'type_document', 'langue', 
-        'version', 'est_public', 'est_actif', 
+        'version',  'est_actif', 
         'taille_formattee', 'date_upload'
     )
     list_filter = (
-        'type_document', 'langue', 'est_public', 
+        'type_document', 'langue',  
         'est_actif', 'est_modele'
     )
     search_fields = (
@@ -211,7 +211,7 @@ class DocumentAdmin(admin.ModelAdmin):
             'fields': ('langue', 'description', 'mots_cles')
         }),
         ('Visibilité', {
-            'fields': ('est_public', 'est_actif', 'est_modele')
+            'fields': ( 'est_actif', 'est_modele')
         }),
         ('Dates', {
             'fields': ('date_upload', 'date_maj'),

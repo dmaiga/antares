@@ -1,62 +1,144 @@
 {% extends 'base_candidate.html' %}
 {% load static %}
-
+{% load custom_filters %}
 {% block title %}Supprimer le Document{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-danger">
                 <div class="card-header bg-danger text-white">
                     <h3 class="card-title mb-0">
                         <i class="fas fa-exclamation-triangle me-2"></i> Confirmation de suppression
                     </h3>
                 </div>
                 <div class="card-body">
-                    <p>Êtes-vous sûr de vouloir supprimer le document suivant ?</p>
+                    <p class="lead">Êtes-vous sûr de vouloir supprimer ce document ?</p>
                     
-                    <div class="alert alert-info">
-                        <h5 class="alert-heading">{{ document.titre }}</h5>
-                        <p class="mb-1">
-                            <strong>Type:</strong> 
-                            <span class="badge bg-{% if document.type == 'CV' %}primary{% elif document.type == 'LM' %}success{% elif document.type == 'REC' %}info{% elif document.type == 'DIP' %}warning{% else %}secondary{% endif %}">
-                                {{ document.get_type_display }}
-                            </span>
-                        </p>
-                        <p class="mb-1">
-                            <strong>Taille:</strong> {{ document.fichier.size|filesizeformat }}
-                        </p>
-                        <p class="mb-0">
-                            <strong>Ajouté le:</strong> {{ document.date_ajout|date:"d/m/Y" }}
-                        </p>
+                    <!-- Carte d'information du document -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title text-danger">
+                                <i class="fas fa-file me-2"></i>{{ document.nom }}
+                            </h5>
+                            
+                            <div class="row mt-3">
+                                <div class="col-6">
+                                    <strong>Type:</strong>
+                                    <span class="badge bg-{% if document.type_document == 'CV' %}primary{% elif document.type_document == 'LM' %}success{% elif document.type_document == 'RECOMMANDATION' %}info{% elif document.type_document == 'DIPLOME' %}warning{% elif document.type_document == 'FORMATION' %}secondary{% else %}dark{% endif %} ms-1">
+                                        {{ document.get_type_document_display }}
+                                    </span>
+                                </div>
+                                <div class="col-6">
+                                    <strong>Taille:</strong> 
+                                    <span class="text-muted ms-1">{{ document.taille_formattee }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <strong>Langue:</strong>
+                                    <span class="text-muted ms-1">{{ document.get_langue_display }}</span>
+                                </div>
+                                <div class="col-6">
+                                    <strong>Ajouté le:</strong>
+                                    <span class="text-muted ms-1">{{ document.date_upload|date:"d/m/Y" }}</span>
+                                </div>
+                            </div>
+                            
+                            {% if document.description %}
+                            <div class="mt-3">
+                                <strong>Description:</strong>
+                                <p class="text-muted mb-0 mt-1">{{ document.description }}</p>
+                            </div>
+                            {% endif %}
+                            
+                            {% if document.mots_cles %}
+                            <div class="mt-3">
+                                <strong>Mots-clés:</strong>
+                                <div class="mt-1">
+                                    {% for mot in document.mots_cles|split:"," %}
+                                        <span class="badge bg-light text-dark me-1 mb-1 small">
+                                            #{{ mot|trim }}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
                     </div>
                     
-                    {% if document.description %}
-                        <div class="alert alert-warning">
-                            <strong>Description:</strong> {{ document.description }}
+                    <!-- Avertissement important -->
+                    <div class="alert alert-danger">
+                        <div class="d-flex">
+                            <i class="fas fa-exclamation-circle fa-2x me-3 mt-1"></i>
+                            <div>
+                                <h6 class="alert-heading">Attention !</h6>
+                                <p class="mb-0">Cette action est irréversible. Le fichier sera définitivement supprimé et ne pourra pas être récupéré.</p>
+                            </div>
                         </div>
-                    {% endif %}
+                    </div>
                     
-                    <p class="text-danger">
-                        <i class="fas fa-exclamation-circle me-1"></i>
-                        Cette action est irréversible. Le fichier sera définitivement supprimé.
-                    </p>
-                    
-                    <form method="post">
+                    <!-- Formulaire de suppression -->
+                     <form method="post">
                         {% csrf_token %}
-                        <div class="d-flex justify-content-end">
-                            <a href="{% url 'document_list' %}" class="btn btn-secondary me-2">
+                        {{ form.as_p }}
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'document_list' %}" class="btn btn-secondary">
                                 <i class="fas fa-times me-1"></i> Annuler
                             </a>
-                            <button type="submit" class="btn btn-danger">
-                                <i class="fas fa-trash me-1"></i> Confirmer la suppression
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-archive me-1"></i> Confirmer la suppression
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
+            
+            <!-- Conseils de sécurité -->
+            <div class="card mt-4 border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-lightbulb me-2"></i> Recommandation
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="small mb-0">
+                        <i class="fas fa-info-circle me-1 text-info"></i>
+                        Avant de supprimer, assurez-vous d'avoir une copie de sauvegarde si ce document est important pour vos candidatures futures.
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+    .card {
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+    }
+    
+    .alert {
+        border-radius: 10px;
+        border: none;
+    }
+    
+    @media (max-width: 768px) {
+        .d-flex.justify-content-end {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .d-flex.justify-content-end .btn {
+            width: 100%;
+        }
+    }
+</style>
 {% endblock %}

@@ -38,8 +38,8 @@ urlpatterns = [
     path('candidatures/', views.candidature_list, name='candidature_list'),
     path('candidatures/<int:pk>/', views.candidature_detail, name='candidature_detail'),
     path('candidatures/<int:pk>/retirer/', views.candidature_soft_delete, name='withdraw_candidature'),  # CORRIGÉ
-    path('offres/<int:offre_id>/postuler/', views.candidature_create, name='apply_job'),
-    
+    path('offre/<int:job_id>/postuler/', views.apply_job, name='apply_job'),
+    path('check-documents/', views.check_documents, name='check_documents'),
     # Entretiens (NOUVEAU)
     path('entretiens/<int:pk>/', views.entretien_detail, name='entretien_detail'),  # NOUVEAU
     

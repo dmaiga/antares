@@ -1,178 +1,131 @@
 {% extends 'base_candidate.html' %}
 {% load static %}
 
-{% block title %}{{ offre.titre }} - Offre d'Emploi{% endblock %}
+{% block title %}{{ offre.titre }} - {{ offre.societe }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-12">
-            <nav aria-label="breadcrumb" class="mb-4">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url 'candidat_job_list' %}">Offres d'emploi</a></li>
-                    <li class="breadcrumb-item active">Détail de l'offre</li>
-                </ol>
-            </nav>
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'candidat_job_list' %}" class="text-decoration-none">
+                    <i class="fas fa-arrow-left me-2"></i>Retour aux offres
+                </a>
+            </li>
+            <li class="breadcrumb-item active text-truncate" style="max-width: 200px;">
+                {{ offre.titre }}
+            </li>
+        </ol>
+    </nav>
 
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h3 class="card-title mb-0">{{ offre.titre }}</h3>
-                            <p class="mb-0">{{ offre.societe }}</p>
+    <div class="row">
+        <!-- Contenu principal -->
+        <div class="col-lg-8 col-md-7 mb-4">
+            <!-- Header de l'offre -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-gradient-primary text-white py-4">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+                        <div class="mb-3 mb-md-0">
+                            <h1 class="h3 mb-2 fw-bold">{{ offre.titre }}</h1>
+                            <div class="d-flex flex-wrap align-items-center gap-2">
+                                <span class="badge bg-white text-dark fs-6">
+                                    <i class="fas fa-building me-1"></i>{{ offre.societe }}
+                                </span>
+                                {% if offre.lieu %}
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-map-marker-alt me-1"></i>{{ offre.lieu }}
+                                </span>
+                                {% endif %}
+                            </div>
                         </div>
-                        <span class="badge bg-light text-dark fs-6">Ref: {{ offre.reference }}</span>
+                        <span class="badge bg-light text-dark fs-6 px-3 py-2">
+                            <i class="fas fa-hashtag me-1"></i>{{ offre.reference }}
+                        </span>
                     </div>
                 </div>
+
+                <!-- Métadonnées importantes -->
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <!-- Informations principales -->
-                            <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <h6>Informations sur le poste</h6>
-                                    <ul class="list-unstyled">
-                                        {% if offre.lieu %}
-                                            <li><strong><i class="fas fa-map-marker-alt me-2"></i>Lieu:</strong> {{ offre.lieu }}</li>
-                                        {% endif %}
-                                        {% if offre.salaire %}
-                                            <li><strong><i class="fas fa-euro-sign me-2"></i>Salaire:</strong> {{ offre.salaire }}</li>
-                                        {% endif %}
-                                        {% if offre.niveau_etude %}
-                                            <li><strong><i class="fas fa-graduation-cap me-2"></i>Niveau d'étude:</strong> {{ offre.niveau_etude }}</li>
-                                        {% endif %}
-                                        {% if offre.experience_requise %}
-                                            <li><strong><i class="fas fa-clock me-2"></i>Expérience:</strong> {{ offre.experience_requise }}</li>
-                                        {% endif %}
-                                        {% if offre.secteur %}
-                                            <li><strong><i class="fas fa-industry me-2"></i>Secteur:</strong> {{ offre.secteur }}</li>
-                                        {% endif %}
-                                    </ul>
+                    <div class="row g-4">
+                        {% if offre.salaire %}
+                        <div class="col-sm-6 col-md-4">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3">
+                                    <i class="fas fa-euro-sign text-primary"></i>
                                 </div>
-                                <div class="col-md-6">
-                                    <h6>Dates importantes</h6>
-                                    <ul class="list-unstyled">
-                                        <li><strong><i class="fas fa-calendar-plus me-2"></i>Publication:</strong> {{ offre.date_publication|date:"d/m/Y" }}</li>
-                                        {% if offre.date_limite %}
-                                            <li><strong><i class="fas fa-calendar-times me-2"></i>Clôture:</strong> 
-                                                <span class="{% if offre.date_limite < today %}text-danger{% endif %}">
-                                                    {{ offre.date_limite|date:"d/m/Y" }}
-                                                </span>
-                                            </li>
-                                        {% endif %}
-                                        <li><strong><i class="fas fa-users me-2"></i>Postes:</strong> {{ offre.nombre_candidat }}</li>
-                                    </ul>
+                                <div>
+                                    <small class="text-muted d-block">Salaire</small>
+                                    <strong>{{ offre.salaire }}</strong>
                                 </div>
                             </div>
+                        </div>
+                        {% endif %}
 
-                            <!-- Contenu détaillé -->
-                            {% if offre.mission_principale %}
-                                <div class="mb-4">
-                                    <h5><i class="fas fa-bullseye me-2"></i>Mission principale</h5>
-                                    <div class="border-start border-3 border-primary ps-3">
-                                        {{ offre.mission_principale|safe }}
-                                    </div>
+                        {% if offre.niveau_etude %}
+                        <div class="col-sm-6 col-md-4">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-success bg-opacity-10 p-3 rounded-circle me-3">
+                                    <i class="fas fa-graduation-cap text-success"></i>
                                 </div>
-                            {% endif %}
+                                <div>
+                                    <small class="text-muted d-block">Niveau</small>
+                                    <strong>{{ offre.niveau_etude }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
 
-                            {% if offre.taches %}
-                                <div class="mb-4">
-                                    <h5><i class="fas fa-tasks me-2"></i>Tâches et responsabilités</h5>
-                                    <div class="border-start border-3 border-success ps-3">
-                                        {{ offre.taches|safe }}
-                                    </div>
+                        {% if offre.experience_requise %}
+                        <div class="col-sm-6 col-md-4">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-warning bg-opacity-10 p-3 rounded-circle me-3">
+                                    <i class="fas fa-clock text-warning"></i>
                                 </div>
-                            {% endif %}
+                                <div>
+                                    <small class="text-muted d-block">Expérience</small>
+                                    <strong>{{ offre.experience_requise }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
 
-                            {% if offre.profil_recherche %}
-                                <div class="mb-4">
-                                    <h5><i class="fas fa-user-tie me-2"></i>Profil recherché</h5>
-                                    <div class="border-start border-3 border-warning ps-3">
-                                        {{ offre.profil_recherche|safe }}
-                                    </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div class="d-flex align-items-center">
+                                <div >
+                                    <i class="fas fa-calendar-plus text-info"></i>
                                 </div>
-                            {% endif %}
-
-                            {% if offre.competences_qualifications %}
-                                <div class="mb-4">
-                                    <h5><i class="fas fa-cogs me-2"></i>Compétences et qualifications</h5>
-                                    <div class="border-start border-3 border-info ps-3">
-                                        {{ offre.competences_qualifications|safe }}
-                                    </div>
+                                <div>
+                                    <small class="text-muted d-block">Publication</small>
+                                    <strong>{{ offre.date_publication|date:"d/m/Y" }}</strong>
                                 </div>
-                            {% endif %}
-
-                            {% if offre.conditions %}
-                                <div class="mb-4">
-                                    <h5><i class="fas fa-file-contract me-2"></i>Conditions de travail</h5>
-                                    <div class="border-start border-3 border-secondary ps-3">
-                                        {{ offre.conditions|safe }}
-                                    </div>
-                                </div>
-                            {% endif %}
-
-                            {% if offre.comment_postuler %}
-                                <div class="mb-4">
-                                    <h5><i class="fas fa-paper-plane me-2"></i>Comment postuler</h5>
-                                    <div class="border-start border-3 border-danger ps-3">
-                                        {{ offre.comment_postuler|safe }}
-                                    </div>
-                                </div>
-                            {% endif %}
+                            </div>
                         </div>
 
-                        <div class="col-md-4">
-                            <!-- Sidebar avec actions -->
-                            <div class="card sticky-top" style="top: 20px;">
-                                <div class="card-header">
-                                    <h6 class="mb-0">Actions</h6>
+                        {% if offre.date_limite %}
+                        <div class="col-sm-6 col-md-4">
+                            <div class="d-flex align-items-center">
+                                <div >
+                                    <i class="fas fa-calendar-times text-{% if offre.date_limite < today %}danger{% else %}secondary{% endif %}"></i>
                                 </div>
-                                <div class="card-body">
-                                    {% if deja_postule %}
-                                        <div class="alert alert-success">
-                                            <i class="fas fa-check-circle me-2"></i>
-                                            <strong>Vous avez déjà postulé à cette offre</strong>
-                                            <p class="mb-0 small mt-2">Votre candidature a été envoyée le {{ candidature.date_postulation|date:"d/m/Y" }}</p>
-                                        </div>
-                                        <a href="{% url 'candidature_detail' candidature.pk %}" class="btn btn-outline-primary w-100 mb-2">
-                                            <i class="fas fa-eye me-1"></i> Voir ma candidature
-                                        </a>
-                                    {% else %}
-                                        <a href="{% url 'apply_job' offre.pk %}" class="btn btn-success w-100 mb-2">
-                                            <i class="fas fa-paper-plane me-1"></i> Postuler maintenant
-                                        </a>
-                                    {% endif %}
-                                    
-                                    {% if offre.fichier_pdf %}
-                                        <a href="{{ offre.fichier_pdf.url }}" class="btn btn-outline-primary w-100 mb-2" target="_blank">
-                                            <i class="fas fa-download me-1"></i> Télécharger l'offre (PDF)
-                                        </a>
-                                    {% endif %}
-                                    
-                                    {% if offre.contact %}
-                                        <div class="mt-3">
-                                            <h6>Contact</h6>
-                                            <p class="mb-1">
-                                                <i class="fas fa-envelope me-2"></i>
-                                                <a href="mailto:{{ offre.contact }}">{{ offre.contact }}</a>
-                                            </p>
-                                        </div>
-                                    {% endif %}
-                                    
-                                    <div class="mt-3">
-                                        <h6>Partager cette offre</h6>
-                                        <div class="d-flex gap-2">
-                                            <a href="#" class="btn btn-sm btn-outline-secondary">
-                                                <i class="fab fa-linkedin"></i>
-                                            </a>
-                                            <a href="#" class="btn btn-sm btn-outline-secondary">
-                                                <i class="fab fa-facebook"></i>
-                                            </a>
-                                            <a href="#" class="btn btn-sm btn-outline-secondary">
-                                                <i class="fas fa-envelope"></i>
-                                            </a>
-                                        </div>
-                                    </div>
+                                <div>
+                                    <small class="text-muted d-block">Clôture</small>
+                                    <strong class="text-{% if offre.date_limite < today %}danger{% endif %}">
+                                        {{ offre.date_limite|date:"d/m/Y" }}
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="col-sm-6 col-md-4">
+                            <div class="d-flex align-items-center">
+                                <div >
+                                    <i class="fas fa-users text-dark"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Postes</small>
+                                    <strong>{{ offre.nombre_candidat }}</strong>
                                 </div>
                             </div>
                         </div>
@@ -180,62 +133,250 @@
                 </div>
             </div>
 
-            <!-- Pièces jointes -->
-            {% if offre.attachments.all %}
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-paperclip me-2"></i>Pièces jointes</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            {% for attachment in offre.attachments.all %}
-                                <div class="col-md-4 mb-2">
-                                    <div class="d-flex align-items-center p-2 border rounded">
-                                        <i class="fas fa-file-{{ attachment.file.name|slice:'-3:' }} text-primary me-2"></i>
-                                        <div class="flex-grow-1">
-                                            <small class="d-block text-truncate" style="max-width: 200px;">
-                                                {{ attachment.name|default:attachment.file.name }}
-                                            </small>
-                                            <small class="text-muted">{{ attachment.file.size|filesizeformat }}</small>
-                                        </div>
-                                        <a href="{{ attachment.file.url }}" class="btn btn-sm btn-outline-primary ms-2" download>
-                                            <i class="fas fa-download"></i>
-                                        </a>
-                                    </div>
+            <!-- Contenu détaillé avec onglets -->
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <ul class="nav nav-tabs nav-justified mb-4" id="offreTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="mission-tab" data-bs-toggle="tab" data-bs-target="#mission" type="button" role="tab">
+                                <i class="fas fa-bullseye me-2"></i>Mission
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="profil-tab" data-bs-toggle="tab" data-bs-target="#profil" type="button" role="tab">
+                                <i class="fas fa-user-tie me-2"></i>Profil
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="competences-tab" data-bs-toggle="tab" data-bs-target="#competences" type="button" role="tab">
+                                <i class="fas fa-cogs me-2"></i>Compétences
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="conditions-tab" data-bs-toggle="tab" data-bs-target="#conditions" type="button" role="tab">
+                                <i class="fas fa-file-contract me-2"></i>Conditions
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="offreTabsContent">
+                        <!-- Mission -->
+                        <div class="tab-pane fade show active" id="mission" role="tabpanel">
+                            {% if offre.mission_principale %}
+                                <div class="content-box">
+                                    {{ offre.mission_principale|safe }}
                                 </div>
-                            {% endfor %}
+                            {% endif %}
+                            {% if offre.taches %}
+                                <h6 class="mt-4 text-primary">Tâches principales :</h6>
+                                <div class="content-box">
+                                    {{ offre.taches|safe }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Profil -->
+                        <div class="tab-pane fade" id="profil" role="tabpanel">
+                            {% if offre.profil_recherche %}
+                                <div class="content-box">
+                                    {{ offre.profil_recherche|safe }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Compétences -->
+                        <div class="tab-pane fade" id="competences" role="tabpanel">
+                            {% if offre.competences_qualifications %}
+                                <div class="content-box">
+                                    {{ offre.competences_qualifications|safe }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Conditions -->
+                        <div class="tab-pane fade" id="conditions" role="tabpanel">
+                            {% if offre.conditions %}
+                                <div class="content-box">
+                                    {{ offre.conditions|safe }}
+                                </div>
+                            {% endif %}
+                            {% if offre.comment_postuler %}
+                                <h6 class="mt-4 text-primary">Comment postuler :</h6>
+                                <div class="content-box">
+                                    {{ offre.comment_postuler|safe }}
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
-            {% endif %}
+            </div>
+        </div>
+
+        <!-- Sidebar Actions -->
+        <div class="col-lg-4 col-md-5">
+            <div class="sticky-top" style="top: 100px; z-index: 1000;">
+                <!-- CTA Principal -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body text-center">
+                        {% if deja_postule %}
+                            <div class="alert alert-success border-0">
+                                <i class="fas fa-check-circle fa-2x mb-3 text-success"></i>
+                                <h6 class="fw-bold">Candidature envoyée</h6>
+                                <p class="small mb-2">Le {{ candidature.date_postulation|date:"d/m/Y" }}</p>
+                                <a href="{% url 'candidature_detail' candidature.pk %}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-eye me-1"></i>Voir ma candidature
+                                </a>
+                            </div>
+                        {% else %}
+                            <a href="{% url 'apply_job' offre.pk %}" class="btn btn-primary btn-lg w-100 mb-3 py-3">
+                                <i class="fas fa-paper-plane me-2"></i>Postuler maintenant
+                            </a>
+                            <p class="text-muted small">
+                                <i class="fas fa-clock me-1"></i>
+                                {% if offre.date_limite %}
+                                    Clôture le {{ offre.date_limite|date:"d/m/Y" }}
+                                {% else %}
+                                    Offre à pourvoir rapidement
+                                {% endif %}
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Informations de contact -->
+                {% if offre.contact or offre.fichier_pdf %}
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informations</h6>
+                    </div>
+                    <div class="card-body">
+                        {% if offre.contact %}
+                        <div class="mb-3">
+                            <h6 class="small text-muted mb-2">Contact</h6>
+                            <a href="mailto:{{ offre.contact }}" class="btn btn-outline-secondary btn-sm w-100 text-start">
+                                <i class="fas fa-envelope me-2"></i>{{ offre.contact }}
+                            </a>
+                        </div>
+                        {% endif %}
+                        
+                        {% if offre.fichier_pdf %}
+                        <div>
+                            <h6 class="small text-muted mb-2">Document</h6>
+                            <a href="{{ offre.fichier_pdf.url }}" class="btn btn-outline-primary btn-sm w-100 text-start" target="_blank">
+                                <i class="fas fa-download me-2"></i>Télécharger l'offre PDF
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Partage -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0"><i class="fas fa-share-alt me-2"></i>Partager</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary btn-sm share-btn" data-platform="linkedin">
+                                <i class="fab fa-linkedin me-2"></i>LinkedIn
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm share-btn" data-platform="facebook">
+                                <i class="fab fa-facebook me-2"></i>Facebook
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm share-btn" data-platform="email">
+                                <i class="fas fa-envelope me-2"></i>Email
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-    .sticky-top {
-        position: sticky;
-        z-index: 1000;
+    .breadcrumb {
+        background: transparent;
+        padding: 0;
+        margin-bottom: 2rem;
     }
-    .border-start {
-        background-color: #f8f9fa;
-        padding: 1rem;
-        border-radius: 0 0.375rem 0.375rem 0;
+    
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    }
+    
+    .content-box {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border-left: 4px solid #0d6efd;
+    }
+    
+    .nav-tabs .nav-link {
+        border: none;
+        border-bottom: 3px solid transparent;
+        color: #6c757d;
+        padding: 1rem 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-tabs .nav-link.active {
+        border-bottom-color: #0d6efd;
+        color: #0d6efd;
+        background: transparent;
+        font-weight: 600;
+    }
+    
+    .nav-tabs .nav-link:hover {
+        border-bottom-color: #0d6efd;
+        color: #0d6efd;
+    }
+    
+    @media (max-width: 768px) {
+        .nav-tabs {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .nav-tabs .nav-item {
+            min-width: 120px;
+        }
+        
+        .content-box {
+            padding: 1rem;
+        }
+        
+        .sticky-top {
+            position: relative;
+            top: 0 !important;
+        }
     }
 </style>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Ajouter des classes Bootstrap aux éléments de liste
-        const lists = document.querySelectorAll('ul');
-        lists.forEach(list => {
-            if (!list.classList.contains('list-unstyled')) {
-                list.classList.add('list-group', 'list-group-flush');
-                const items = list.querySelectorAll('li');
-                items.forEach(item => {
-                    item.classList.add('list-group-item');
-                });
+    // Partage sur les réseaux sociaux
+    document.querySelectorAll('.share-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const platform = this.dataset.platform;
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent('{{ offre.titre }} - {{ offre.societe }}');
+            
+            let shareUrl;
+            switch(platform) {
+                case 'linkedin':
+                    shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+                    break;
+                case 'facebook':
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+                    break;
+                case 'email':
+                    shareUrl = `mailto:?subject=${title}&body=Je vous partage cette offre: ${url}`;
+                    break;
             }
+            
+            window.open(shareUrl, '_blank');
         });
     });
 </script>

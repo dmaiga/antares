@@ -9,7 +9,7 @@
       <tr>
         <th>Nom</th>
         <th>Catégorie</th>
-        <th>Description</th>
+        <th>Niveau</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -18,7 +18,7 @@
       <tr>
         <td>{{ competence.nom }}</td>
         <td>{{ competence.get_categorie_display }}</td>
-        <td>{{ competence.description|default:"-" }}</td>
+        <td>{{ competence.niveau|default:"-" }}</td>
         <td>
           <a href="{% url 'competence_update' competence.pk %}" class="btn btn-sm btn-primary">Modifier</a>
           <a href="{% url 'competence_delete' competence.pk %}" class="btn btn-sm btn-danger">Supprimer</a>

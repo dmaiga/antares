@@ -4,14 +4,43 @@
 {% block title %}{% if form.instance.pk %}Modifier{% else %}Ajouter{% endif %} un Document{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-3">
+    <!-- Section Conseil - En premier sur mobile -->
+    <div class="row">
+        <div class="col-12 mb-4 d-md-none"> <!-- Visible seulement sur mobile -->
+            <div class="card bg-light border-0">
+                <div class="card-body text-center">
+                    <i class="fas fa-upload fa-2x text-primary mb-2"></i>
+                    <h5 class="text-primary mb-2">Boostez votre profil !</h5>
+                    
+                    <div class="alert alert-info mb-2 py-2">
+                        <strong class="small">📁 Tous vos documents comptent</strong>
+                    </div>
+                    
+                    <p class="small mb-2">
+                        CV, Diplômes, Recommandations, Projets...
+                        <strong>Chaque fichier augmente vos chances</strong>
+                    </p>
+                    
+                    <div class="bg-warning p-2 rounded mb-2">
+                        <p class="mb-0 small">
+                            <i class="fas fa-star me-1"></i>
+                            <strong>3x plus de visibilité</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <!-- Formulaire - Prend toute la largeur sur mobile -->
+        <div class="col-12 col-md-8">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">
+                    <h3 class="card-title h5">
                         <i class="fas fa-file-upload me-2"></i>
-                        {% if form.instance.pk %}Modifier le Document{% else %}Ajouter un Nouveau Document{% endif %}
+                        {% if form.instance.pk %}Modifier le Document{% else %}Ajouter un Document{% endif %}
                     </h3>
                 </div>
                 <div class="card-body">
@@ -25,45 +54,32 @@
                                 {% endfor %}
                             </div>
                         {% endif %}
-                        
+
                         <div class="mb-3 required-field">
-                            <label for="{{ form.titre.id_for_label }}" class="form-label">{{ form.titre.label }}</label>
-                            {{ form.titre }}
-                            {% if form.titre.errors %}
+                            <label for="{{ form.type_document.id_for_label }}" class="form-label">{{ form.type_document.label }}</label>
+                            {{ form.type_document }}
+                            {% if form.type_document.errors %}
                                 <div class="text-danger">
-                                    {% for error in form.titre.errors %}
+                                    {% for error in form.type_document.errors %}
                                         {{ error }}
                                     {% endfor %}
                                 </div>
                             {% endif %}
                         </div>
-                        
+
                         <div class="mb-3 required-field">
-                            <label for="{{ form.type.id_for_label }}" class="form-label">{{ form.type.label }}</label>
-                            {{ form.type }}
-                            {% if form.type.errors %}
+                            <label for="{{ form.nom.id_for_label }}" class="form-label">{{ form.nom.label }}</label>
+                            {{ form.nom }}
+                            {% if form.nom.errors %}
                                 <div class="text-danger">
-                                    {% for error in form.type.errors %}
+                                    {% for error in form.nom.errors %}
                                         {{ error }}
                                     {% endfor %}
                                 </div>
                             {% endif %}
                         </div>
-                        
+
                         <div class="mb-3">
-                            <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
-                            {{ form.description }}
-                            {% if form.description.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.description.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                            <div class="form-text">Décrivez brièvement le contenu de ce document.</div>
-                        </div>
-                        
-                        <div class="mb-3 required-field">
                             <label for="{{ form.fichier.id_for_label }}" class="form-label">{{ form.fichier.label }}</label>
                             
                             {% if form.instance.pk and form.instance.fichier %}
@@ -71,7 +87,7 @@
                                     <i class="fas fa-file me-2"></i>
                                     Fichier actuel : <a href="{{ form.instance.fichier.url }}" target="_blank">{{ form.instance.fichier.name }}</a>
                                     <br>
-                                    <small class="text-muted">Taille : {{ form.instance.fichier.size|filesizeformat }}</small>
+                                    <small class="text-muted">Taille : {{ form.instance.taille_formattee }}</small>
                                 </div>
                                 <div class="form-check mb-3">
                                     <input class="form-check-input" type="checkbox" id="clear_file" name="clear_file">
@@ -90,15 +106,70 @@
                                 </div>
                             {% endif %}
                             <div class="form-text">
-                                Formats acceptés : PDF, DOC, DOCX. Taille maximale : 10MB.
+                                Formats acceptés : PDF, DOC, DOCX, ODT, JPG, PNG, JPEG. Taille max : 10MB.
                             </div>
                         </div>
-                        
+
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.description.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">Décrivez brièvement ce document.</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.langue.id_for_label }}" class="form-label">{{ form.langue.label }}</label>
+                                    {{ form.langue }}
+                                    {% if form.langue.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.langue.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.mots_cles.id_for_label }}" class="form-label">{{ form.mots_cles.label }}</label>
+                                    {{ form.mots_cles }}
+                                    {% if form.mots_cles.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.mots_cles.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">Mots-clés séparés par des virgules</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            {{ form.est_actif }}
+                            <label for="{{ form.est_actif.id_for_label }}" class="form-check-label">{{ form.est_actif.label }}</label>
+                            {% if form.est_actif.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.est_actif.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
                         <div class="form-group mt-4">
-                            <button type="submit" class="btn btn-success me-2">
+                            <button type="submit" class="btn btn-success me-2 w-100 w-md-auto">
                                 <i class="fas fa-save me-1"></i> Enregistrer
                             </button>
-                            <a href="{% url 'document_list' %}" class="btn btn-secondary">
+                            <a href="{% url 'document_list' %}" class="btn btn-secondary mt-2 mt-md-0 w-100 w-md-auto">
                                 <i class="fas fa-times me-1"></i> Annuler
                             </a>
                         </div>
@@ -106,8 +177,57 @@
                 </div>
             </div>
         </div>
+
+        <!-- Section Conseil - Côté droit sur desktop -->
+        <div class="col-md-4 d-none d-md-block"> <!-- Caché sur mobile -->
+            <div class="card bg-light border-0 sticky-top" style="top: 20px;">
+                <div class="card-body text-center">
+                    <i class="fas fa-upload fa-3x text-primary mb-3"></i>
+                    <h4 class="text-primary mb-3">Boostez votre profil !</h4>
+                    
+                    <div class="alert alert-info mb-3">
+                        <strong>📁 Tous vos documents comptent</strong>
+                    </div>
+                    
+                    <p class="small mb-3">
+                        CV, Diplômes, Recommandations, Attestations, Certificats, Projets...
+                        <strong>Chaque fichier augmente vos chances</strong>
+                    </p>
+                    
+                    <div class="bg-warning p-2 rounded mb-3">
+                        <p class="mb-1 small">
+                            <i class="fas fa-star me-1"></i>
+                            <strong>3x plus de visibilité</strong>
+                        </p>
+                        <p class="mb-0 small">Meilleur matching avec les offres</p>
+                    </div>
+                    
+                    <p class="text-success fw-bold small">
+                        <i class="fas fa-check-circle me-1"></i>
+                        Plus vous partagez, plus on vous remarque !
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<style>
+    .required-field label:after {
+        content: " *";
+        color: #dc3545;
+    }
+    
+    @media (max-width: 768px) {
+        .card-title {
+            font-size: 1.2rem;
+        }
+        .btn {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+    }
+</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -138,24 +258,11 @@
             textarea.rows = 3;
         }
         
-        // Style the checkbox
-        const checkbox = document.querySelector('input[type="checkbox"]');
-        if (checkbox) {
+        // Style the checkboxes
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
             checkbox.classList.add('form-check-input');
-        }
-        
-        // Show file name when selected
-        if (fileInput) {
-            fileInput.addEventListener('change', function() {
-                const fileName = this.files[0]?.name;
-                if (fileName) {
-                    const helpText = this.nextElementSibling;
-                    if (helpText && helpText.classList.contains('form-text')) {
-                        helpText.textContent = `Fichier sélectionné : ${fileName}`;
-                    }
-                }
-            });
-        }
+        });
     });
 </script>
 {% endblock %}
