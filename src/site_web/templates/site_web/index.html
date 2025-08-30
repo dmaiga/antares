@@ -463,7 +463,14 @@
   .rh-value-card:hover .icon-circle {
     transform: rotate(5deg) scale(1.1);
   }
-  
+  html, body {
+  overflow-x: hidden !important;
+}
+
+img, .container, .container-fluid {
+  max-width: 100% !important;
+}
+
   /* Responsive */
   @media (max-width: 768px) {
     .rh-value-card {
