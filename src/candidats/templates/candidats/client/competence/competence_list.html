@@ -3,33 +3,160 @@
 {% block content %}
 <div class="container py-3">
   <h2 class="h5 mb-3">Liste des compétences</h2>
-  <a href="{% url 'competence_create' %}" class="btn btn-success mb-3">+ Ajouter une compétence</a>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Nom</th>
-        <th>Catégorie</th>
-        <th>Niveau</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for competence in competences %}
-      <tr>
-        <td>{{ competence.nom }}</td>
-        <td>{{ competence.get_categorie_display }}</td>
-        <td>{{ competence.niveau|default:"-" }}</td>
-        <td>
-          <a href="{% url 'competence_update' competence.pk %}" class="btn btn-sm btn-primary">Modifier</a>
-          <a href="{% url 'competence_delete' competence.pk %}" class="btn btn-sm btn-danger">Supprimer</a>
-        </td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="4" class="text-center">Aucune compétence enregistrée</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  
+  <!-- Message d'incitation - Visible en premier sur mobile -->
+  <div class="row d-md-none ">
+    <div class="col-12">
+      <div class="card bg-light border-0">
+        <div class="card-body">
+          <div class="text-center mb-2">
+            <i class="fas fa-bullhorn fa-2x text-warning"></i>
+          </div>
+          <h5 class="card-title text-primary mb-2 text-center">Sortez du lot !</h5>
+          
+          <div class="alert alert-info mb-2 py-2">
+            <strong class="small">Ne sous-estimez aucune de vos compétences</strong>
+          </div>
+          
+          <p class="small mb-2 text-center">
+            <strong>Techniques, linguistiques, soft skills...</strong>
+            Chaque compétence est un mot-clé supplémentaire pour les recruteurs.
+          </p>
+          
+          <div class="bg-warning p-2 rounded mb-2">
+            <p class="mb-1 small text-center">
+              <i class="fas fa-star me-1"></i>
+              <strong>3x plus de visibilité</strong>
+            </p>
+            <p class="mb-0 small text-center">Meilleur matching avec les offres</p>
+          </div>
+          
+          <p class="text-success fw-bold small text-center">
+            <i class="fas fa-check-circle me-1"></i>
+            Plus vous ajoutez, plus on vous remarque !
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="row">
+    <!-- Colonne principale (9/12) pour le tableau -->
+    <div class="col-lg-9 col-md-8 order-2 order-md-1">
+      <a href="{% url 'competence_create' %}" class="btn btn-success mb-3">+ Ajouter une compétence</a>
+      
+      <div class="card">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Catégorie</th>
+                  <th>Niveau</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for competence in competences %}
+                <tr>
+                  <td>{{ competence.nom }}</td>
+                  <td>{{ competence.get_categorie_display }}</td>
+                  <td>{{ competence.niveau|default:"-" }}</td>
+                  <td>
+                    <div class="btn-group btn-group-sm" role="group">
+                      <a href="{% url 'competence_update' competence.pk %}" class="btn btn-primary">Modifier</a>
+                      <a href="{% url 'competence_delete' competence.pk %}" class="btn btn-danger">Supprimer</a>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center">Aucune compétence enregistrée</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Colonne latérale (3/12) pour le message d'incitation - Cachée sur mobile -->
+    <div class="col-lg-3 col-md-4 order-1 order-md-2 d-none d-md-block">
+      <div class="card bg-light border-0 " >
+        <div class="card-body">
+          <div class="text-center mb-3">
+            <i class="fas fa-bullhorn fa-2x text-warning"></i>
+          </div>
+          <h5 class="card-title text-primary mb-3">Sortez du lot !</h5>
+          
+          <div class="alert alert-info mb-3 py-2">
+            <strong class="small">Ne sous-estimez aucune de vos compétences</strong>
+          </div>
+          
+          <p class="small mb-3">
+            <strong>Techniques, linguistiques, soft skills...</strong>
+            Chaque compétence est un mot-clé supplémentaire pour les recruteurs.
+          </p>
+          
+          <div class="bg-warning p-2 rounded mb-3">
+            <p class="mb-1 small">
+              <i class="fas fa-star me-1"></i>
+              <strong>3x plus de visibilité</strong>
+            </p>
+            <p class="mb-0 small">Meilleur matching avec les offres</p>
+          </div>
+          
+          <p class="text-success fw-bold small">
+            <i class="fas fa-check-circle me-1"></i>
+            Plus vous ajoutez, plus on vous remarque !
+          </p>
+          
+          <div class="text-center mt-3">
+            <a href="{% url 'competence_create' %}" class="btn btn-sm btn-success">
+              <i class="fas fa-plus me-1"></i> Ajouter une compétence
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<style>
+ 
+  
+  @media (max-width: 767.98px) {
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    
+    .btn-group .btn {
+      width: 100%;
+    }
+    
+    .table-responsive {
+      overflow-x: auto;
+      width: 100%;
+    }
+  }
+  
+  @media (max-width: 575.98px) {
+    .card-body {
+      padding: 0.75rem;
+    }
+    
+    table {
+      font-size: 0.875rem;
+    }
+    
+    .btn {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+    }
+  }
+</style>
 {% endblock %}

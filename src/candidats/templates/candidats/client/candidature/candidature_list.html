@@ -4,12 +4,264 @@
 {% block title %}Mes Candidatures - Antares{% endblock %}
 
 {% block content %}
+  <!-- Import Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --secondary-blue: #2D76B6;
+      --light-gray: #F4F4F9;
+      --dark-gray: #333333;
+      --light-blue: #E6F0FA;
+      --accent-orange: #FA8301;
+      --primary-blue: #0A4B8C;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 12px;
+        transition: transform 0.2s ease-in-out;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 20px;
+    }
+    
+    .bg-POSTULE { background-color: #0dcaf0; }
+    .bg-EN_REVUE { background-color: #0d6efd; }
+    .bg-ENTRETIEN { background-color: #ffc107; color: #000; }
+    .bg-ACCEPTE { background-color: #198754; }
+    .bg-REFUSE { background-color: #dc3545; }
+    .bg-RETIRE { background-color: #6c757d; }
+    
+    .btn-primary-custom {
+        background-color: var(--primary-blue);
+        border-color: var(--primary-blue);
+        color: white;
+    }
+    
+    .btn-primary-custom:hover {
+        background-color: var(--secondary-blue);
+        border-color: var(--secondary-blue);
+        color: white;
+    }
+    
+    .btn-outline-primary-custom {
+        color: var(--primary-blue);
+        border-color: var(--primary-blue);
+    }
+    
+    .btn-outline-primary-custom:hover {
+        background-color: var(--primary-blue);
+        color: white;
+    }
+    
+    .info-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, var(--light-gray) 100%);
+        border: 1px solid var(--secondary-blue);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        height: 100%;
+    }
+    
+    .info-header {
+        background-color: var(--primary-blue);
+        color: white;
+        padding: 0.75rem 1rem;
+        text-align: center;
+        font-weight: bold;
+    }
+    
+    .antares-logo-container {
+        width: 100px;
+        height: 100px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        margin: 0 auto;
+        padding: 15px;
+        border: 2px solid var(--light-blue);
+    }
+    
+    .antares-logo-img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+    
+    .antares-logo-small {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        padding: 8px;
+        border: 1px solid var(--light-blue);
+    }
+    
+    .antares-logo-small-img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+    
+    .status-timeline {
+        position: relative;
+        padding-left: 25px;
+        margin: 1rem 0;
+    }
+    
+    .status-timeline::before {
+        content: '';
+        position: absolute;
+        left: 8px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background-color: var(--light-blue);
+    }
+    
+    .status-step {
+        position: relative;
+        margin-bottom: 0.8rem;
+    }
+    
+    .status-step::before {
+        content: '';
+        position: absolute;
+        left: -17px;
+        top: 5px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: var(--secondary-blue);
+    }
+    
+    .status-step.active::before {
+        background-color: var(--accent-orange);
+        width: 10px;
+        height: 10px;
+        left: -18px;
+    }
+    
+    .message-antares {
+        background: linear-gradient(135deg, var(--light-blue) 0%, #e3f2fd 100%);
+        border-left: 4px solid var(--primary-blue);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    
+    
+    @media (max-width: 991.98px) {
+        .sticky-sidebar {
+            position: relative;
+            top: 0 !important;
+            margin-top: 2rem;
+        }
+        
+        .row-custom-layout {
+            flex-direction: column;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .d-flex.justify-content-between {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .flex-shrink-0.ms-3 {
+            margin-left: 0 !important;
+            margin-top: 1rem;
+            align-self: center;
+        }
+        
+        .card-footer .d-flex {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+        
+        .antares-logo-container {
+            width: 80px;
+            height: 80px;
+        }
+        
+        .antares-logo-small {
+            width: 40px;
+            height: 40px;
+        }
+    }
+  </style>
+  
 <div class="container mt-4">
-    <div class="row">
-        <div class="col-md-12">
+    <!-- Message d'information Antares en haut -->
+    <div class="message-antares">
+        <div class="row align-items-center">
+            <div class="col-md-1 text-center mb-3 mb-md-0">
+                <i class="fas fa-info-circle fa-2x text-primary"></i>
+            </div>
+            <div class="col-md-11">
+                <h5 class="text-primary mb-2">Votre dossier sera étudié avec attention</h5>
+                <p class="mb-0">
+                    Si votre profil correspond à nos recherches, nous vous contacterons. 
+                    Sinon, pas d'inquiétude ! En tant que cabinet de recrutement, nous vous 
+                    recontacterons pour d'autres projets correspondant à votre profil.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row row-custom-layout">
+        <!-- Colonne À propos d'Antares (3 colonnes) -->
+        <div class="col-lg-3 col-md-4">
+            <div class="sticky-sidebar">
+                <div class="info-card">
+                    <div class="info-header">
+                        <i class="fas fa-info-circle me-1"></i> À propos d'Antares
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <div class="antares-logo-container mb-2">
+                                <img src="{% static 'site_web/images/hero/logo_antares_centre.png' %}" 
+                                     alt="Logo Antares" 
+                                     loading="lazy"
+                                     class="antares-logo-img">
+                            </div>
+                            <h6 class="text-primary-custom">Votre partenaire carrière</h6>
+                        </div>
+                        <p class="small text-muted text-center">
+                            Antares est bien plus qu'un simple cabinet de recrutement. 
+                            Nous vous accompagnons tout au long de votre parcours professionnel.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenu principal - Candidatures (6 colonnes) -->
+        <div class="col-lg-6 col-md-8">
+            <!-- En-tête avec actions -->
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2><i class="fas fa-paper-plane me-2"></i>Mes Candidatures</h2>
-                <a href="{% url 'candidat_job_list' %}" class="btn btn-primary">
+                <h2><i class="fas fa-paper-plane me-2 text-primary-custom"></i>Mes Candidatures</h2>
+                <a href="{% url 'candidat_job_list' %}" class="btn btn-primary-custom">
                     <i class="fas fa-search me-1"></i> Voir les offres
                 </a>
             </div>
@@ -26,8 +278,8 @@
             {% if candidatures %}
                 <div class="row">
                     {% for candidature in candidatures %}
-                        <div class="col-md-12 mb-4">
-                            <div class="card h-100 shadow-sm">
+                        <div class="col-12 mb-4">
+                            <div class="card h-100">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start">
                                         <div class="flex-grow-1">
@@ -41,12 +293,12 @@
                                                     {{ candidature.get_statut_display }}
                                                 </span>
                                                 {% if candidature.offre.lieu %}
-                                                <span class="badge bg-light text-dark">
+                                                <span class="badge bg-light text-dark border">
                                                     <i class="fas fa-map-marker-alt me-1"></i>{{ candidature.offre.lieu }}
                                                 </span>
                                                 {% endif %}
                                                 {% if candidature.offre.type_contrat %}
-                                                <span class="badge bg-light text-dark">
+                                                <span class="badge bg-light text-dark border">
                                                     <i class="fas fa-file-contract me-1"></i>{{ candidature.offre.get_type_contrat_display }}
                                                 </span>
                                                 {% endif %}
@@ -75,10 +327,12 @@
                                             {% endif %}
                                         </div>
                                         <div class="flex-shrink-0 ms-3">
-                                            <!-- Logo Antares -->
-                                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" 
-                                                 style="width: 80px; height: 80px;">
-                                                <span class="text-white fw-bold fs-4">A</span>
+                                            <!-- Logo Antares amélioré -->
+                                            <div class="antares-logo-small">
+                                                <img src="{% static 'site_web/images/hero/logo_antares_centre.png' %}" 
+                                                     alt="Logo Antares" 
+                                                     loading="lazy"
+                                                     class="antares-logo-small-img">
                                             </div>
                                         </div>
                                     </div>
@@ -86,7 +340,7 @@
                                 <div class="card-footer bg-transparent">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <a href="{% url 'candidature_detail' candidature.pk %}" class="btn btn-sm btn-outline-primary me-2">
+                                            <a href="{% url 'candidature_detail' candidature.pk %}" class="btn btn-sm btn-outline-primary-custom me-2">
                                                 <i class="fas fa-eye me-1"></i> Détails
                                             </a>
                                             {% if candidature.statut == 'POSTULE' or candidature.statut == 'EN_REVUE' %}
@@ -152,71 +406,55 @@
                     <h4 class="alert-heading">Aucune candidature</h4>
                     <p>Vous n'avez postulé à aucune offre pour le moment.</p>
                     <div class="mt-3">
-                        <a href="{% url 'candidat_job_list' %}" class="btn btn-primary">
+                        <a href="{% url 'candidat_job_list' %}" class="btn btn-primary-custom">
                             <i class="fas fa-search me-1"></i> Découvrir les offres Antares
                         </a>
                     </div>
                 </div>
             {% endif %}
         </div>
+
+        <!-- Colonne Services proposés (3 colonnes) -->
+        <div class="col-lg-3 col-md-12">
+            <div class="sticky-sidebar">
+                <!-- Nos services -->
+                <div class="info-card">
+                    <div class="info-header">
+                        <i class="fas fa-concierge-bell me-1"></i> Nos Services
+                    </div>
+                    <div class="card-body">
+                        <div class="status-timeline">
+                            <div class="status-step active">
+                                <small class="fw-bold text-primary-custom">Recrutement et sélection</small>
+                                <p class="small text-muted mb-2">Identification des candidats les plus adaptés</p>
+                            </div>
+                            <div class="status-step">
+                                <small class="fw-bold">Formation professionnelle</small>
+                                <p class="small text-muted mb-2">Renforcement des compétences techniques</p>
+                            </div>
+                            <div class="status-step">
+                                <small class="fw-bold">Missions d'intérim</small>
+                                <p class="small text-muted mb-2">Recrutements temporaires variés</p>
+                            </div>
+                            <div class="status-step">
+                                <small class="fw-bold">Conseil en gestion RH</small>
+                                <p class="small text-muted mb-2">Structuration des services RH</p>
+                            </div>
+                            <div class="status-step">
+                                <small class="fw-bold">Audit RH</small>
+                                <p class="small text-muted mb-2">Analyse et optimisation des pratiques</p>
+                            </div>
+                            <div class="status-step">
+                                <small class="fw-bold">Coaching professionnel</small>
+                                <p class="small text-muted mb-0">Accompagnement personnalisé</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
-<style>
-    .card {
-        border: none;
-        border-radius: 12px;
-        transition: transform 0.2s ease-in-out;
-    }
-    
-    .card:hover {
-        transform: translateY(-2px);
-    }
-    
-    .badge {
-        font-size: 0.75rem;
-        padding: 0.5rem 0.75rem;
-        border-radius: 20px;
-    }
-    
-    .bg-POSTULE { background-color: #0dcaf0; }
-    .bg-EN_REVUE { background-color: #0d6efd; }
-    .bg-ENTRETIEN { background-color: #ffc107; color: #000; }
-    .bg-ACCEPTE { background-color: #198754; }
-    .bg-REFUSE { background-color: #dc3545; }
-    .bg-RETIRE { background-color: #6c757d; }
-    
-    .pagination .page-link {
-        border-radius: 8px;
-        margin: 0 3px;
-        border: none;
-    }
-    
-    .btn-sm {
-        border-radius: 8px;
-        padding: 0.375rem 0.75rem;
-        font-size: 0.875rem;
-    }
-    
-    @media (max-width: 768px) {
-        .d-flex.justify-content-between {
-            flex-direction: column;
-            gap: 1rem;
-        }
-        
-        .flex-shrink-0.ms-3 {
-            margin-left: 0 !important;
-            margin-top: 1rem;
-            align-self: center;
-        }
-        
-        .card-footer .d-flex {
-            flex-direction: column;
-            gap: 1rem;
-            text-align: center;
-        }
-    }
-</style>
 
 <script>
     // Confirmation pour le retrait de candidature

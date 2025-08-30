@@ -881,8 +881,9 @@ class CandidatureForm(forms.ModelForm):
                 'niveau': 'danger',
                 'message': f"""
                 <i class="fas fa-id-card me-2"></i>
-                <strong>Information manquante :</strong> Veuillez compléter les informations de votre pièce d'identité 
-                <a href="/antares/candidat/profil/" class="alert-link">dans votre profil</a> avant de postuler.
+                <strong>Information requise :</strong> Pour pouvoir postuler, il faudrait avoir au moins un CV et avoir rempli 
+                dans votre profil les informations relatives à votre pièce d'identité.
+                <a href="/antares/candidat/profil/" class="alert-link">Complétez votre profil</a>.
                 """,
                 'obligatoire': True
             })
@@ -892,9 +893,9 @@ class CandidatureForm(forms.ModelForm):
                 'niveau': 'warning',
                 'message': f"""
                 <i class="fas fa-file-upload me-2"></i>
-                <strong>Document recommandé :</strong> Pour renforcer votre candidature, nous vous recommandons d'uploader 
-                une copie de votre pièce d'identité 
-                <a href="/antares/candidat/documents/ajouter/" class="alert-link">dans vos documents</a>.
+                <strong>Conseil :</strong> Renseignez vos expériences professionnelles et compétences dans la plateforme 
+                pour mettre en avant que vous êtes le candidat idéal pour le poste.
+                <a href="/antares/candidat/documents/ajouter/" class="alert-link">Ajouter des documents</a>.
                 """,
                 'obligatoire': False
             })

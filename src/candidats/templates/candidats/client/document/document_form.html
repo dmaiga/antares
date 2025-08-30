@@ -7,7 +7,7 @@
 <div class="container mt-3">
     <!-- Section Conseil - En premier sur mobile -->
     <div class="row">
-        <div class="col-12 mb-4 d-md-none"> <!-- Visible seulement sur mobile -->
+        <div class="col-12 mb-4 d-md-none">
             <div class="card bg-light border-0">
                 <div class="card-body text-center">
                     <i class="fas fa-upload fa-2x text-primary mb-2"></i>
@@ -44,7 +44,7 @@
                     </h3>
                 </div>
                 <div class="card-body">
-                    <form method="post" enctype="multipart/form-data">
+                    <form method="post" enctype="multipart/form-data" id="adaptiveForm">
                         {% csrf_token %}
                         
                         {% if form.non_field_errors %}
@@ -107,6 +107,87 @@
                             {% endif %}
                             <div class="form-text">
                                 Formats acceptés : PDF, DOC, DOCX, ODT, JPG, PNG, JPEG. Taille max : 10MB.
+                            </div>
+                        </div>
+
+                        <!-- Section conditionnelle pour les diplômes -->
+                        <div id="diplomeFields" class="form-section conditional-field mb-4 p-3 bg-light rounded">
+                            <h4 class="mb-3"><i class="fas fa-graduation-cap me-2"></i>Informations spécifiques au diplôme</h4>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="intitule" class="form-label required-field">Intitulé du diplôme</label>
+                                    <input type="text" class="form-control" id="intitule" name="intitule" value="{{ request.POST.intitule }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="etablissement" class="form-label required-field">Établissement</label>
+                                    <input type="text" class="form-control" id="etablissement" name="etablissement" value="{{ request.POST.etablissement }}">
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="type_etablissement" class="form-label">Type d'établissement</label>
+                                    <select class="form-select" id="type_etablissement" name="type_etablissement">
+                                        <option value="UNIV">Université</option>
+                                        <option value="ECOLE">École</option>
+                                        <option value="LYCEE">Lycée</option>
+                                        <option value="ORG">Organisme de formation</option>
+                                        <option value="AUTRE">Autre</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="niveau" class="form-label required-field">Niveau</label>
+                                    <select class="form-select" id="niveau" name="niveau">
+                                        <option value="">Sélectionnez un niveau</option>
+                                        <option value="BAC">Baccalauréat</option>
+                                        <option value="BAC+2">BAC+2 (BTS, DUT, DEUG)</option>
+                                        <option value="LICENCE">Licence (BAC+3)</option>
+                                        <option value="MASTER">Master (BAC+5)</option>
+                                        <option value="DOCTORAT">Doctorat (BAC+8)</option>
+                                        <option value="AUTRE">Autre</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="domaine" class="form-label required-field">Domaine d'études</label>
+                                    <input type="text" class="form-control" id="domaine" name="domaine" value="{{ request.POST.domaine }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="pays_obtention" class="form-label">Pays d'obtention</label>
+                                    <input type="text" class="form-control" id="pays_obtention" name="pays_obtention" value="Mali" value="{{ request.POST.pays_obtention|default:'Mali' }}">
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="ville_obtention" class="form-label">Ville d'obtention</label>
+                                    <input type="text" class="form-control" id="ville_obtention" name="ville_obtention" value="{{ request.POST.ville_obtention }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="mention" class="form-label">Mention</label>
+                                    <input type="text" class="form-control" id="mention" name="mention" value="{{ request.POST.mention }}">
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="date_debut" class="form-label">Date de début</label>
+                                    <input type="date" class="form-control" id="date_debut" name="date_debut" value="{{ request.POST.date_debut }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="date_obtention" class="form-label required-field">Date d'obtention</label>
+                                    <input type="date" class="form-control" id="date_obtention" name="date_obtention" value="{{ request.POST.date_obtention }}">
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="note" class="form-label">Note/20</label>
+                                    <input type="number" class="form-control" id="note" name="note" step="0.01" min="0" max="20" value="{{ request.POST.note }}">
+                                </div>
                             </div>
                         </div>
 
@@ -179,7 +260,7 @@
         </div>
 
         <!-- Section Conseil - Côté droit sur desktop -->
-        <div class="col-md-4 d-none d-md-block"> <!-- Caché sur mobile -->
+        <div class="col-md-4 d-none d-md-block">
             <div class="card bg-light border-0 sticky-top" style="top: 20px;">
                 <div class="card-body text-center">
                     <i class="fas fa-upload fa-3x text-primary mb-3"></i>
@@ -216,6 +297,16 @@
     .required-field label:after {
         content: " *";
         color: #dc3545;
+    }
+    
+    .conditional-field {
+        display: none;
+        border-left: 4px solid #0d6efd;
+    }
+    
+    .form-section {
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
     }
     
     @media (max-width: 768px) {
@@ -262,6 +353,53 @@
         const checkboxes = document.querySelectorAll('input[type="checkbox"]');
         checkboxes.forEach(checkbox => {
             checkbox.classList.add('form-check-input');
+        });
+        
+        // Gestion des champs conditionnels pour les diplômes
+        const typeDocumentSelect = document.getElementById('{{ form.type_document.id_for_label }}');
+        const diplomeFields = document.getElementById('diplomeFields');
+        const diplomeRequiredFields = diplomeFields.querySelectorAll('.required-field');
+        
+        // Fonction pour gérer l'affichage des champs conditionnels
+        function toggleDiplomeFields() {
+            if (typeDocumentSelect.value === 'DIPLOME') {
+                diplomeFields.style.display = 'block';
+                // Rendre les champs requis
+                diplomeRequiredFields.forEach(field => {
+                    const input = field.querySelector('input, select');
+                    if (input) input.required = true;
+                });
+            } else {
+                diplomeFields.style.display = 'none';
+                // Enlever l'attribut requis
+                diplomeRequiredFields.forEach(field => {
+                    const input = field.querySelector('input, select');
+                    if (input) input.required = false;
+                });
+            }
+        }
+        
+        // Écouter les changements sur le select
+        if (typeDocumentSelect) {
+            typeDocumentSelect.addEventListener('change', toggleDiplomeFields);
+            
+            // Initialiser l'état au chargement
+            toggleDiplomeFields();
+        }
+        
+        // Validation du formulaire
+        document.getElementById('adaptiveForm').addEventListener('submit', function(e) {
+            // Validation supplémentaire si nécessaire
+            if (typeDocumentSelect.value === 'DIPLOME') {
+                const dateDebut = document.getElementById('date_debut');
+                const dateObtention = document.getElementById('date_obtention');
+                
+                if (dateDebut.value && dateObtention.value && new Date(dateObtention.value) < new Date(dateDebut.value)) {
+                    e.preventDefault();
+                    alert("La date d'obtention ne peut pas être antérieure à la date de début.");
+                    dateObtention.focus();
+                }
+            }
         });
     });
 </script>

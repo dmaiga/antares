@@ -4,153 +4,28 @@
 {% block title %}Mes Documents{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <!-- Header avec statistiques -->
-    <div class="row">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2 class="h4 mb-1">
-                        <i class="fas fa-file-alt me-2 text-primary"></i>Mes Documents
-                    </h2>
-
-                </div>
-                <a href="{% url 'add_document' %}" class="btn btn-primary">
-                    <i class="fas fa-plus me-1"></i> Ajouter
-                </a>
-            </div>
-
-            
-        </div>
-    </div>
-
+  <!-- Import Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-
-    <!-- Grille de documents -->
-    {% if documents %}
-        <div class="row">
-            {% for document in documents %}
-                <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-body">
-                            <!-- Header du document -->
-                            <div class="d-flex align-items-start mb-3">
-                                <div class="flex-grow-1">
-                                    <h5 class="card-title h6 mb-1 text-truncate" title="{{ document.nom }}">
-                                        {{ document.nom|truncatewords:5 }}
-                                    </h5>
-                                    <span class="badge bg-{% if document.type_document == 'CV' %}primary{% elif document.type_document == 'LM' %}success{% elif document.type_document == 'RECOMMANDATION' %}info{% elif document.type_document == 'DIPLOME' %}warning{% elif document.type_document == 'FORMATION' %}secondary{% else %}dark{% endif %} mb-2">
-                                        {{ document.get_type_document_display }}
-                                    </span>
-                                </div>
-                              
-                            </div>
-                            
-                            <!-- Description -->
-                            {% if document.description %}
-                                <p class="card-text text-muted small mb-2">
-                                    {{ document.description|truncatewords:15 }}
-                                </p>
-                            {% endif %}
-                            
-                            <!-- Mots-clés -->
-                            {% if document.mots_cles %}
-                                <div class="mb-3">
-                                    {% for mot in document.mots_cles|split:","|slice:":3" %}
-                                        <span class="badge bg-light text-dark me-1 mb-1 small">
-                                            #{{ mot|trim }}
-                                        </span>
-                                    {% endfor %}
-                                    {% if document.mots_cles|split:","|length > 3 %}
-                                        <span class="badge bg-light text-muted small">
-                                            +{{ document.mots_cles|split:","|length|add:"-3" }}
-                                        </span>
-                                    {% endif %}
-                                </div>
-                            {% endif %}
-                            
-                            <!-- Métadonnées -->
-                            <div class="d-flex justify-content-between align-items-center text-muted small">
-                                <span>
-                                    <i class="fas fa-calendar-alt me-1"></i>
-                                    {{ document.date_upload|date:"d/m/Y" }}
-                                </span>
-                                <span>
-                                    <i class="fas fa-language me-1"></i>
-                                    {{ document.get_langue_display }}
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <!-- Footer avec actions -->
-                        <div class="card-footer bg-white border-0 pt-0">
-                            <div class="d-grid gap-2 d-md-flex justify-content-md-between">
-                                <a href="{{ document.fichier.url }}" target="_blank" 
-                                   class="btn btn-sm btn-outline-primary flex-fill me-md-2 mb-2 mb-md-0">
-                                    <i class="fas fa-eye me-1"></i> Voir
-                                </a>
-                                <a href="{% url 'edit_document' document.pk %}" 
-                                   class="btn btn-sm btn-outline-secondary flex-fill me-md-2 mb-2 mb-md-0">
-                                    <i class="fas fa-edit me-1"></i> Modifier
-                                </a>
-                                <a href="{% url 'delete_document' document.pk %}" 
-                                   class="btn btn-sm btn-outline-danger flex-fill">
-                                    <i class="fas fa-trash me-1"></i> Supprimer
-                                </a>
-                            </div>
-                            
-                           
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <!-- État vide -->
-        <div class="text-center py-5">
-            <div class="empty-state">
-                <i class="fas fa-file-upload fa-4x text-muted mb-3"></i>
-                <h4 class="text-muted mb-3">Aucun document ajouté</h4>
-                <p class="text-muted mb-4">Commencez par ajouter votre CV, lettres de motivation et autres documents importants</p>
-                <a href="{% url 'add_document' %}" class="btn btn-primary btn-lg">
-                    <i class="fas fa-plus me-2"></i>Ajouter votre premier document
-                </a>
-            </div>
-        </div>
-    {% endif %}
+  <style>
+    :root {
+      --secondary-blue: #2D76B6;
+      --light-gray: #F4F4F9;
+      --dark-gray: #333333;
+      --light-blue: #E6F0FA;
+      --accent-orange: #FA8301;
+      --primary-blue: #0A4B8C;
+    }
     
-    <!-- Guide des types de documents -->
-    <div class="mt-5 pt-4 border-top">
-        <h4 class="h5 mb-4">
-            <i class="fas fa-lightbulb text-warning me-2"></i>
-            Documents recommandés pour maximiser vos chances
-        </h4>
-        
-        <div class="row">
-            {% for type_doc in document_types %}
-            <div class="col-6 col-md-3 col-lg-2 mb-3">
-                <div class="text-center">
-                    <div class="icon-container mb-2">
-                        <i class="fas fa-{{ type_doc.icon }} fa-2x text-{{ type_doc.color }}"></i>
-                    </div>
-                    <h6 class="small fw-bold mb-1">{{ type_doc.name }}</h6>
-                    <p class="text-muted small mb-0">{{ type_doc.desc }}</p>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-
-<style>
     .card {
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         border-radius: 12px;
+        border: none;
     }
     
     .card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1) !important;
     }
     
     .empty-state {
@@ -162,22 +37,360 @@
         width: 60px;
         height: 60px;
         margin: 0 auto;
-        background: var(--bs-light);
+        background: var(--light-gray);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: transform 0.2s ease;
     }
     
-    .progress {
-        border-radius: 10px;
+    .icon-container:hover {
+        transform: scale(1.1);
+    }
+    
+    .btn-primary-custom {
+        background-color: var(--primary-blue);
+        border-color: var(--primary-blue);
+        color: white;
+    }
+    
+    .btn-primary-custom:hover {
+        background-color: var(--secondary-blue);
+        border-color: var(--secondary-blue);
+        color: white;
+    }
+    
+    .btn-outline-primary-custom {
+        color: var(--primary-blue);
+        border-color: var(--primary-blue);
+    }
+    
+    .btn-outline-primary-custom:hover {
+        background-color: var(--primary-blue);
+        color: white;
+    }
+    
+    .tip-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, var(--light-gray) 100%);
+        border: 1px solid var(--secondary-blue);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+    
+    .tip-header {
+        background-color: var(--primary-blue);
+        color: white;
+        padding: 0.75rem 1rem;
+        text-align: center;
+        font-weight: bold;
+    }
+    
+    .sticky-tips {
+        position: sticky;
+        top: 100px;
+        z-index: 1020;
+    }
+    
+    .document-stat {
+        background: linear-gradient(135deg, var(--light-blue) 0%, #e3f2fd 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    @media (max-width: 991.98px) {
+        .sticky-tips {
+            position: relative;
+            top: 0 !important;
+            margin-top: 2rem;
+        }
     }
     
     @media (max-width: 768px) {
         .d-md-flex .flex-fill {
             min-width: auto;
         }
+        
+        .btn-group-responsive {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .btn-group-responsive .btn {
+            width: 100%;
+        }
     }
-</style>
+  </style>
+  
+<div class="container mt-4">
+    <div class="row">
+        <!-- Contenu principal (8 colonnes) -->
+        <div class="col-lg-9">
+            <!-- Header avec statistiques -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h2 class="h4 mb-1">
+                                <i class="fas fa-file-alt me-2 text-primary-custom"></i>Mes Documents
+                            </h2>
+                            <p class="text-muted mb-0">Gérez tous vos documents professionnels</p>
+                        </div>
+                        <a href="{% url 'add_document' %}" class="btn btn-primary-custom">
+                            <i class="fas fa-plus me-1"></i> Ajouter
+                        </a>
+                    </div>
+                </div>
+            </div>
 
+        
+            <!-- Grille de documents -->
+            {% if documents %}
+                <div class="row">
+                    {% for document in documents %}
+                        <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <!-- Header du document -->
+                                    <div class="d-flex align-items-start mb-3">
+                                        <div class="flex-grow-1">
+                                              <span class="badge bg-{% if document.type_document == 'CV' %}primary{% elif document.type_document == 'LM' %}success{% elif document.type_document == 'RECOMMANDATION' %}info{% elif document.type_document == 'DIPLOME' %}warning{% elif document.type_document == 'FORMATION' %}secondary{% else %}dark{% endif %} mb-2">
+                                                {{ document.get_type_document_display }}
+                                            </span>
+                                            <h5 class="card-title h6 mb-1 text-truncate" title="{{ document.nom }}">
+                                                {{ document.nom|truncatewords:3 }}
+                                            </h5>
+                                          
+                                        </div>
+                                      
+                                    </div>
+                                    
+                                    <!-- Description -->
+                                    {% if document.description %}
+                                        <p class="card-text text-muted small mb-2">
+                                            {{ document.description|truncatewords:15 }}
+                                        </p>
+                                    {% endif %}
+                                    
+                                    <!-- Mots-clés -->
+                                    {% if document.mots_cles %}
+                                        <div class="mb-3">
+                                            {% for mot in document.mots_cles|split:","|slice:":3" %}
+                                                <span class="badge bg-light text-dark me-1 mb-1 small">
+                                                    #{{ mot|trim }}
+                                                </span>
+                                            {% endfor %}
+                                            {% if document.mots_cles|split:","|length > 3 %}
+                                                <span class="badge bg-light text-muted small">
+                                                    +{{ document.mots_cles|split:","|length|add:"-3" }}
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <!-- Métadonnées -->
+                                    <div class="d-flex justify-content-between align-items-center text-muted small">
+                                        <span>
+                                            <i class="fas fa-calendar-alt me-1"></i>
+                                            {{ document.date_upload|date:"d/m/Y" }}
+                                        </span>
+                                        <span>
+                                            <i class="fas fa-language me-1"></i>
+                                            {{ document.get_langue_display }}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Footer avec actions -->
+                                <div class="card-footer bg-white border-0 pt-0">
+                                    <div class="btn-group-responsive d-flex gap-2">
+                                        <a href="{{ document.fichier.url }}" target="_blank" 
+                                           class="btn btn-sm btn-outline-primary-custom flex-fill">
+                                            <i class="fas fa-eye me-1"></i> Voir
+                                        </a>
+                                        <a href="{% url 'edit_document' document.pk %}" 
+                                           class="btn btn-sm btn-outline-secondary flex-fill">
+                                            <i class="fas fa-edit me-1"></i> Modifier
+                                        </a>
+                                        <a href="{% url 'delete_document' document.pk %}" 
+                                           class="btn btn-sm btn-outline-danger flex-fill">
+                                            <i class="fas fa-trash me-1"></i> Supprimer
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <!-- État vide -->
+                <div class="text-center py-5">
+                    <div class="empty-state">
+                        <i class="fas fa-file-upload fa-4x text-muted mb-3"></i>
+                        <h4 class="text-muted mb-3">Aucun document ajouté</h4>
+                        <p class="text-muted mb-4">Commencez par ajouter votre CV, lettres de motivation et autres documents importants</p>
+                        <a href="{% url 'add_document' %}" class="btn btn-primary-custom btn-lg">
+                            <i class="fas fa-plus me-2"></i>Ajouter votre premier document
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Guide des types de documents -->
+            <div class="mt-5 pt-4 border-top">
+                <h4 class="h5 mb-4">
+                    <i class="fas fa-lightbulb text-warning me-2"></i>
+                    Documents recommandés pour maximiser vos chances
+                </h4>
+                
+                <div class="row">
+                          <div class="col-6 col-md-3 col-lg-2 mb-3">
+                        <div class="text-center">
+                            <div class="icon-container mb-2">
+                                <i class="fas fa-graduation-cap fa-2x text-warning"></i>
+                            </div>
+                            <h6 class="small fw-bold mb-1">Diplômes</h6>
+                            <p class="text-muted small mb-0">Certifications</p>
+                        </div>
+                    </div>
+              
+                    <div class="col-6 col-md-3 col-lg-2 mb-3">
+                        <div class="text-center">
+                            <div class="icon-container mb-2">
+                                <i class="fas fa-file-alt fa-2x text-primary"></i>
+                            </div>
+                            <h6 class="small fw-bold mb-1">CV</h6>
+                            <p class="text-muted small mb-0">À jour et adapté</p>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3 col-lg-2 mb-3">
+                        <div class="text-center">
+                            <div class="icon-container mb-2">
+                                <i class="fas fa-envelope fa-2x text-success"></i>
+                            </div>
+                            <h6 class="small fw-bold mb-1">Lettre de Motivation</h6>
+                            <p class="text-muted small mb-0">Personnalisée</p>
+                        </div>
+                    </div>
+              
+                    <div class="col-6 col-md-3 col-lg-2 mb-3">
+                        <div class="text-center">
+                            <div class="icon-container mb-2">
+                                <i class="fas fa-certificate fa-2x text-secondary"></i>
+                            </div>
+                            <h6 class="small fw-bold mb-1">Formations</h6>
+                            <p class="text-muted small mb-0">Compétences</p>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3 col-lg-2 mb-3">
+                        <div class="text-center">
+                            <div class="icon-container mb-2">
+                                <i class="fas fa-id-card fa-2x text-dark"></i>
+                            </div>
+                            <h6 class="small fw-bold mb-1">Pièce Identité</h6>
+                            <p class="text-muted small mb-0">Officielle</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar conseils (4 colonnes) -->
+        <div class="col-lg-3">
+            <div >
+                <!-- Conseils pour les documents -->
+                <div class="tip-card mb-4">
+                    <div class="tip-header">
+                        <i class="fas fa-tips me-1"></i> Conseils Importants
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="d-flex align-items-start mb-2">
+                                <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                <div>
+                                    <small class="fw-bold">CV toujours à jour</small>
+                                    <p class="small text-muted mb-0">Mettez à jour votre CV régulièrement</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex align-items-start mb-2">
+                                <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                <div>
+                                    <small class="fw-bold">Format PDF recommandé</small>
+                                    <p class="small text-muted mb-0">Utilisez le format PDF pour une meilleure préservation</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex align-items-start mb-2">
+                                <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                <div>
+                                    <small class="fw-bold">Taille maximale 5MB</small>
+                                    <p class="small text-muted mb-0">Optimisez vos fichiers pour un téléchargement rapide</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-start mb-2">
+                                <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                <div>
+                                    <small class="fw-bold">Mots-clés pertinents</small>
+                                    <p class="small text-muted mb-0">Ajoutez des mots-clés pour une meilleure visibilité</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+
+                <!-- Actions rapides -->
+                <div class="tip-card">
+                    <div class="tip-header bg-primary-custom">
+                        <i class="fas fa-bolt me-1"></i> Actions Rapides
+                    </div>
+                    <div class="card-body">
+                        <a href="{% url 'add_document' %}" class="btn btn-primary-custom btn-sm w-100 mb-2 text-start">
+                            <i class="fas fa-plus me-1"></i> Nouveau document
+                        </a>
+                        <a href="{% url 'edit_profil' %}" class="btn btn-outline-primary-custom btn-sm w-100 mb-2 text-start">
+                            <i class="fas fa-user-edit me-1"></i> Compléter mon profil
+                        </a>
+                        <a href="{% url 'competence_list' %}" class="btn btn-outline-primary-custom btn-sm w-100 text-start">
+                            <i class="fas fa-star me-1"></i> Ajouter des compétences
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Confirmation pour la suppression
+        const deleteButtons = document.querySelectorAll('a[href*="delete_document"]');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                if (!confirm('Êtes-vous sûr de vouloir supprimer ce document ? Cette action est irréversible.')) {
+                    e.preventDefault();
+                }
+            });
+        });
+        
+        // Animation des icônes
+        const icons = document.querySelectorAll('.icon-container');
+        icons.forEach(icon => {
+            icon.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.1)';
+            });
+            icon.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+    });
+</script>
 {% endblock %}

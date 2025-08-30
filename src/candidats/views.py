@@ -493,27 +493,28 @@ def candidat_job_list(request):
     
     return render(request, 'candidats/client/candidat_job_list.html', {'offres': offres})
 
+
 @login_required
 def candidat_job_detail(request, pk):
     if not check_candidat(request.user):
         return redirect('access_denied')
     
     offre = get_object_or_404(JobOffer, pk=pk)
-    deja_postule = Candidature.objects.filter(
+    candidature = Candidature.objects.filter(
         candidat=request.user,
         offre=offre,
         est_supprime=False
-    ).exists()
+    ).first() 
+    
+    deja_postule = candidature is not None
     
     context = {
         'offre': offre,
-        'deja_postule': deja_postule
+        'deja_postule': deja_postule,
+        'candidature': candidature 
     }
     
     if not deja_postule:
         context['form'] = CandidatureForm(user=request.user, initial={'offre': offre.pk})
     
     return render(request, 'candidats/client/candidat_job_detail.html', context)
-
-
-

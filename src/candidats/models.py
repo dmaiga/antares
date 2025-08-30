@@ -311,7 +311,7 @@ class Diplome(models.Model):
     niveau = models.CharField(max_length=20, choices=NIVEAU_CHOICES)
     domaine = models.CharField(max_length=100)
     
-    pays_obtention = models.CharField(max_length=100, default="France", verbose_name="Pays d'obtention")
+    pays_obtention = models.CharField(max_length=100, default="Mali", verbose_name="Pays d'obtention")
     ville_obtention = models.CharField(max_length=100, blank=True, verbose_name="Ville d'obtention")
     date_debut = models.DateField(null=True, blank=True, verbose_name="Date de début")
     date_obtention = models.DateField()
@@ -356,7 +356,7 @@ class ExperienceProfessionnelle(models.Model):
     type_contrat = models.CharField(max_length=20, choices=TYPE_CONTRAT_CHOICES, default='CDI')
     
     lieu = models.CharField(max_length=200)
-    pays = models.CharField(max_length=100, default="France")
+    pays = models.CharField(max_length=100, default="Mali")
     remote = models.BooleanField(default=False, verbose_name="Télétravail")
     
     date_debut = models.DateField()
@@ -373,6 +373,8 @@ class ExperienceProfessionnelle(models.Model):
     contact_reference = models.CharField(max_length=200, blank=True, verbose_name="Contact de référence")
     
     est_supprime = models.BooleanField(default=False)
+    date_creation = models.DateTimeField(auto_now_add=True, verbose_name="Date d'ajout")
+    date_maj = models.DateTimeField(auto_now=True, verbose_name="Dernière modification")
     
     class Meta:
         verbose_name = "Expérience professionnelle"

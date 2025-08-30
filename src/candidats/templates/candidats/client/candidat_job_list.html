@@ -4,44 +4,180 @@
 {% block title %}Offres d'Emploi{% endblock %}
 
 {% block content %}
+  <!-- Import Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --secondary-blue: #2D76B6;
+      --light-gray: #F4F4F9;
+      --dark-gray: #333333;
+      --light-blue: #E6F0FA;
+      --accent-orange: #FA8301;
+      --primary-blue: #0A4B8C;
+    }
+    
+    .job-card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+    }
+    
+    .job-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .filter-section {
+        background: linear-gradient(135deg, var(--light-blue) 0%, #f8f9fa 100%);
+        border: 1px solid var(--secondary-blue);
+        border-radius: 8px;
+        padding: 1.5rem;
+    }
+    
+    .filter-header {
+        background-color: var(--primary-blue);
+        color: white;
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+    }
+    
+    .btn-primary-custom {
+        background-color: var(--primary-blue);
+        border-color: var(--primary-blue);
+        color: white;
+    }
+    
+    .btn-primary-custom:hover {
+        background-color: var(--secondary-blue);
+        border-color: var(--secondary-blue);
+        color: white;
+    }
+    
+    .btn-outline-primary-custom {
+        color: var(--primary-blue);
+        border-color: var(--primary-blue);
+    }
+    
+    .btn-outline-primary-custom:hover {
+        background-color: var(--primary-blue);
+        color: white;
+    }
+    
+    .pub-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, var(--light-gray) 100%);
+        border: 1px solid var(--secondary-blue);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .pub-header {
+        background-color: var(--accent-orange);
+        color: white;
+        padding: 0.75rem 1rem;
+        text-align: center;
+        font-weight: bold;
+    }
+    
+    
+  
+  </style>
+  
 <div class="container mt-4">
     <div class="row">
-        <div class="col-md-12">
+        <!-- Contenu principal (9 colonnes) -->
+        <div class="col-lg-9">
+            <!-- En-tête avec actions -->
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2><i class="fas fa-briefcase me-2"></i>Offres d'Emploi</h2>
+                <h2><i class="fas fa-briefcase me-2 text-primary-custom"></i>Offres d'Emploi</h2>
                 <div class="d-flex gap-2">
-                    <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#filtersCollapse">
-                        <i class="fas fa-filter me-1"></i> Filtres
+                    <button class="btn btn-outline-primary-custom" type="button" data-bs-toggle="collapse" data-bs-target="#filtersCollapse">
+                        <i class="fas fa-filter me-1"></i> Filtres avancés
                     </button>
                 </div>
             </div>
 
-            <!-- Filtres -->
-            <div class="collapse mb-4" id="filtersCollapse">
-                <div class="card card-body">
-                    <form method="get" class="row g-3">
-                        <div class="col-md-4">
-                            <label for="search" class="form-label">Recherche</label>
+            <!-- Filtres améliorés et toujours visibles -->
+            <div class="filter-section mb-4">
+                <div class="filter-header d-flex align-items-center">
+                    <i class="fas fa-search me-2"></i>
+                    <span>Rechercher des offres</span>
+                </div>
+                <form method="get" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="search" class="form-label fw-bold">Mots-clés</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
                             <input type="text" class="form-control" id="search" name="search" 
-                                   placeholder="Titre, lieu, compétences..." value="{{ request.GET.search }}">
+                                   placeholder="Poste, compétences, mots-clés..." value="{{ request.GET.search }}">
                         </div>
-                        <div class="col-md-3">
-                            <label for="lieu" class="form-label">Lieu</label>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="lieu" class="form-label fw-bold">Localisation</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
                             <input type="text" class="form-control" id="lieu" name="lieu" 
                                    placeholder="Ville, région..." value="{{ request.GET.lieu }}">
                         </div>
-                        <div class="col-md-3">
-                            <label for="secteur" class="form-label">Secteur</label>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="secteur" class="form-label fw-bold">Secteur</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-industry"></i></span>
                             <input type="text" class="form-control" id="secteur" name="secteur" 
                                    placeholder="Secteur d'activité" value="{{ request.GET.secteur }}">
                         </div>
-                        <div class="col-md-2">
-                            <label class="form-label">&nbsp;</label>
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-search me-1"></i> Appliquer
-                                </button>
-                            </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold">&nbsp;</label>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary-custom">
+                                <i class="fas fa-search me-1"></i> Rechercher
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Filtres avancés (collapse) -->
+            <div class="collapse mb-4" id="filtersCollapse">
+                <div class="card card-body">
+                    <h5 class="mb-3"><i class="fas fa-sliders-h me-2"></i>Filtres avancés</h5>
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="type_contrat" class="form-label">Type de contrat</label>
+                            <select class="form-select" id="type_contrat" name="type_contrat">
+                                <option value="">Tous les types</option>
+                                <option value="CDI">CDI</option>
+                                <option value="CDD">CDD</option>
+                                <option value="FREELANCE">Freelance</option>
+                                <option value="STAGE">Stage</option>
+                                <option value="ALTERNANCE">Alternance</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="niveau_experience" class="form-label">Niveau d'expérience</label>
+                            <select class="form-select" id="niveau_experience" name="niveau_experience">
+                                <option value="">Tous niveaux</option>
+                                <option value="Débutant">Débutant</option>
+                                <option value="Junior">Junior (1-3 ans)</option>
+                                <option value="Confirmé">Confirmé (3-5 ans)</option>
+                                <option value="Senior">Senior (5+ ans)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="salaire_min" class="form-label">Salaire minimum</label>
+                            <input type="number" class="form-control" id="salaire_min" name="salaire_min" 
+                                   placeholder="Salaire min" value="{{ request.GET.salaire_min }}">
+                        </div>
+                        <div class="col-12 text-end">
+                            <button type="submit" class="btn btn-primary-custom me-2">
+                                <i class="fas fa-check me-1"></i> Appliquer
+                            </button>
+                            <a href="{% url 'candidat_job_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i> Réinitialiser
+                            </a>
                         </div>
                     </form>
                 </div>
@@ -109,7 +245,7 @@
                                                 </small>
                                             {% endif %}
                                         </div>
-                                        <a href="{% url 'candidat_job_detail' offre.pk %}" class="btn btn-sm btn-primary">
+                                        <a href="{% url 'candidat_job_detail' offre.pk %}" class="btn btn-sm btn-primary-custom">
                                             Voir détails <i class="fas fa-arrow-right ms-1"></i>
                                         </a>
                                     </div>
@@ -169,35 +305,85 @@
             {% else %}
                 <div class="alert alert-info text-center">
                     <i class="fas fa-info-circle me-2"></i>
-                    Aucune offre d'emploi disponible pour le moment.
+                    Aucune offre d'emploi ne correspond à vos critères de recherche.
                     <div class="mt-3">
-                        <a href="{% url 'candidat_job_list' %}" class="btn btn-primary">
+                        <a href="{% url 'candidat_job_list' %}" class="btn btn-primary-custom">
                             <i class="fas fa-refresh me-1"></i> Réinitialiser les filtres
                         </a>
                     </div>
                 </div>
             {% endif %}
         </div>
+
+        <!-- Sidebar publicité (3 colonnes) -->
+        <div class="col-lg-3">
+            <div >
+                
+
+                <!-- Carte de conseils -->
+                <div class="pub-card mb-3">
+                    <div class="pub-header">
+                        <i class="fas fa-lightbulb me-1"></i> Conseil 
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-2">
+                            <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                            <h6 class="text-dark">Postulez rapidement !</h6>
+                        </div>
+                        <p class="small text-muted">
+                            Les candidatures envoyées dans les 48h après la publication ont 
+                            <strong>3 fois plus</strong> de chances d'être remarquées.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Carte d'alerte profil -->
+                <div class="pub-card">
+                    <div class="pub-header bg-warning text-dark">
+                        <i class="fas fa-exclamation-triangle me-1"></i> Vérifiez Votre Profil
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-2">
+                            <i class="fas fa-user-check fa-2x text-warning mb-2"></i>
+                            <h6 class="text-dark">Profil complet = Plus de chances</h6>
+                        </div>
+                        <p class="small text-muted">
+                            Les recruteurs consultent <strong>2 fois plus</strong> les profils complets avec:
+                        </p>
+                        <ul class="small text-muted">
+                            <li>Photo professionnelle</li>
+                            <li>CV à jour</li>
+                            <li>Compétences renseignées</li>
+                            <li>Expériences détaillées</li>
+                        </ul>
+                        <div class="d-grid">
+                            <a href="{% url 'edit_profil' %}" class="btn btn-warning btn-sm">
+                                <i class="fas fa-edit me-1"></i> Compléter mon profil
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<style>
-    .job-card {
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    }
-    .job-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-</style>
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Afficher les filtres s'il y a des paramètres de recherche
+        // Afficher les filtres avancés s'il y a des paramètres de recherche
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.toString() && !urlParams.has('page')) {
             const filtersCollapse = new bootstrap.Collapse(document.getElementById('filtersCollapse'));
         }
+        
+        // Pré-remplir les filtres avancés
+        const urlParamsObj = Object.fromEntries(urlParams.entries());
+        Object.keys(urlParamsObj).forEach(key => {
+            const element = document.getElementById(key);
+            if (element && urlParamsObj[key]) {
+                element.value = urlParamsObj[key];
+            }
+        });
     });
 </script>
 {% endblock %}

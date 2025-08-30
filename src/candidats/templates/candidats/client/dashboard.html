@@ -1,19 +1,190 @@
 {% extends 'base_candidate.html' %}
 {% load static %}
 
-{% block title %}Tableau de bord{% endblock %}
+{% block title %}Tableau de bord - Antares{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-  <!-- Message de bienvenue personnalisé -->
-  <div class="alert alert-primary bg-primary-blue border-0 text-white mb-4">
+  <!-- Import Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --secondary-blue: #2D76B6;
+      --light-gray: #F4F4F9;
+      --dark-gray: #333333;
+      --light-blue: #E6F0FA;
+      --accent-orange: #FA8301;
+      --primary-blue: #0A4B8C;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 12px;
+        transition: transform 0.2s ease-in-out;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+    }
+    
+    .stats-card {
+        transition: transform 0.2s;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stats-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+    
+    .job-card {
+        transition: transform 0.2s;
+    }
+    
+    .job-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .service-item {
+        transition: background-color 0.2s;
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+    }
+    
+    .service-item:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .btn-primary-custom {
+        background-color: var(--primary-blue);
+        border-color: var(--primary-blue);
+        color: white;
+    }
+    
+    .btn-primary-custom:hover {
+        background-color: var(--secondary-blue);
+        border-color: var(--secondary-blue);
+        color: white;
+    }
+    
+    .btn-outline-primary-custom {
+        color: var(--primary-blue);
+        border-color: var(--primary-blue);
+    }
+    
+    .btn-outline-primary-custom:hover {
+        background-color: var(--primary-blue);
+        color: white;
+    }
+    
+    .btn-orange {
+        background-color: var(--accent-orange);
+        border-color: var(--accent-orange);
+        color: white;
+    }
+    
+    .btn-orange:hover {
+        background-color: #e67300;
+        border-color: #e67300;
+        color: white;
+    }
+    
+    .welcome-banner {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+        border-radius: 12px;
+        color: white;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .mobile-stats {
+        display: none;
+    }
+    
+    @media (max-width: 768px) {
+        .desktop-stats {
+            display: none;
+        }
+        
+        .mobile-stats {
+            display: block;
+        }
+        
+        .stats-scroll {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 1rem;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .stats-scroll .stat-item {
+            display: inline-block;
+            min-width: 140px;
+            margin-right: 1rem;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .table-responsive {
+            font-size: 0.875rem;
+        }
+        
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .welcome-banner {
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .welcome-banner .d-flex {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .welcome-banner .flex-shrink-0 {
+            margin-top: 1rem;
+        }
+    }
+  </style>
+  
+<div class="container mt-4">
+  <!-- Message de bienvenue personnalisé et inclusif -->
+  <div class="welcome-banner">
     <div class="d-flex align-items-center">
       <div class="flex-grow-1">
-        <h4 class="alert-heading mb-1">Bonjour {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.email }}{% endif %} !</h4>
-        <p class="mb-0">Ensemble, construisons votre avenir professionnel. Votre prochaine opportunité est à portée de main.</p>
+        <h4 class="mb-2">Bonjour {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.email }}{% endif %} !</h4>
+        <p class="mb-0 opacity-90">
+          Chez Antares, nous croyons que chaque parcours professionnel est unique. 
+          Ensemble, découvrons les opportunités qui correspondent à vos aspirations.
+        </p>
       </div>
       <div class="flex-shrink-0 ms-3">
-        <i class="bi bi-rocket-takeoff display-6 opacity-75"></i>
+        <i class="fas fa-handshake-angle fa-2x opacity-75"></i>
       </div>
     </div>
   </div>
@@ -21,15 +192,15 @@
   <div class="row">
     <!-- Contenu principal -->
     <div class="col-lg-9">
-      <!-- Statistiques rapides améliorées -->
       
-
       <!-- Offres récentes améliorées -->
       <div class="card mb-4 border-0 shadow-sm">
-        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
-          <h5 class="mb-0 fw-bold text-primary-blue">Offres récentes</h5>
-          <a href="{% url 'candidat_job_list' %}" class="btn btn-sm btn-outline-primary">
-            Voir tout <i class="bi bi-arrow-right ms-1"></i>
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold text-primary-custom">
+            <i class="fas fa-briefcase me-2"></i>Offres récentes
+          </h5>
+          <a href="{% url 'candidat_job_list' %}" class="btn btn-sm btn-outline-primary-custom">
+            Voir tout <i class="fas fa-arrow-right ms-1"></i>
           </a>
         </div>
         <div class="card-body p-3">
@@ -41,7 +212,7 @@
                     <div class="card-body">
                       <div class="d-flex justify-content-between align-items-start mb-2">
                         <h5 class="card-title h6 mb-1 text-truncate fw-bold">{{ offre.titre }}</h5>
-                        <span class="badge bg-primary-blue small">{{ offre.get_type_offre_display }}</span>
+                        <span class="badge bg-primary-custom small">{{ offre.get_type_offre_display }}</span>
                       </div>
                       <h6 class="card-subtitle mb-2 text-muted small">{{ offre.societe }}</h6>
                       <p class="card-text text-muted small mb-3 line-clamp-2">
@@ -50,18 +221,18 @@
                       <div class="d-flex justify-content-between align-items-center">
                         <div class="d-flex flex-wrap gap-1">
                           {% if offre.deja_postule %}
-                            <span class="badge bg-success small"><i class="bi bi-check-circle me-1"></i>Déjà postulé</span>
+                            <span class="badge bg-success small"><i class="fas fa-check-circle me-1"></i>Déjà postulé</span>
                           {% else %}
-                            <span class="badge bg-secondary small"><i class="bi bi-clock me-1"></i>En attente</span>
+                            <span class="badge bg-secondary small"><i class="fas fa-clock me-1"></i>Disponible</span>
                           {% endif %}
                         </div>
                         <div>
-                          <a href="{% url 'candidat_job_detail' offre.pk %}" class="btn btn-sm btn-outline-primary me-1">
-                            <i class="bi bi-eye me-1"></i>Détails
+                          <a href="{% url 'candidat_job_detail' offre.pk %}" class="btn btn-sm btn-outline-primary-custom me-1">
+                           Détails
                           </a>
                           {% if not offre.deja_postule %}
                             <a href="{% url 'apply_job' offre.id %}" class="btn btn-sm btn-orange">
-                              <i class="bi bi-send me-1"></i>Postuler
+                              <i class="fas fa-paper-plane me-1"></i>Postuler
                             </a>
                           {% endif %}
                         </div>
@@ -79,10 +250,10 @@
             </div>
           {% else %}
             <div class="text-center py-4">
-              <i class="bi bi-briefcase display-4 text-muted"></i>
+              <i class="fas fa-briefcase fa-3x text-muted mb-3"></i>
               <p class="text-muted mt-3">Aucune offre disponible pour le moment.</p>
               <a href="{% url 'candidat_job_list' %}" class="btn btn-orange mt-2">
-                <i class="bi bi-search me-1"></i> Explorer les offres
+                <i class="fas fa-search me-1"></i> Explorer les offres
               </a>
             </div>
           {% endif %}
@@ -91,10 +262,12 @@
 
       <!-- Dernières candidatures améliorées -->
       <div class="card mb-4 border-0 shadow-sm">
-        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
-          <h5 class="mb-0 fw-bold text-primary-blue">Mes dernières candidatures</h5>
-          <a href="{% url 'candidature_list' %}" class="btn btn-sm btn-outline-primary">
-            Voir tout <i class="bi bi-arrow-right ms-1"></i>
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold text-primary-custom">
+            <i class="fas fa-file-contract me-2"></i>Mes dernières candidatures
+          </h5>
+          <a href="{% url 'candidature_list' %}" class="btn btn-sm btn-outline-primary-custom">
+            Voir tout <i class="fas fa-arrow-right ms-1"></i>
           </a>
         </div>
         <div class="card-body p-3">
@@ -117,7 +290,7 @@
                         {{ candidature.offre.titre }}
                       </td>
                       <td class="text-truncate fw-medium" style="max-width: 120px;">
-                        {{ candidature.offre.societe }}
+                        Antares
                       </td>
                       <td class="d-none d-lg-table-cell">
                         {{ candidature.date_postulation|date:"d/m/Y" }}
@@ -125,23 +298,23 @@
                       <td>
                         <span class="badge 
                           {% if candidature.statut == 'POSTULE' %}bg-primary
-                          {% elif candidature.statut == 'ENTRETIEN1' or candidature.statut == 'ENTRETIEN2' or candidature.statut == 'ENTRETIEN3' %}bg-warning
+                          {% elif candidature.statut == 'ENTRETIEN' %}bg-warning
                           {% elif candidature.statut == 'ACCEPTE' %}bg-success
                           {% elif candidature.statut == 'REFUSE' %}bg-danger
                           {% else %}bg-secondary{% endif %}">
-                          <i class="bi 
-                            {% if candidature.statut == 'POSTULE' %}bi-send
-                            {% elif candidature.statut == 'ENTRETIEN1' or candidature.statut == 'ENTRETIEN2' or candidature.statut == 'ENTRETIEN3' %}bi-calendar
-                            {% elif candidature.statut == 'ACCEPTE' %}bi-check-circle
-                            {% elif candidature.statut == 'REFUSE' %}bi-x-circle
-                            {% else %}bi-question-circle{% endif %} me-1"></i>
+                          <i class="fas 
+                            {% if candidature.statut == 'POSTULE' %}fa-paper-plane
+                            {% elif candidature.statut == 'ENTRETIEN' %}fa-calendar
+                            {% elif candidature.statut == 'ACCEPTE' %}fa-check-circle
+                            {% elif candidature.statut == 'REFUSE' %}fa-times-circle
+                            {% else %}fa-question-circle{% endif %} me-1"></i>
                           {{ candidature.get_statut_display }}
                         </span>
                       </td>
                       <td class="text-end">
                         <a href="{% url 'candidature_detail' candidature.pk %}" 
-                           class="btn btn-sm btn-outline-primary" title="Voir détails">
-                          <i class="bi bi-eye"></i>
+                           class="btn btn-sm btn-outline-primary-custom" title="Voir détails">
+                          <i class="fas fa-eye"></i>
                         </a>
                       </td>
                     </tr>
@@ -151,21 +324,24 @@
             </div>
           {% else %}
             <div class="text-center py-4">
-              <i class="bi bi-file-earmark-text display-4 text-muted"></i>
+              <i class="fas fa-file-contract fa-3x text-muted mb-3"></i>
               <p class="text-muted mt-3">Vous n'avez pas encore postulé à des offres.</p>
               <a href="{% url 'candidat_job_list' %}" class="btn btn-orange mt-2">
-                <i class="bi bi-search me-1"></i> Parcourir les offres
+                <i class="fas fa-search me-1"></i> Parcourir les offres
               </a>
             </div>
           {% endif %}
         </div>
       </div>
+
       <!-- Derniers documents uploadés -->
       <div class="card mb-4 border-0 shadow-sm">
-        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
-          <h5 class="mb-0 fw-bold text-primary-blue">Mes 5 derniers documents</h5>
-          <a href="{% url 'document_list' %}" class="btn btn-sm btn-outline-primary">
-            Voir tout <i class="bi bi-arrow-right ms-1"></i>
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold text-primary-custom">
+            <i class="fas fa-file-alt me-2"></i>Mes derniers documents
+          </h5>
+          <a href="{% url 'document_list' %}" class="btn btn-sm btn-outline-primary-custom">
+            Voir tout <i class="fas fa-arrow-right ms-1"></i>
           </a>
         </div>
         <div class="card-body">
@@ -174,13 +350,13 @@
               {% for doc in documents_recents %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                   <div class="text-truncate" style="max-width: 70%;">
-                    <i class="bi bi-file-earmark-text text-primary-blue me-2"></i>
+                    <i class="fas fa-file text-primary-custom me-2"></i>
                     <span class="fw-medium">{{ doc.nom }}</span>
                     <small class="text-muted d-block">{{ doc.date_upload|date:"d/m/Y" }} · {{ doc.get_type_document_display }}</small>
                   </div>
                   <div class="d-flex gap-2">
-                    <a href="{{ doc.fichier.url }}" target="_blank" class="btn btn-sm btn-outline-primary" title="Voir">
-                      <i class="bi bi-eye"></i>
+                    <a href="{{ doc.fichier.url }}" target="_blank" class="btn btn-sm btn-outline-primary-custom" title="Voir">
+                      <i class="fas fa-eye"></i>
                     </a>
                   </div>
                 </li>
@@ -188,10 +364,10 @@
             </ul>
           {% else %}
             <div class="text-center py-4">
-              <i class="bi bi-file-earmark-text display-4 text-muted"></i>
-              <p class="text-muted mt-3">Aucun document n’a encore été ajouté.</p>
+              <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+              <p class="text-muted mt-3">Aucun document n'a encore été ajouté.</p>
               <a href="{% url 'document_list' %}" class="btn btn-orange mt-2">
-                <i class="bi bi-plus-circle me-1"></i> Ajouter un document
+                <i class="fas fa-plus-circle me-1"></i> Ajouter un document
               </a>
             </div>
           {% endif %}
@@ -203,17 +379,17 @@
     <div class="col-lg-3">
       <!-- Profil candidat -->
       <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-primary-blue text-white border-0 py-3">
-          <h5 class="mb-0 fw-bold">Votre espace candidat</h5>
+        <div class="card-header bg-primary-custom  border-0">
+          <h5 class="mb-0 fw-bold">Votre espace talent</h5>
         </div>
         <div class="card-body">
-          <p class="card-text">
-            En vous inscrivant, vous intégrez notre base de talents et serez contacté directement 
-            par nos recruteurs pour des opportunités adaptées à votre profil (CDI, CDD, intérim, etc.).
+          <p class="card-text small">
+            En partageant votre profil avec Antares, vous rejoignez notre communauté de talents 
+            et augmentez vos chances d'être contacté pour des opportunités adaptées à vos compétences.
           </p>
           <div class="d-grid">
             <a href="{% url 'edit_profil' %}" class="btn btn-orange">
-              <i class="bi bi-person-gear me-1"></i> Compléter mon profil
+              <i class="fas fa-user-edit me-1"></i> Compléter mon profil
             </a>
           </div>
         </div>
@@ -221,106 +397,77 @@
 
       <!-- Mon dossier -->
       <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-white border-0 py-3">
-          <h5 class="mb-0 fw-bold text-primary-blue">Mon dossier</h5>
+        <div class="card-header bg-white border-0">
+          <h5 class="mb-0 fw-bold text-primary-custom">Mon dossier</h5>
         </div>
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded">
             <div>
-              <i class="bi bi-award text-primary-blue me-2"></i>
-              <span>Diplômes</span>
+              <i class="fas fa-file-alt text-primary-custom me-2"></i>
+              <span>Documents</span>
             </div>
-            <a href="{% url 'diplome_list' %}" class="btn btn-sm btn-outline-primary">
-              <i class="bi bi-arrow-right"></i>
+            <a href="{% url 'document_list' %}" class="btn btn-sm btn-outline-primary-custom">
+              <i class="fas fa-arrow-right"></i>
             </a>
           </div>
           
           <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded">
             <div>
-              <i class="bi bi-briefcase text-primary-blue me-2"></i>
+              <i class="fas fa-briefcase text-primary-custom me-2"></i>
               <span>Expériences</span>
             </div>
-            <a href="{% url 'experience_list' %}" class="btn btn-sm btn-outline-primary">
-              <i class="bi bi-arrow-right"></i>
+            <a href="{% url 'experience_list' %}" class="btn btn-sm btn-outline-primary-custom">
+              <i class="fas fa-arrow-right"></i>
             </a>
           </div>
           
           <div class="d-flex justify-content-between align-items-center p-2 bg-light rounded">
             <div>
-              <i class="bi bi-tools text-primary-blue me-2"></i>
+              <i class="fas fa-star text-primary-custom me-2"></i>
               <span>Compétences</span>
             </div>
-            <a href="{% url 'competence_list' %}" class="btn btn-sm btn-outline-primary">
-              <i class="bi bi-arrow-right"></i>
+            <a href="{% url 'competence_list' %}" class="btn btn-sm btn-outline-primary-custom">
+              <i class="fas fa-arrow-right"></i>
             </a>
           </div>
         </div>
       </div>
 
-<style>
-  .stats-card {
-    transition: transform 0.2s;
-  }
-  
-  .stats-card:hover {
-    transform: translateY(-5px);
-  }
-  
-  .stats-icon {
-    width: 40px;
-    height: 40px;
-  }
-  
-  .job-card {
-    transition: transform 0.2s;
-  }
-  
-  .job-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-  }
-  
-  .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  
-  .service-item {
-    transition: background-color 0.2s;
-    padding: 0.5rem;
-    border-radius: 0.375rem;
-  }
-  
-  .service-item:hover {
-    background-color: #f8f9fa;
-  }
-  
-  .bg-primary-blue {
-    background-color: #0d6efd; /* Couleur bleue primaire de Bootstrap */
-  }
-  
-  .btn-orange {
-    background-color: #fd7e14;
-    border-color: #fd7e14;
-    color: white;
-  }
-  
-  .btn-orange:hover {
-    background-color: #dc6500;
-    border-color: #dc6500;
-    color: white;
-  }
-</style>
-{% endblock %}
+      <!-- Conseils rapides -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0">
+          <h5 class="mb-0 fw-bold text-primary-custom">
+            <i class="fas fa-lightbulb me-2"></i>Conseils
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info small mb-3">
+            <i class="fas fa-info-circle me-1"></i>
+            <strong>Profil complet = Plus d'opportunités</strong>
+            <p class="mb-0 mt-1">Les recruteurs consultent 3x plus les profils complets.</p>
+          </div>
+          <div class="alert alert-warning small">
+            <i class="fas fa-clock me-1"></i>
+            <strong>Réactivité payante</strong>
+            <p class="mb-0 mt-1">Postulez dans les 48h pour maximiser vos chances.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-{% block extra_js %}
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-    tooltipTriggerList.forEach(tooltipTriggerEl => {
-      new bootstrap.Tooltip(tooltipTriggerEl);
+    // Animation des cartes statistiques
+    const statsCards = document.querySelectorAll('.stats-card');
+    statsCards.forEach(card => {
+      card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-5px)';
+      });
+      card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+      });
     });
   });
 </script>
