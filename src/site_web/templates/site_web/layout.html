@@ -25,13 +25,20 @@
       --primary-blue: #0A4B8C;
     }
     
+    /* CORRECTION DU DÉFILEMENT HORIZONTAL */
+    html, body {
+      overflow-x: hidden;
+      max-width: 100%;
+      width: 100%;
+    }
+    
     body {
       font-family: 'Montserrat', sans-serif;
       background-color: var(--light-gray);
       color: var(--dark-gray);
       line-height: 1.6;
     }
-    
+   
     .navbar {
       background-color: white;
       box-shadow: 0 2px 15px rgba(13, 59, 102, 0.1);
@@ -110,13 +117,16 @@
     }
     
     .container {
-      max-width: 1200px;
+      
+      padding-left: 15px;
+      padding-right: 15px;
     }
     
     .navbar-container {
       display: flex;
       width: 100%;
       align-items: center;
+      max-width: 100%;
     }
     
     .navbar-links-container {
@@ -179,7 +189,11 @@
     .nav-item.dropdown.list-unstyled {
       list-style: none;
     }
-    
+     .navbar-auth-container {
+        margin-left: auto;
+    }
+
+    /* CORRECTIONS RESPONSIVES */
     @media (max-width: 991.98px) {
       .navbar-brand {
         margin-right: auto;
@@ -224,6 +238,69 @@
       .dropdown-menu {
         border: none;
         box-shadow: none;
+      }
+      
+      /* Correction des marges négatives */
+      .row {
+        margin-left: -8px;
+        margin-right: -8px;
+      }
+      
+      [class*="col-"] {
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+      /* Afficher l'indicateur et le nom sur mobile */
+        .mobile-menu-indicator {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background-color: var(--accent-orange);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            margin-left: 0.5rem;
+        }
+
+        .user-menu .dropdown-toggle {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            border: 1px solid var(--light-blue);
+            border-radius: 5px;
+            background-color: var(--light-gray);
+        }
+
+        /* Afficher le nom sur mobile */
+        .user-name-mobile {
+            display: inline !important;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--primary-blue);
+            margin-right: 0.5rem;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+    
+    @media (max-width: 576px) {
+      .container {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+      
+      .nav-link {
+        font-size: 0.9rem;
+        padding: 6px 12px;
+      }
+      
+      .btn-orange, .btn-outline-orange {
+        padding: 6px 15px;
+        font-size: 0.9rem;
       }
     }
   </style>
@@ -302,70 +379,62 @@
           </ul>
         </div>
 
-        <!-- Bouton Se connecter ou menu utilisateur -->
+        <!-- Menu utilisateur -->
         <div class="navbar-auth-container">
           <ul class="navbar-nav">
-            {% if user.is_authenticated %}
-            <!-- Utilisateur connecté -->
-            <li class="nav-item dropdown list-unstyled user-menu">
-              <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'images/default-avatar.jpg' %}{% endif %}" 
-                     class="user-avatar me-2" alt="Avatar">
-                <span class="d-none d-md-inline">{{ user.first_name }}</span>
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li class="dropdown-header">
-                  <div class="fw-bold">{{ user.get_full_name }}</div>
-                  <small class="text-muted">{{ user.email }}</small>
-                </li>
-                <li><hr class="dropdown-divider"></li>
-                
-                {% if user.role == 'candidat' %}
-                <li><a class="dropdown-item" href="{% url 'dashboard_candidat' %}">
-                  <i class="bi bi-speedometer2 me-2"></i> Tableau de bord
-                </a></li>
-                <li><a class="dropdown-item" href="{% url 'edit_profil' %}">
-                  <i class="bi bi-person-circle me-2"></i> Mon profil
-                </a></li>
-                {% elif user.role == 'entreprise' %}
-                <li><a class="dropdown-item" href="{% url 'dashboard-client' %}">
-                  <i class="bi bi-speedometer2 me-2"></i> Tableau de bord
-                </a></li>
-                {% elif user.role in 'admin,rh' %}
-                <li><a class="dropdown-item" href="{% url 'dashboard-rh' %}">
-                  <i class="bi bi-speedometer2 me-2"></i> Tableau de bord
-                </a></li>
-                {% endif %}
-                
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">
-                  <i class="bi bi-box-arrow-right me-2"></i> Déconnexion
-                </a></li>
-              </ul>
-            </li>
+            {% if user.is_authenticated and user.role == 'candidat' %}
+              <li class="nav-item dropdown user-menu">
+                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <img src="{% if user.profil_candidat.photo %}{{ user.profil_candidat.photo.url }}{% else %}{% static 'site_web/images/default-avatar.png' %}{% endif %}" 
+                       class="user-avatar" alt="Avatar">
+                  <span class="d-none d-md-inline fw-medium">{{ user.first_name|default:user.email }}</span>
+                  <span class="user-name-mobile d-md-none">
+                    {{ user.first_name|default:user.email }}
+                  </span>
+                  <span class="mobile-menu-indicator">
+                    <i class="fas fa-chevron-down"></i>
+                  </span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li class="dropdown-header">
+                    <div class="fw-medium">{{ user.get_full_name|default:user.email }}</div>
+                    <small class="text-muted">{{ user.email }}</small>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="{% url 'dashboard_candidat' %}">
+                    <i class="bi bi-speedometer2 me-2"></i> Tableau de bord
+                  </a></li>
+                  <li><a class="dropdown-item" href="{% url 'edit_profil' %}">
+                    <i class="bi bi-person-vcard me-2"></i> Mon profil
+                  </a></li>
+                  <li><a class="dropdown-item" href="{% url 'experience_list' %}">
+                    <i class="bi bi-briefcase me-2"></i> Mes expériences
+                  </a></li>
+                  <li><a class="dropdown-item" href="{% url 'competence_list' %}">
+                    <i class="bi bi-star me-2"></i> Mes compétences
+                  </a></li>
+                  <li><a class="dropdown-item" href="{% url 'document_list' %}">
+                    <i class="bi bi-folder me-2"></i> Mes documents
+                  </a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="{% url 'home' %}">
+                    <i class="bi bi-house me-2"></i> Site principal
+                  </a></li>
+                  <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">
+                    <i class="bi bi-box-arrow-right me-2"></i> Déconnexion
+                  </a></li>
+                </ul>
+              </li>
             {% else %}
-            <!-- Utilisateur non connecté -->
-            <li class="nav-item dropdown list-unstyled">
-              <a class="nav-link btn btn-orange dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Se connecter
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="{% url 'login' %}" onclick="setLoginType('candidate')">
-                    <i class="bi bi-person-vcard me-2"></i> Candidat
-                </a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{% url 'login' %}" onclick="setLoginType('company')">
-                    <i class="bi bi-building me-2"></i> Entreprise
-                </a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{% url 'login' %}" onclick="setLoginType('employee')">
-                    <i class="bi bi-person-badge me-2"></i> Consultant
-                </a></li>
-              </ul>
-            </li>
+              <li class="nav-item">
+                <a class="nav-link btn btn-orange" href="{% url 'login' %}?type=candidate">
+                  Se connecter
+                </a>
+              </li>
             {% endif %}
           </ul>
         </div>
+      
       </div>
     </div>
   </nav>
@@ -484,6 +553,7 @@
           <ul class="list-unstyled mb-4">
             <li class="mb-2"><i class="bi bi-geo-alt-fill me-2" style="color: var(--accent-orange);"></i> Bamako, Mali</li>
             <li class="mb-2"><i class="bi bi-telephone-fill me-2" style="color: var(--accent-orange);"></i> +223 20292040</li>
+            <li class="mb-2"><i class="bi bi-telephone-fill me-2" style="color: var(--accent-orange);"></i> +223 77059097</li>
             <li><i class="bi bi-envelope-fill me-2" style="color: var(--accent-orange);"></i> info@antares-rh.com</li>
           </ul>
           

@@ -336,6 +336,7 @@
     position: relative;
     opacity: 0.9;
 }
+
   
 .expired-card::before {
     content: "";
@@ -463,13 +464,9 @@
   .rh-value-card:hover .icon-circle {
     transform: rotate(5deg) scale(1.1);
   }
-  html, body {
-  overflow-x: hidden !important;
-}
+   
 
-img, .container, .container-fluid {
-  max-width: 100% !important;
-}
+
 
   /* Responsive */
   @media (max-width: 768px) {
@@ -481,7 +478,7 @@ img, .container, .container-fluid {
 <!--10_08-->
 
 <!-- Carrousel Partenaires -->
-<section class="partners-section py-5" style="background-color: #F4F4F9;">
+<section class="partners-section" style="background-color: #F4F4F9;">
   <div class="container-fluid px-0">
     <h3 class="h5 text-center text-muted mb-4">Ils nous font confiance</h3>
     <div class="splide" id="partners-slider">
@@ -586,7 +583,7 @@ img, .container, .container-fluid {
   }
   
   .partner-item {
-    padding: 0 2rem;
+    
     display: flex;
     align-items: center;
     justify-content: center;
@@ -594,7 +591,7 @@ img, .container, .container-fluid {
   }
   
   .partner-item img {
-    max-height: 30vh;
+    max-height: 25vh;
     width: auto;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }

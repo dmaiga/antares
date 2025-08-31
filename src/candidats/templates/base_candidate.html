@@ -228,8 +228,6 @@
         background-color: var(--light-blue);
         padding: 0.75rem 0;
         border-bottom: 1px solid var(--secondary-blue);
-      
-       
     }
 
     .quick-access-links {
@@ -262,6 +260,11 @@
     .container {
         max-width: 1140px;
         padding-bottom: 2rem;
+    }
+
+    /* Indicateur visuel pour le menu dropdown mobile */
+    .mobile-menu-indicator {
+        display: none;
     }
 
     @media (max-width: 991.98px) {
@@ -326,6 +329,42 @@
             padding-left: 0.75rem;
             padding-right: 0.75rem;
         }
+
+        /* Afficher l'indicateur et le nom sur mobile */
+        .mobile-menu-indicator {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background-color: var(--accent-orange);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            margin-left: 0.5rem;
+        }
+
+        .user-menu .dropdown-toggle {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            border: 1px solid var(--light-blue);
+            border-radius: 5px;
+            background-color: var(--light-gray);
+        }
+
+        /* Afficher le nom sur mobile */
+        .user-name-mobile {
+            display: inline !important;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--primary-blue);
+            margin-right: 0.5rem;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
     }
 
     @media (max-width: 576px) {
@@ -344,7 +383,7 @@
         }
 
         .quick-access-bar {
-            display: none; /* Cacher la barre d'accès rapide sur mobile */
+            display: none;
         }
 
         footer {
@@ -359,6 +398,24 @@
             width: 32px;
             height: 32px;
             font-size: 0.9rem;
+        }
+
+        .mobile-menu-indicator {
+            width: 20px;
+            height: 20px;
+            font-size: 0.6rem;
+        }
+
+        .user-name-mobile {
+            font-size: 0.8rem;
+            max-width: 100px;
+        }
+    }
+
+    @media (max-width: 400px) {
+        .user-name-mobile {
+            max-width: 80px;
+            font-size: 0.75rem;
         }
     }
   </style>
@@ -416,11 +473,17 @@
         <div class="navbar-auth-container">
           <ul class="navbar-nav">
             {% if user.is_authenticated and user.role == 'candidat' %}
-              <li class="nav-item dropdown list-unstyled user-menu">
+              <li class="nav-item dropdown user-menu">
                 <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   <img src="{% if user.profil_candidat.photo %}{{ user.profil_candidat.photo.url }}{% else %}{% static 'site_web/images/default-avatar.png' %}{% endif %}" 
                        class="user-avatar" alt="Avatar">
                   <span class="d-none d-md-inline fw-medium">{{ user.first_name|default:user.email }}</span>
+                  <span class="user-name-mobile d-md-none">
+                    {{ user.first_name|default:user.email }}
+                  </span>
+                  <span class="mobile-menu-indicator">
+                    <i class="fas fa-chevron-down"></i>
+                  </span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
                   <li class="dropdown-header">
@@ -440,7 +503,6 @@
                   <li><a class="dropdown-item" href="{% url 'competence_list' %}">
                     <i class="bi bi-star me-2"></i> Mes compétences
                   </a></li>
-                  
                   <li><a class="dropdown-item" href="{% url 'document_list' %}">
                     <i class="bi bi-folder me-2"></i> Mes documents
                   </a></li>
@@ -479,7 +541,6 @@
         <a href="{% url 'document_list' %}" class="quick-access-btn">
           <i class="fas fa-upload"></i> Document
         </a>
-       
         <a href="{% url 'candidat_job_list' %}" class="quick-access-btn">
           <i class="fas fa-search"></i> Recherche d'emploi
         </a>
@@ -523,8 +584,6 @@
             <li><a href="{% url 'competence_list' %}"><i class="fas fa-star"></i> Mes compétences</a></li>
           </ul>
         </div>
-
-      
 
         <!-- Section Candidatures -->
         <div class="col-md-4 col-sm-6 footer-section">
