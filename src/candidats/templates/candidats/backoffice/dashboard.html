@@ -1,0 +1,245 @@
+<!-- templates/candidats/backoffice/dashboard.html -->
+{% extends 'authentication/base.html' %}
+{% load static %}
+
+{% block title %}Tableau de Bord - Backoffice{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- En-tête -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Tableau de Bord Recrutement</h1>
+        <span class="text-muted">{{ today|date:"l j F Y" }}</span>
+    </div>
+
+    <!-- Cartes de statistiques -->
+    <div class="row mb-4">
+        <!-- Candidats -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Candidats</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_candidats }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Candidatures -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Total Candidatures</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_candidatures }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Offres actives -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Offres Actives</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_offres_actives }}</div>
+                           
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-briefcase fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Entretiens aujourd'hui -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Entretiens Aujourd'hui</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ prochains_entretiens|length }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-check fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Prochains entretiens -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Prochains Entretiens</h6>
+                    <a href="{% url 'backoffice_entretien_list' %}" class="btn btn-sm btn-outline-primary">
+                        Voir tous
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if prochains_entretiens %}
+                    <div class="list-group list-group-flush">
+                        {% for entretien in prochains_entretiens %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ entretien.candidature.candidat.get_full_name }}</h6>
+                                <p class="mb-1 small text-muted">
+                                    {{ entretien.candidature.offre.titre }}
+                                    <br>
+                                    <small>{{ entretien.candidature.offre.get_type_offre_display }}</small>
+                                </p>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock"></i>
+                                    {{ entretien.date_prevue|date:"H:i" }} - 
+                                    {{ entretien.get_type_entretien_display }}
+                                </small>
+                            </div>
+                            <span class="badge bg-{% if entretien.statut == 'PLANIFIE' %}warning{% else %}success{% endif %}">
+                                {{ entretien.get_statut_display }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-calendar-times fa-3x text-gray-300 mb-3"></i>
+                        <p class="text-muted">Aucun entretien prévu aujourd'hui</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Dernières candidatures -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-success">Dernières Candidatures</h6>
+                    <a href="{% url 'backoffice_candidature_list' %}" class="btn btn-sm btn-outline-success">
+                        Voir toutes
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if dernieres_candidatures %}
+                    <div class="list-group list-group-flush">
+                        {% for candidature in dernieres_candidatures %}
+                        <a href="{% url 'backoffice_candidature_detail' candidature.id %}" 
+                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ candidature.candidat.get_full_name }}</h6>
+                                <p class="mb-1 small text-muted">
+                                    {{ candidature.offre.titre }}
+                                    <br>
+                                    <small>{{ candidature.offre.get_type_offre_display }}</small>
+                                </p>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock"></i>
+                                    {{ candidature.date_postulation|timesince }}
+                                </small>
+                            </div>
+                            <span class="badge bg-{% if candidature.statut == 'POSTULE' %}info{% elif candidature.statut == 'ENTRETIEN' %}warning{% elif candidature.statut == 'ACCEPTE' %}success{% else %}secondary{% endif %}">
+                                {{ candidature.get_statut_display }}
+                            </span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-file-alt fa-3x text-gray-300 mb-3"></i>
+                        <p class="text-muted">Aucune candidature récente</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Actions Rapides</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'backoffice_candidat_list' %}" class="btn btn-outline-primary btn-lg w-100">
+                                <i class="fas fa-users fa-2x mb-2"></i><br>
+                                Voir les Candidats
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'backoffice_candidature_list' %}" class="btn btn-outline-success btn-lg w-100">
+                                <i class="fas fa-file-alt fa-2x mb-2"></i><br>
+                                Voir les Candidatures
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'backoffice_entretien_list' %}" class="btn btn-outline-warning btn-lg w-100">
+                                <i class="fas fa-calendar-check fa-2x mb-2"></i><br>
+                                Voir les Entretiens
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/admin/jobs/joboffer/" class="btn btn-outline-info btn-lg w-100">
+                                <i class="fas fa-briefcase fa-2x mb-2"></i><br>
+                                Gérer les Offres
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.card {
+    border: none;
+    border-radius: 0.5rem;
+}
+.card-header {
+    border-bottom: 1px solid #e3e6f0;
+    background-color: #f8f9fc;
+}
+.list-group-item {
+    border: none;
+    border-bottom: 1px solid #e3e6f0;
+}
+.list-group-item:last-child {
+    border-bottom: none;
+}
+.badge {
+    font-size: 0.75rem;
+}
+.btn-lg {
+    padding: 1rem 0.5rem;
+    height: 100px;
+}
+</style>
+{% endblock %}

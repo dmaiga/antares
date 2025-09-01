@@ -304,6 +304,8 @@ def send_general_email(contact):
 
 #12_08
 #_____________________________________________________________________________
+from django.db.models import Case, When, Value, IntegerField
+
 def jobs(request):
     # Récupération des paramètres
     search_query = request.GET.get('q', '')
@@ -313,14 +315,30 @@ def jobs(request):
     hide_expired = request.GET.get('hide_expired', 'false') == 'true'
     page_number = request.GET.get('page', 1)
     
-    # Filtrage de base
+    # Mettre à jour automatiquement le statut des offres expirées
+    offres_a_mettre_a_jour = JobOffer.objects.filter(
+        statut=JobStatus.OUVERT,
+        date_limite__lt=timezone.now().date()
+    )
+    offres_a_mettre_a_jour.update(statut=JobStatus.EXPIRE)
+    
+    # Filtrage de base avec tri personnalisé
     jobs = JobOffer.objects.filter(
         visible_sur_site=True,
         statut__in=[JobStatus.OUVERT, JobStatus.EXPIRE]
     ).exclude(
         statut=JobStatus.BROUILLON
-    ).order_by('-date_publication')
-    #pour masque les offres expirées
+    ).annotate(
+        # Priorité 1 pour les offres ouvertes, 2 pour les expirées
+        status_priority=Case(
+            When(statut=JobStatus.OUVERT, then=Value(1)),
+            When(statut=JobStatus.EXPIRE, then=Value(2)),
+            default=Value(3),
+            output_field=IntegerField()
+        )
+    ).order_by('status_priority', '-date_publication')
+    
+    # pour masquer les offres expirées
     if hide_expired:
         jobs = jobs.exclude(statut=JobStatus.EXPIRE)
     

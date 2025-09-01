@@ -7,11 +7,11 @@ from authentication.models import User
 from .models import (
     ProfilCandidat, Diplome, ExperienceProfessionnelle,
     Document, Candidature, Adresse, Entretien, Competence,
-    EvaluationEntretien ,STATUT_CANDIDATURE_CHOICES # NOUVEAU MODÈLE
+    EvaluationEntretien ,
+    STATUT_CANDIDATURE_CHOICES,CANAL_CANDIDATURE_CHOICES,NIVEAU_CHOICES 
 )
 from django.core.exceptions import ValidationError
-
-
+from jobs.models import JobOffer,JobStatus,JobType
 # ====================================================
 # FORMULAIRES EXISTANTS MODIFIÉS
 # ====================================================
@@ -23,7 +23,7 @@ class CompetenceForm(forms.ModelForm):
         widgets = {
             'nom': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Ex: Python, Communication, Anglais, etc..'
+                'placeholder': 'Ex: , Anglais,Python, Communication, etc..'
             }),
             'categorie': forms.Select(attrs={
                 'class': 'form-select'
@@ -98,66 +98,119 @@ class ProfilCandidatForm(forms.ModelForm):
             'accepte_newsletter', 'adresse'
         ]
         widgets = {
-            'photo': forms.FileInput(attrs={'class': 'form-control'}),
+            'photo': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*',
+                'onchange': 'previewImage(this)'
+            }),
             'telephone': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '+223 XXXXXXXX'
+                'placeholder': 'Ex: +223 76 45 32 10',
+                'help_text': 'Votre numéro principal de contact'
             }),
             'telephone_second': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '+223 XXXXXXXX'
+                'placeholder': 'Ex: +223 70 12 34 56 (optionnel)',
+                'help_text': 'Un numéro secondaire pour vous joindre'
             }),
             
-            'date_naissance': DateInput(),
-            'genre': forms.Select(attrs={'class': 'form-select'}),
-            'situation_familiale': forms.Select(attrs={'class': 'form-select'}),
+            'date_naissance': DateInput(attrs={
+                'placeholder': 'JJ/MM/AAAA',
+                'help_text': 'Votre date de naissance'
+            }),
+            'genre': forms.Select(attrs={
+                'class': 'form-select',
+                'help_text': 'Civilité'
+            }),
+            'situation_familiale': forms.Select(attrs={
+                'class': 'form-select',
+                'help_text': 'Votre situation familiale'
+            }),
             'type_piece_identite': forms.Select(attrs={  
                 'class': 'form-select',
-                'id': 'type_piece_identite'
+                'id': 'type_piece_identite',
+                'help_text': 'Type de document d\'identité'
             }),
             'numero_piece_identite': forms.TextInput(attrs={ 
                 'class': 'form-control',
-                'placeholder': 'Numéro de la pièce',
-                'id': 'numero_piece_identite'
+                'placeholder': 'Ex: AB1234567',
+                'id': 'numero_piece_identite',
+                'help_text': 'Numéro de votre pièce d\'identité'
             }),
-            'date_delivrance_piece': DateInput(),  # Utiliser le widget personnalisé
+            'date_delivrance_piece': DateInput(attrs={
+                'placeholder': 'JJ/MM/AAAA',
+                'help_text': 'Date de délivrance du document'
+            }),
             'lieu_delivrance_piece': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Lieu de délivrance'
+                'placeholder': 'Ex: Bamako, Commune I',
+                'help_text': 'Lieu où le document a été délivré'
             }),
             'pretention_salariale': forms.NumberInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Prétention salariale annuelle',
-                'step': '1000'
+                'placeholder': 'Ex: 150000',
+                'step': '5',
+                'help_text': 'Salaire Mensuel souhaité en FCFA'
             }),
             'localite_souhaitee': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Localité souhaitée'
+                'placeholder': 'Ex: Bamako, Sikasso, ou Télétravail',
+                'help_text': 'Où souhaitez-vous travailler ?'
             }),
             
             'linkedin_url': forms.URLInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'https://linkedin.com/in/votrenom'
+                'placeholder': 'https://linkedin.com/in/votrenom',
+                'help_text': 'Lien vers votre profil LinkedIn'
             }),
             'portfolio_url': forms.URLInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'https://votreportfolio.com'
+                'placeholder': 'https://votreportfolio.com',
+                'help_text': 'Lien vers votre portfolio en ligne'
             }),
-            
             'facebook_url': forms.URLInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'https://facebook.com/votrenom'
+                'placeholder': 'https://facebook.com/votrenom',
+                'help_text': 'Lien vers votre profil Facebook (optionnel)'
             }),
             'instagram_url': forms.URLInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'https://instagram.com/votrenom'
+                'placeholder': 'https://instagram.com/votrenom',
+                'help_text': 'Lien vers votre profil Instagram (optionnel)'
             }),
        
-            'disponible': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'recherche_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'accepte_newsletter': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'mission_temporaire': forms.CheckboxInput(attrs={'class': 'form-check-input'}),    
-            'adresse': forms.Select(attrs={'class': 'form-select'}),
+            'disponible': forms.CheckboxInput(attrs={
+                'class': 'form-check-input',
+                'help_text': 'Je suis disponible pour commencer rapidement'
+            }),
+            'recherche_active': forms.CheckboxInput(attrs={
+                'class': 'form-check-input',
+                'help_text': 'Je recherche activement un emploi'
+            }),
+            'accepte_newsletter': forms.CheckboxInput(attrs={
+                'class': 'form-check-input',
+                'help_text': 'Je souhaite recevoir des offres par email'
+            }),
+            'mission_temporaire': forms.CheckboxInput(attrs={
+                'class': 'form-check-input',
+                'help_text': 'J\'accepte les missions temporaires'
+            }),    
+            'adresse': forms.Select(attrs={
+                'class': 'form-select',
+                'help_text': 'Votre adresse principale'
+            }),
+        }
+        help_texts = {
+            'disponible': "Cochez si vous êtes disponible pour commencer sous 15 jours",
+            'recherche_active': "Cochez si vous recherchez activement un emploi",
+            'mission_temporaire': "Cochez si vous acceptez les CDD, intérim ou missions",
+            'accepte_newsletter': "Recevez nos meilleures offres par email",
+        }
+        labels = {
+            'disponible': "Disponibilité immédiate",
+            'recherche_active': "En recherche active",
+            'mission_temporaire': "Missions temporaires acceptées",
+            'accepte_newsletter': "Newsletter des offres",
         }
 
     def __init__(self, *args, **kwargs):
@@ -167,6 +220,11 @@ class ProfilCandidatForm(forms.ModelForm):
         self.fields['numero_piece_identite'].required = False
         self.fields['date_delivrance_piece'].required = False
         self.fields['lieu_delivrance_piece'].required = False
+        
+        # Ajouter des textes d'aide supplémentaires
+        self.fields['telephone'].help_text = "Format international : +223 XX XX XX XX"
+        self.fields['pretention_salariale'].help_text = "Salaire annuel brut souhaité en FCFA"
+        self.fields['localite_souhaitee'].help_text = "Ville, région ou 'Télétravail'"
 
     def clean(self):
         cleaned_data = super().clean()
@@ -196,8 +254,7 @@ class ProfilCandidatForm(forms.ModelForm):
                     self.add_error('lieu_delivrance_piece', 
                                   "Veuillez renseigner le lieu de délivrance.")
 
-        return cleaned_data
-    
+        return cleaned_data    
 
     
 class DiplomeForm(forms.ModelForm):
@@ -313,8 +370,8 @@ class ExperienceForm(forms.ModelForm):
             'en_poste': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'salaire': forms.NumberInput(attrs={
                 'class': 'form-control',
-                'step': '1000',
-                'placeholder': 'Salaire annuel brut'
+                'step': '5',
+                'placeholder': 'Salaire Mensuel brut'
             }),
             'equipe': forms.NumberInput(attrs={
                 'class': 'form-control',
@@ -474,8 +531,8 @@ class EntretienForm(forms.ModelForm):
             }),
             'duree_prevue': forms.NumberInput(attrs={
                 'class': 'form-control',
-                'min': 15,
-                'step': 15,
+                'min': 5,
+                'step': 5,
                 'placeholder': 'Durée en minutes'
             }),
             'interlocuteurs': forms.TextInput(attrs={
@@ -902,3 +959,453 @@ class CandidatureForm(forms.ModelForm):
         
         
         return alertes
+    
+
+
+
+
+# ====================================================
+# FORMULAIRES SPECIFIQUES AU BACKOFFICE (RH/RECRUTEUR)
+# ====================================================
+
+from django import forms
+from django.db.models import Q
+from django_summernote.widgets import SummernoteWidget
+
+
+class CandidatFilterForm(forms.Form):
+    """
+    Formulaire de filtrage avancé pour la liste des candidats (Vue 360)
+    """
+    q = forms.CharField(
+        required=False,
+        label="Recherche globale",
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Nom, prénom, email, téléphone, compétence, localité...'
+        })
+    )
+    
+    competence = forms.ModelMultipleChoiceField(
+        required=False,
+        queryset=Competence.objects.filter(est_supprime=False),
+        widget=forms.SelectMultiple(attrs={
+            'class': 'form-select',
+            'data-placeholder': 'Filtrer par compétence...'
+        }),
+        label="Compétences"
+    )
+    
+    source_competence = forms.ChoiceField(
+        required=False,
+        choices=[
+            ('', 'Toutes sources'),
+            ('profil', 'Profil uniquement'),
+            ('diplomes', 'Diplômes uniquement'),
+            ('experiences', 'Expériences uniquement')
+        ],
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Source des compétences"
+    )
+
+    niveau_etude = forms.ChoiceField(
+        required=False,
+        choices=[('', '---------')] + NIVEAU_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Niveau d'étude minimum"
+    )
+    
+    localite = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Ville ou pays souhaité'
+        }),
+        label="Localisation"
+    )
+    
+    statut_candidature = forms.ChoiceField(
+        required=False,
+        choices=[('', '---------')] + STATUT_CANDIDATURE_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Statut de candidature actif"
+    )
+    
+    recherche_active = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        label="En recherche active seulement"
+    )
+    
+    disponible = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        label="Disponible immédiatement seulement"
+    )
+
+class CandidatureBackofficeForm(forms.ModelForm):
+    """
+    Formulaire COMPLET de gestion d'une candidature pour le backoffice.
+    Permet de changer le statut, planifier un entretien, noter, etc.
+    """
+    class Meta:
+        model = Candidature
+        fields = [
+            'statut', 'canal', 'notes', 'motivation', 'points_forts', 'points_faibles',
+            'date_entretien', 'type_entretien', 'evaluation_entretien', 'feedback_recruteur'
+        ]
+        widgets = {
+            'statut': forms.Select(attrs={
+                'class': 'form-select',
+                'onchange': 'toggleEntretienFields()'  # JS pour afficher/masquer les champs liés
+            }),
+            'canal': forms.Select(attrs={'class': 'form-select'}),
+            'notes': SummernoteWidget(attrs={
+                'summernote': {
+                    'toolbar': [
+                        ['style', ['bold', 'italic', 'underline']],
+                        ['para', ['ul', 'ol']],
+                        ['view', ['codeview']],
+                    ],
+                    'height': 150,
+                    'placeholder': 'Notes internes pour le recruteur...'
+                }
+            }),
+            'motivation': SummernoteWidget(attrs={
+                'summernote': {
+                    'toolbar': [
+                        ['style', ['bold', 'italic']],
+                        ['para', ['ul', 'ol']],
+                    ],
+                    'height': 150,
+                    'placeholder': 'Résumé de la motivation du candidat...'
+                }
+            }),
+            'points_forts': SummernoteWidget(attrs={
+                'summernote': {
+                    'toolbar': [
+                        ['style', ['bold']],
+                        ['para', ['ul']],
+                    ],
+                    'height': 150,
+                    'placeholder': 'Points forts du candidat pour ce poste...'
+                }
+            }),
+            'points_faibles': SummernoteWidget(attrs={
+                'summernote': {
+                    'toolbar': [
+                        ['style', ['bold']],
+                        ['para', ['ul']],
+                    ],
+                    'height': 150,
+                    'placeholder': 'Points faibles ou à améliorer...'
+                }
+            }),
+            'date_entretien': forms.DateTimeInput(attrs={
+                'class': 'form-control',
+                'type': 'datetime-local'
+            }),
+            'type_entretien': forms.Select(attrs={'class': 'form-select'}),
+            'evaluation_entretien': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': 1,
+                'max': 5,
+                'step': 1
+            }),
+            'feedback_recruteur': SummernoteWidget(attrs={
+                'summernote': {
+                    'toolbar': [
+                        ['style', ['bold', 'italic']],
+                        ['para', ['ul', 'ol']],
+                    ],
+                    'height': 200,
+                    'placeholder': 'Feedback détaillé pour le candidat...'
+                }
+            }),
+        }
+        labels = {
+            'feedback_recruteur': 'Feedback pour le candidat',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Réorganiser l'ordre des champs si nécessaire
+        self.order_fields([
+            'statut', 'canal', 'date_entretien', 'type_entretien',
+            'evaluation_entretien', 'feedback_recruteur',
+            'motivation', 'points_forts', 'points_faibles', 'notes'
+        ])
+
+class EntretienPlanificationForm(forms.ModelForm):
+    """
+    Formulaire simplifié pour planifier rapidement un entretien depuis le détail d'une candidature.
+    """
+    envoyer_email = forms.BooleanField(
+        required=False,
+        initial=True,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        label="Envoyer un email d'invitation au candidat",
+        help_text="Si coché, un email avec les détails sera envoyé automatiquement."
+    )
+
+    class Meta:
+        model = Entretien
+        fields = ['type_entretien', 'date_prevue', 'duree_prevue', 'interlocuteurs', 'lieu', 'lien_video', 'codes_acces']
+        widgets = {
+            'type_entretien': forms.Select(attrs={'class': 'form-select'}),
+            'date_prevue': forms.DateTimeInput(attrs={
+                'class': 'form-control',
+                'type': 'datetime-local'
+            }),
+            'duree_prevue': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': 5,
+                'step': 5,
+                'placeholder': 'Durée en minutes'
+            }),
+            'interlocuteurs': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Noms des interlocuteurs (RH, Tech Lead, etc.)'
+            }),
+            'lieu': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Adresse physique ou nom de la salle'
+            }),
+            'lien_video': forms.URLInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Lien Google Meet, Teams, Zoom, etc.'
+            }),
+            'codes_acces': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Code de la réunion, mot de passe'
+            }),
+        }
+
+    def clean_date_prevue(self):
+        date_prevue = self.cleaned_data.get('date_prevue')
+        if date_prevue and date_prevue < timezone.now():
+            raise forms.ValidationError("La date de l'entretien ne peut pas être dans le passé.")
+        return date_prevue
+
+class EntretienCompteRenduForm(forms.ModelForm):
+    """
+    Formulaire complet pour saisir le compte-rendu détaillé après un entretien.
+    Utilise Summernote pour une mise en forme riche.
+    """
+    class Meta:
+        model = Entretien
+        fields = [
+            'statut', 'date_reelle', 'duree_reelle',
+            'feedback', 'points_abordes', 'questions_posées',
+            'note_globale', 'points_positifs', 'points_amelioration', 'suite_prevue'
+        ]
+        widgets = {
+            'statut': forms.Select(attrs={'class': 'form-select'}),
+            'date_reelle': forms.DateTimeInput(attrs={
+                'class': 'form-control',
+                'type': 'datetime-local'
+            }),
+            'duree_reelle': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': 1,
+                'placeholder': 'Durée réelle en minutes'
+            }),
+            'feedback': SummernoteWidget(attrs={
+                'summernote': {
+                    'toolbar': [
+                        ['style', ['bold', 'italic', 'underline']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['insert', ['link']],
+                        ['view', ['codeview', 'help']],
+                    ],
+                    'height': 250,
+                    'placeholder': 'Feedback général et impression sur l\'entretien...'
+                }
+            }),
+            'points_abordes': SummernoteWidget(attrs={
+                'summernote': {
+                    'toolbar': [
+                        ['style', ['bold']],
+                        ['para', ['ul', 'ol']],
+                    ],
+                    'height': 200,
+                    'placeholder': 'Liste des sujets et points techniques abordés...'
+                }
+            }),
+            'questions_posées': SummernoteWidget(attrs={
+                'summernote': {
+                    'toolbar': [
+                        ['style', ['bold']],
+                        ['para', ['ul', 'ol']],
+                    ],
+                    'height': 200,
+                    'placeholder': 'Questions posées par le candidat et réponses apportées...'
+                }
+            }),
+            'note_globale': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': 0,
+                'max': 10,
+                'step': 0.5,
+                'placeholder': 'Note sur 10'
+            }),
+            'points_positifs': SummernoteWidget(attrs={
+                'summernote': {
+                    'toolbar': [
+                        ['style', ['bold']],
+                        ['para', ['ul']],
+                    ],
+                    'height': 150,
+                    'placeholder': 'Points forts, compétences confirmées, atouts du candidat...'
+                }
+            }),
+            'points_amelioration': SummernoteWidget(attrs={
+                'summernote': {
+                    'toolbar': [
+                        ['style', ['bold']],
+                        ['para', ['ul']],
+                    ],
+                    'height': 150,
+                    'placeholder': 'Points faibles, lacunes, axes d\'amélioration pour le candidat...'
+                }
+            }),
+            'suite_prevue': SummernoteWidget(attrs={
+                'summernote': {
+                    'toolbar': [
+                        ['style', ['bold']],
+                        ['para', ['ul']],
+                    ],
+                    'height': 100,
+                    'placeholder': 'Prochaines étapes : autre entretien, test, délai de réponse...'
+                }
+            }),
+        }
+
+class EvaluationEntretienBackofficeForm(forms.ModelForm):
+    """
+    Formulaire d'évaluation détaillée pour le backoffice.
+    Version plus complète que la précédente, intégrant Summernote.
+    """
+    class Meta:
+        model = EvaluationEntretien
+        fields = [
+            'note_technique', 'note_communication', 'note_motivation', 'note_culture',
+            'points_forts', 'points_amelioration', 'recommandation',
+            'recommander', 'niveau_urgence'
+        ]
+        widgets = {
+            'note_technique': forms.Select(attrs={'class': 'form-select'}),
+            'note_communication': forms.Select(attrs={'class': 'form-select'}),
+            'note_motivation': forms.Select(attrs={'class': 'form-select'}),
+            'note_culture': forms.Select(attrs={'class': 'form-select'}),
+            'points_forts': SummernoteWidget(attrs={
+                'summernote': {
+                    'toolbar': [
+                        ['style', ['bold']],
+                        ['para', ['ul']],
+                    ],
+                    'height': 150,
+                    'placeholder': 'Compétences techniques validées, expertise démontrée...'
+                }
+            }),
+            'points_amelioration': SummernoteWidget(attrs={
+                'summernote': {
+                    'toolbar': [
+                        ['style', ['bold']],
+                        ['para', ['ul']],
+                    ],
+                    'height': 150,
+                    'placeholder': 'Écarts avec le profil recherché, compétences manquantes...'
+                }
+            }),
+            'recommandation': SummernoteWidget(attrs={
+                'summernote': {
+                    'toolbar': [
+                        ['style', ['bold', 'italic']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['view', ['codeview']],
+                    ],
+                    'height': 200,
+                    'placeholder': 'Analyse finale, avis pour la suite du processus, niveau de priorité...'
+                }
+            }),
+            'recommander': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'niveau_urgence': forms.Select(attrs={'class': 'form-select'}),
+        }
+        labels = {
+            'note_technique': "Compétences Techniques / Hard Skills",
+            'note_communication': "Communication / Soft Skills",
+            'note_motivation': "Motivation & Intérêt",
+            'note_culture': "Adéquation Culturelle (Fit)",
+            'points_forts': "Points Forts & Atouts",
+            'points_amelioration': "Points d'Amélioration & Risques",
+            'recommandation': "Recommandation Détaillée & Avis Final",
+            'recommander': "Je recommande ce candidat pour la suite",
+            'niveau_urgence': "Niveau d'Urgence / Priorité de traitement"
+        }
+
+class CandidatureFilterForm(forms.Form):
+    """
+    Formulaire pour filtrer les candidatures par offre, statut, etc.
+    """
+    offre = forms.ModelChoiceField(
+        required=False,
+        queryset=JobOffer.objects.filter(statut='OUVERT', visible_sur_site=True),
+        empty_label="Toutes les offres",
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    
+    statut = forms.MultipleChoiceField(
+        required=False,
+        choices=STATUT_CANDIDATURE_CHOICES,
+        widget=forms.SelectMultiple(attrs={'class': 'form-select'}),
+        label="Statut(s)"
+    )
+    
+    canal = forms.MultipleChoiceField(
+        required=False,
+        choices=CANAL_CANDIDATURE_CHOICES,
+        widget=forms.SelectMultiple(attrs={'class': 'form-select'}),
+        label="Canal(s) de recrutement"
+    )
+    
+    date_min = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date'
+        }),
+        label="Postulé après le"
+    )
+    
+    date_max = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date'
+        }),
+        label="Postulé avant le"
+    )
+
+class NoteInterneForm(forms.Form):
+    """
+    Formulaire rapide pour ajouter une note interne à une candidature.
+    """
+    note = forms.CharField(
+        widget=SummernoteWidget(attrs={
+            'summernote': {
+                'toolbar': [
+                    ['style', ['bold', 'italic']],
+                    ['para', ['ul', 'ol']],
+                ],
+                'height': 100,
+                'placeholder': 'Ajoutez une note interne...'
+            }
+        })
+    )
+    is_important = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        label="Marquer comme importante",
+        help_text="Les notes importantes sont mises en évidence."
+    )

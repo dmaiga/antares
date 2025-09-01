@@ -155,45 +155,121 @@
             </div>
 
             <!-- Section 4: Préférences professionnelles -->
-            <div class="card mb-4 border-0 shadow-sm">
-              <div class="card-header bg-light">
-                <h6 class="mb-0"><i class="bi bi-briefcase me-2"></i>Préférences professionnelles</h6>
-              </div>
-              <div class="card-body">
-                <div class="row">
-                  <div class="col-12 col-md-6 mb-2">
-                    <label for="id_pretention_salariale" class="form-label small">Prétention salariale (FCFA)</label>
-                    {{ profil_form.pretention_salariale }}
-                  </div>
-                  <div class="col-12 col-md-6 mb-2">
-                    <label for="id_localite_souhaitee" class="form-label small">Localité souhaitée</label>
-                    {{ profil_form.localite_souhaitee }}
-                  </div>
+<div class="card mb-4 border-0 shadow-sm">
+    <div class="card-header bg-light">
+        <h6 class="mb-0"><i class="bi bi-briefcase me-2"></i>Préférences professionnelles</h6>
+    </div>
+    <div class="card-body">
+        <!-- Prétention salariale -->
+        <div class="row mb-3">
+            <div class="col-12 col-md-6">
+                <label for="id_pretention_salariale" class="form-label small fw-semibold">
+                    Prétention salariale annuelle (FCFA)
+                </label>
+                {{ profil_form.pretention_salariale }}
+                {% if profil_form.pretention_salariale.help_text %}
+                <div class="form-text text-muted small">
+                    <i class="bi bi-info-circle me-1"></i>
+                    {{ profil_form.pretention_salariale.help_text }}
                 </div>
+                {% endif %}
+                {% if profil_form.pretention_salariale.errors %}
+                <div class="text-danger small mt-1">
+                    {{ profil_form.pretention_salariale.errors }}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Localité souhaitée -->
+            <div class="col-12 col-md-6">
+                <label for="id_localite_souhaitee" class="form-label small fw-semibold">
+                    Localité souhaitée
+                </label>
+                {{ profil_form.localite_souhaitee }}
+                {% if profil_form.localite_souhaitee.help_text %}
+                <div class="form-text text-muted small">
+                    <i class="bi bi-info-circle me-1"></i>
+                    {{ profil_form.localite_souhaitee.help_text }}
+                </div>
+                {% endif %}
+                {% if profil_form.localite_souhaitee.errors %}
+                <div class="text-danger small mt-1">
+                    {{ profil_form.localite_souhaitee.errors }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
 
-                <div class="row">
-                  <div class="col-12 col-md-4 mb-2">
-                    <div class="form-check form-switch">
-                      {{ profil_form.disponible }}
-                      <label class="form-check-label small" for="id_disponible">Disponible immédiatement</label>
-                    </div>
-                  </div>
-                  <div class="col-12 col-md-4 mb-2">
-                    <div class="form-check form-switch">
-                      {{ profil_form.mission_temporaire }}
-                      <label class="form-check-label small" for="id_mission_temporaire">Missions temporaires</label>
-                    </div>
-                  </div>
-                  <div class="col-12 col-md-4 mb-2">
-                    <div class="form-check form-switch">
-                      {{ profil_form.recherche_active }}
-                      <label class="form-check-label small" for="id_recherche_active">En recherche active</label>
-                    </div>
-                  </div>
+        <!-- Options avec switches -->
+        <div class="row">
+            <!-- Disponibilité immédiate -->
+            <div class="col-12 col-md-6 col-lg-4 mb-3">
+                <div class="form-check form-switch">
+                    {{ profil_form.disponible }}
+                    <label class="form-check-label small fw-semibold" for="id_disponible">
+                        <i class="bi bi-check-circle me-1 text-success"></i>
+                        {{ profil_form.disponible.label }}
+                    </label>
                 </div>
-              </div>
+                {% if profil_form.disponible.help_text %}
+                <div class="form-text text-muted small ms-4 mt-1">
+                    {{ profil_form.disponible.help_text }}
+                </div>
+                {% endif %}
             </div>
 
+            <!-- Missions temporaires -->
+            <div class="col-12 col-md-6 col-lg-4 mb-3">
+                <div class="form-check form-switch">
+                    {{ profil_form.mission_temporaire }}
+                    <label class="form-check-label small fw-semibold" for="id_mission_temporaire">
+                        <i class="bi bi-clock-history me-1 text-warning"></i>
+                        {{ profil_form.mission_temporaire.label }}
+                    </label>
+                </div>
+                {% if profil_form.mission_temporaire.help_text %}
+                <div class="form-text text-muted small ms-4 mt-1">
+                    {{ profil_form.mission_temporaire.help_text }}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Recherche active -->
+            <div class="col-12 col-md-6 col-lg-4 mb-3">
+                <div class="form-check form-switch">
+                    {{ profil_form.recherche_active }}
+                    <label class="form-check-label small fw-semibold" for="id_recherche_active">
+                        <i class="bi bi-search me-1 text-primary"></i>
+                        {{ profil_form.recherche_active.label }}
+                    </label>
+                </div>
+                {% if profil_form.recherche_active.help_text %}
+                <div class="form-text text-muted small ms-4 mt-1">
+                    {{ profil_form.recherche_active.help_text }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Newsletter option -->
+        <div class="row mt-3 pt-3 border-top">
+            <div class="col-12">
+                <div class="form-check form-switch">
+                    {{ profil_form.accepte_newsletter }}
+                    <label class="form-check-label small fw-semibold" for="id_accepte_newsletter">
+                        <i class="bi bi-envelope me-1 text-info"></i>
+                        {{ profil_form.accepte_newsletter.label }}
+                    </label>
+                </div>
+                {% if profil_form.accepte_newsletter.help_text %}
+                <div class="form-text text-muted small ms-4 mt-1">
+                    {{ profil_form.accepte_newsletter.help_text }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
             <!-- Section 5: Réseaux sociaux et portfolio -->
             <div class="card mb-4 border-0 shadow-sm">
               <div class="card-header bg-light">

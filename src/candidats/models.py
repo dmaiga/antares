@@ -206,7 +206,12 @@ class Competence(models.Model):
 class ProfilCandidat(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, primary_key=True, related_name='profil_candidat')
     photo = models.ImageField(upload_to='candidat/avatars/', null=True, blank=True, verbose_name="Photo de profil")
-
+    competences = models.ManyToManyField(
+        'Competence',
+        related_name='candidats',
+        blank=True,
+        verbose_name="Compétences"
+    )
     # Téléphones
     telephone = models.CharField(max_length=20, validators=[RegexValidator(r'^\+?\s*(?:\d[\s\-()]?){8,}$')], blank=True)
     telephone_second = models.CharField(
@@ -287,7 +292,9 @@ class ProfilCandidat(models.Model):
     date_inscription = models.DateTimeField(auto_now_add=True)
     derniere_maj = models.DateTimeField(auto_now=True)
     derniere_connexion = models.DateTimeField(null=True, blank=True, verbose_name="Dernière connexion")
-    
+    est_supprime = models.BooleanField(default=False, verbose_name="Profil supprimé")
+
+
     class Meta:
         verbose_name = "Profil Candidat"
         verbose_name_plural = "Profils Candidats"
@@ -411,7 +418,6 @@ class ExperienceProfessionnelle(models.Model):
 
 def document_path(instance, filename):
     return f'documents/candidat_{instance.candidat.id}/{instance.type_document}/{filename}'
-
 class Document(models.Model):
     candidat = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='documents')
     type_document = models.CharField(max_length=20, choices=TYPE_DOCUMENT_CHOICES, verbose_name="Type de document")
@@ -426,7 +432,13 @@ class Document(models.Model):
     mots_cles = models.CharField(max_length=255, blank=True, verbose_name="Mots-clés",
                                 help_text="Mots-clés séparés par des virgules (ex: python, gestion, leadership)")
     
-    # Suppression de est_public puisque c'est vous qui gérez
+    # Nouveau champ pour la vérification
+    est_verifie = models.BooleanField(default=False, verbose_name="Document vérifié")
+    verifie_par = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, 
+                                   null=True, blank=True, related_name='documents_verifies',
+                                   verbose_name="Vérifié par")
+    date_verification = models.DateTimeField(null=True, blank=True, verbose_name="Date de vérification")
+    
     est_actif = models.BooleanField(default=True, verbose_name="Document actif")
     est_modele = models.BooleanField(default=False, verbose_name="Modèle de document")
     
@@ -443,7 +455,8 @@ class Document(models.Model):
         verbose_name = "Document"
         verbose_name_plural = "Documents"
         ordering = ['-date_upload']
-        unique_together = ['candidat', 'nom', 'version']    
+        unique_together = ['candidat', 'nom', 'version']
+    
     def __str__(self):
         return f"{self.nom} v{self.version} ({self.get_type_document_display()})"
     
@@ -464,7 +477,24 @@ class Document(models.Model):
     def soft_delete(self):
         self.est_supprime = True
         self.save()
+    
+    def verifier(self, utilisateur):
+        """Méthode pour vérifier un document"""
+        self.est_verifie = True
+        self.verifie_par = utilisateur
+        self.date_verification = timezone.now()
+        self.save()
+    
+    def annuler_verification(self):
+        """Méthode pour annuler la vérification d'un document"""
+        self.est_verifie = False
+        self.verifie_par = None
+        self.date_verification = None
+        self.save()
 
+
+
+        
 class Candidature(models.Model):
     candidat = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='candidatures')
     offre = models.ForeignKey(JobOffer, on_delete=models.CASCADE)

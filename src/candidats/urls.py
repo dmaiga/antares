@@ -46,4 +46,28 @@ urlpatterns = [
     # Offres d'emploi
     path('offres_emploies/', views.candidat_job_list, name='candidat_job_list'),
     path('offres_detail/<int:pk>/', views.candidat_job_detail, name='candidat_job_detail'),
+
+    ####
+    #
+    ####
+    path('dashboard_backoffice/', views.backoffice_dashboard, name='backoffice_dashboard'),
+    path('documents/<int:document_id>/verifier/', views.verifier_document, name='verifier_document'),
+    path('documents/<int:document_id>/annuler-verification/', views.annuler_verification_document, name='annuler_verification_document'),
+    path('documents/<int:document_id>/telecharger/', views.telecharger_document, name='telecharger_document'),
+    # Candidats
+    path('candidats_backoffice/', views.backoffice_candidat_list, name='backoffice_candidat_list'),
+    path('candidats_backoffice/<int:candidat_id>/', views.backoffice_candidat_detail, name='backoffice_candidat_detail'),
+    
+    # Candidatures
+    path('candidatures_backoffice/', views.backoffice_candidature_list, name='backoffice_candidature_list'),
+    path('candidatures_backoffice/<int:candidature_id>/', views.backoffice_candidature_detail, name='backoffice_candidature_detail'),
+    path('candidatures_backoffice/<int:candidature_id>/action/<str:action>/', views.backoffice_candidature_quick_action, name='backoffice_candidature_quick_action'),
+    
+    # Entretiens
+    path('entretiens_backoffice/', views.backoffice_entretien_list, name='backoffice_entretien_list'),
+    path('entretiens_backoffice/<int:entretien_id>/', views.backoffice_entretien_detail, name='backoffice_entretien_detail'),
+    path('entretiens_backoffice/<int:entretien_id>/action/<str:action>/', views.backoffice_entretien_quick_action, name='backoffice_entretien_quick_action'),
+    
+    # Évaluations
+    path('entretiens_backoffice/<int:entretien_id>/evaluation/', views.backoffice_evaluation_create, name='backoffice_evaluation_create'),
 ]

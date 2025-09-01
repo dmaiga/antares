@@ -66,6 +66,14 @@
                 Entreprise
             </a>
         </li>
+          <li class="nav-item mb-2">
+            <a class="nav-link text-dark {% if request.path == '/candidat/' %}active-link{% endif %}" 
+               href="{% url 'backoffice_dashboard' %}">
+                <i class="bi bi-building me-2 text-primary"></i>
+                Candidat
+            </a>
+        </li>
+
 <a class="nav-link text-dark {% if request.path == '/offres/' %}active-link{% endif %}" 
    href="{% url 'job-offer-list' %}">
     <i class="bi bi-building me-2 text-primary"></i>

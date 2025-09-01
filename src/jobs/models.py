@@ -95,6 +95,25 @@ class JobOffer(models.Model):
         verbose_name = "Offre d'emploi"
         verbose_name_plural = "Offres d'emploi"
 
+    @property
+    def est_expiree(self):
+        """Vérifie si l'offre est expirée basée sur la date limite"""
+        if self.statut == JobStatus.EXPIRE:
+            return True
+        if self.date_limite and self.date_limite < timezone.now().date():
+            return True
+        return False
+    
+    def save(self, *args, **kwargs):
+        """Met à jour automatiquement le statut si la date limite est dépassée"""
+        if self.date_limite and self.date_limite < timezone.now().date():
+            self.statut = JobStatus.EXPIRE
+        elif self.visible_sur_site and self.statut != JobStatus.EXPIRE:
+            self.statut = JobStatus.OUVERT
+        
+        super().save(*args, **kwargs)
+
+        
     def __str__(self):
         return f"{self.reference} - {self.titre}"
     
@@ -140,6 +159,8 @@ class JobOffer(models.Model):
         if len(text_content) > max_length:
             return text_content[:max_length] + '...'
         return text_content
+
+
 
 from django.db import models
 from django_summernote.models import AbstractAttachment

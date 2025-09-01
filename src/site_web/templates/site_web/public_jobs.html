@@ -176,9 +176,8 @@
     {% if jobs %}
         {% for job in jobs %}
         <div class="card job-card mb-2 border-start-4 
-            {% if job.statut == 'ouvert' %}border-success
-            {% elif job.statut == 'expire' %}border-danger
-            {% else %}border-secondary{% endif %}">
+    {% if job.est_expiree %}border-danger
+    {% else %}border-success{% endif %}">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start ">
                     <div>
@@ -187,12 +186,11 @@
                             <i class="bi bi-building"></i> <strong style="color: #F98301;">{{ job.societe }}</strong>
                         </p>
                     </div>
-                    <span class="badge rounded-pill py-2 px-3 
-                        {% if job.statut == 'ouvert' %}bg-success
-                        {% elif job.statut == 'expire' %}bg-danger
-                        {% else %}bg-secondary{% endif %}">
-                        {{ job.get_statut_display|upper }}
-                    </span>
+                     <span class="badge rounded-pill py-2 px-3 
+        {% if job.est_expiree %}bg-danger
+        {% else %}bg-success{% endif %}">
+        {% if job.est_expiree %}EXPIRÉE{% else %}OUVERTE{% endif %}
+    </span>
                 </div>
 
                 <!-- Ligne d'informations clés -->

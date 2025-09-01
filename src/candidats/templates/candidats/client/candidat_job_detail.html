@@ -21,7 +21,7 @@
 
     <div class="row">
         <!-- Contenu principal -->
-        <div class="col-lg-8 col-md-7 mb-4">
+        <div class="col-lg-9 col-md-7 mb-4">
             <!-- Header de l'offre -->
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-gradient-primary text-white py-4">
@@ -102,21 +102,21 @@
                             </div>
                         </div>
 
-                        {% if offre.date_limite %}
-                        <div class="col-sm-6 col-md-4">
-                            <div class="d-flex align-items-center">
-                                <div >
-                                    <i class="fas fa-calendar-times text-{% if offre.date_limite < today %}danger{% else %}secondary{% endif %}"></i>
-                                </div>
-                                <div>
-                                    <small class="text-muted d-block">Clôture</small>
-                                    <strong class="text-{% if offre.date_limite < today %}danger{% endif %}">
-                                        {{ offre.date_limite|date:"d/m/Y" }}
-                                    </strong>
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
+{% if offre.date_limite %}
+<div class="col-sm-6 col-md-4">
+    <div class="d-flex align-items-center">
+        <div>
+            <i class="fas fa-calendar-times text-{% if offre.est_expiree_db %}danger{% else %}secondary{% endif %}"></i>
+        </div>
+        <div>
+            <small class="text-muted d-block">Clôture</small>
+            <strong class="text-{% if offre.est_expiree_db %}danger{% endif %}">
+                {{ offre.date_limite|date:"d/m/Y" }}
+            </strong>
+        </div>
+    </div>
+</div>
+{% endif %}
 
                         <div class="col-sm-6 col-md-4">
                             <div class="d-flex align-items-center">
@@ -213,7 +213,7 @@
         </div>
 
         <!-- Sidebar Actions -->
-        <div class="col-lg-4 col-md-5">
+        <div class="col-lg-3 col-md-5">
             <div class="sticky-top" style="top: 100px; z-index: 1000;">
                 <!-- CTA Principal -->
                 <div class="card shadow-sm border-0 mb-4">
@@ -228,18 +228,23 @@
                                 </a>
                             </div>
                         {% else %}
-                            <a href="{% url 'apply_job' offre.pk %}" class="btn btn-primary btn-lg w-100 mb-3 py-3">
-                                <i class="fas fa-paper-plane me-2"></i>Postuler maintenant
-                            </a>
-                            <p class="text-muted small">
-                                <i class="fas fa-clock me-1"></i>
-                                {% if offre.date_limite %}
-                                    Clôture le {{ offre.date_limite|date:"d/m/Y" }}
-                                {% else %}
-                                    Offre à pourvoir rapidement
-                                {% endif %}
-                            </p>
-                        {% endif %}
+    <a href="{% url 'apply_job' offre.pk %}" class="btn btn-primary btn-lg w-100 mb-3 py-3 {% if offre.est_expiree_db %}disabled{% endif %}">
+        <i class="fas fa-paper-plane me-2"></i>
+        {% if offre.est_expiree_db %}Offre expirée{% else %}Postuler maintenant{% endif %}
+    </a>
+    <p class="text-muted small">
+        <i class="fas fa-clock me-1"></i>
+        {% if offre.date_limite %}
+            {% if offre.est_expiree_db %}
+                Offre expirée depuis le {{ offre.date_limite|date:"d/m/Y" }}
+            {% else %}
+                Clôture le {{ offre.date_limite|date:"d/m/Y" }}
+            {% endif %}
+        {% else %}
+            Offre à pourvoir rapidement
+        {% endif %}
+    </p>
+{% endif %}
                     </div>
                 </div>
 

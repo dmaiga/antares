@@ -1,0 +1,591 @@
+{% extends 'authentication/base.html' %}
+{% load static %}
+
+{% block title %}Profil Candidat - {{ candidat.get_full_name }} - Backoffice{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- Breadcrumb/Retour -->
+    <div class="row my-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'backoffice_dashboard' %}">
+                            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'backoffice_candidat_list' %}">Candidats</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ candidat.get_full_name }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <!-- En-tête avec bouton retour -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <a href="{% url 'backoffice_candidat_list' %}" class="btn btn-outline-secondary btn-sm me-2">
+                        <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+                    </a>
+                    <h1 class="h3 mb-0 text-gray-800 d-inline-block">
+                        <i class="fas fa-user me-2"></i>Profil Candidat
+                    </h1>
+                </div>
+                <div class="btn-group">
+                    <a href="mailto:{{ candidat.email }}" class="btn btn-outline-primary">
+                        <i class="fas fa-envelope me-1"></i>Contacter
+                    </a>
+                    {% if profil.linkedin_url %}
+                    <a href="{{ profil.linkedin_url }}" target="_blank" class="btn btn-outline-info">
+                        <i class="fab fa-linkedin me-1"></i>LinkedIn
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Colonne de gauche - Informations personnelles -->
+        <div class="col-lg-4">
+            <!-- Carte Profil -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-id-card me-2"></i>Informations Personnelles
+                    </h6>
+                </div>
+                <div class="card-body text-center">
+                    <!-- Photo -->
+                    {% if profil.photo %}
+                    <img src="{{ profil.photo.url }}" class="rounded-circle mb-3" width="120" height="120" alt="{{ candidat.get_full_name }}">
+                    {% else %}
+                    <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 120px; height: 120px;">
+                        <i class="fas fa-user text-white fa-3x"></i>
+                    </div>
+                    {% endif %}
+                    
+                    <h4 class="mb-1">{{ candidat.get_full_name }}</h4>
+                    <p class="text-muted mb-3">{{ candidat.email }}</p>
+                    
+                    <!-- Statuts -->
+                    <div class="d-flex justify-content-center gap-2 mb-3">
+                        <span class="badge bg-{% if profil.recherche_active %}success{% else %}secondary{% endif %}">
+                            {% if profil.recherche_active %}Recherche active{% else %}Non recherché{% endif %}
+                        </span>
+                        <span class="badge bg-{% if profil.disponible %}info{% else %}warning{% endif %}">
+                            {% if profil.disponible %}Disponible{% else %}Indisponible{% endif %}
+                        </span>
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- Informations de contact -->
+                    <div class="text-start">
+                        <h6 class="text-primary mb-3"><i class="fas fa-phone me-2"></i>Coordonnées</h6>
+                        
+                        <div class="mb-2">
+                            <strong>Téléphone :</strong><br>
+                            {% if profil.telephone %}
+                            {{ profil.telephone }}
+                            {% else %}
+                            <span class="text-muted">Non renseigné</span>
+                            {% endif %}
+                        </div>
+                        
+                        {% if profil.telephone_second %}
+                        <div class="mb-2">
+                            <strong>Téléphone secondaire :</strong><br>
+                            {{ profil.telephone_second }}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mb-2">
+                            <strong>Localisation :</strong><br>
+                            {% if profil.adresse %}
+                            {{ profil.adresse.ville }}, {{ profil.adresse.pays }}
+                            {% elif profil.localite_souhaitee %}
+                            {{ profil.localite_souhaitee }}
+                            {% else %}
+                            <span class="text-muted">Non renseignée</span>
+                            {% endif %}
+                        </div>
+                        
+                        {% if profil.date_naissance %}
+                        <div class="mb-2">
+                            <strong>Âge :</strong><br>
+                            {{ profil.date_naissance|timesince }} ({{ profil.date_naissance|date:"d/m/Y" }})
+                        </div>
+                        {% endif %}
+                        
+                        {% if profil.genre %}
+                        <div class="mb-2">
+                            <strong>Genre :</strong><br>
+                            {{ profil.get_genre_display }}
+                        </div>
+                        {% endif %}
+                        
+                        {% if profil.situation_familiale %}
+                        <div class="mb-2">
+                            <strong>Situation familiale :</strong><br>
+                            {{ profil.get_situation_familiale_display }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carte Préférences -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-sliders-h me-2"></i>Préférences
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Prétention salariale :</strong><br>
+                        {% if profil.pretention_salariale %}
+                        {{ profil.pretention_salariale }} FCFA
+                        {% else %}
+                        <span class="text-muted">Non spécifié</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Type de mission :</strong><br>
+                        {% if profil.mission_temporaire %}
+                        Accepte les missions temporaires
+                        {% else %}
+                        Recherche un poste permanent
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Localité souhaitée :</strong><br>
+                        {% if profil.localite_souhaitee %}
+                        {{ profil.localite_souhaitee }}
+                        {% else %}
+                        <span class="text-muted">Non spécifié</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Inscrit depuis :</strong><br>
+                        {{ profil.date_inscription|date:"d/m/Y" }}
+                    </div>
+                    
+                    <div>
+                        <strong>Dernière connexion :</strong><br>
+                        {% if profil.derniere_connexion %}
+                        {{ profil.derniere_connexion|date:"d/m/Y H:i" }}
+                        {% else %}
+                        <span class="text-muted">Jamais connecté</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compétences -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-tools me-2"></i>Compétences
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if competences %}
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for competence in competences %}
+                        <span class="badge bg-primary">
+                            {{ competence.nom }} ({{ competence.get_niveau_display }})
+                        </span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">Aucune compétence renseignée</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Colonne de droite - Contenu principal -->
+        <div class="col-lg-8">
+            <!-- Expériences professionnelles -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-briefcase me-2"></i>Expériences Professionnelles
+                    </h6>
+                    <span class="badge bg-primary">{{ experiences|length }}</span>
+                </div>
+                <div class="card-body">
+                    {% if experiences %}
+                    <div class="experiences-list">
+                        {% for experience in experiences %}
+                        <div class="experience-item {% if not forloop.last %}mb-4 pb-4 border-bottom{% endif %}">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="mb-1 fw-bold">{{ experience.poste|upper }}</h6>
+                                <span class="text-muted small">
+                                    {{ experience.date_debut|date:"m/Y" }} - 
+                                    {% if experience.en_poste %}
+                                    <span class="badge bg-success">En poste</span>
+                                    {% else %}
+                                    {{ experience.date_fin|date:"m/Y" }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            
+                            <p class="mb-2 text-primary fw-medium">
+                                <i class="fas fa-building me-1"></i>{{ experience.entreprise }}
+                            </p>
+                            
+                            <div class="mb-2">
+                                <span class="badge bg-secondary me-1">{{ experience.get_type_contrat_display }}</span>
+                                {% if experience.remote %}
+                                <span class="badge bg-info me-1">Télétravail</span>
+                                {% endif %}
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-map-marker-alt me-1"></i>{{ experience.lieu }}, {{ experience.pays }}
+                                </span>
+                            </div>
+                            
+                            <!-- Durée de l'expérience -->
+                            {% if experience.duree %}
+                            <div class="mb-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>Durée: {{ experience.duree }} mois
+                                </small>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Description avec mise en forme améliorée -->
+                            {% if experience.description %}
+                            <div class="mb-3">
+                                <h6 class="text-dark mb-2">Description du poste:</h6>
+                                <div class="bg-light p-3 rounded">
+                                    {{ experience.description|safe|linebreaks }}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Réalisations avec mise en forme améliorée -->
+                            {% if experience.realisation %}
+                            <div class="mb-3">
+                                <h6 class="text-dark mb-2">
+                                    <i class="fas fa-trophy me-1"></i>Réalisations marquantes:
+                                </h6>
+                                <div class="bg-light p-3 rounded">
+                                    {{ experience.realisation|safe|linebreaks }}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Compétences utilisées -->
+                            {% if experience.competences.all %}
+                            <div class="mb-2">
+                                <h6 class="text-dark mb-2">
+                                    <i class="fas fa-tools me-1"></i>Compétences utilisées:
+                                </h6>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for competence in experience.competences.all %}
+                                    <span class="badge bg-primary text-white">
+                                        {{ competence.nom }} 
+                                        {% if competence.niveau != 'INTERMEDIAIRE' %}
+                                        <small>({{ competence.get_niveau_display }})</small>
+                                        {% endif %}
+                                    </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Informations supplémentaires -->
+                            {% if experience.manager or experience.contact_reference %}
+                            <div class="mt-3 pt-2 border-top">
+                                {% if experience.manager %}
+                                <div class="mb-1">
+                                    <small class="text-muted">
+                                        <strong>Manager:</strong> {{ experience.manager }}
+                                    </small>
+                                </div>
+                                {% endif %}
+                                
+                                {% if experience.contact_reference %}
+                                <div class="mb-1">
+                                    <small class="text-muted">
+                                        <strong>Contact référence:</strong> {{ experience.contact_reference }}
+                                    </small>
+                                </div>
+                                {% endif %}
+                                
+                                {% if experience.salaire %}
+                                <div class="mb-1">
+                                    <small class="text-muted">
+                                        <strong>Salaire annuel:</strong> {{ experience.salaire }} FCFA
+                                    </small>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-briefcase fa-3x text-muted mb-3"></i>
+                        <p class="text-muted mb-0">Aucune expérience professionnelle renseignée</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Documents -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-file-pdf me-2"></i>Documents
+                    </h6>
+                    <span class="badge bg-primary">{{ documents|length }}</span>
+                </div>
+                <div class="card-body">
+                    {% if documents %}
+                    <div class="list-group">
+                        {% for document in documents %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="mb-0">{{ document.nom }}</h6>
+                                        <span class="badge bg-{% if document.est_verifie %}success{% else %}warning{% endif %}">
+                                            {% if document.est_verifie %}
+                                            <i class="fas fa-check-circle me-1"></i>Vérifié
+                                            {% else %}
+                                            <i class="fas fa-clock me-1"></i>Non vérifié
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="mb-2">
+                                        <span class="badge bg-secondary me-1">{{ document.get_type_document_display }}</span>
+                                        <span class="badge bg-light text-dark me-1">{{ document.get_langue_display }}</span>
+                                        <span class="badge bg-info text-dark">{{ document.taille_formattee }}</span>
+                                    </div>
+                                    
+                                    {% if document.description %}
+                                    <p class="mb-2 small">{{ document.description }}</p>
+                                    {% endif %}
+                                    
+                                    <div class="text-muted small">
+                                        Ajouté le {{ document.date_upload|date:"d/m/Y" }}
+                                        {% if document.est_verifie and document.verifie_par %}
+                                        • Vérifié par {{ document.verifie_par.get_full_name }} le {{ document.date_verification|date:"d/m/Y" }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="ms-3 d-flex flex-column">
+                                    <!-- Bouton télécharger -->
+                                    <a href="{% url 'telecharger_document' document.id %}" 
+                                       class="btn btn-sm btn-outline-primary mb-2"
+                                       target="_blank">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                    
+                                    <!-- Boutons de vérification -->
+                                    {% if not document.est_verifie %}
+                                    <form method="post" action="{% url 'verifier_document' document.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-success" 
+                                                onclick="return confirm('Confirmer la vérification de ce document?')">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                    {% else %}
+                                    <form method="post" action="{% url 'annuler_verification_document' document.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-warning" 
+                                                onclick="return confirm('Annuler la vérification de ce document?')">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            {% if document.mots_cles %}
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    <strong>Mots-clés:</strong> {{ document.mots_cles }}
+                                </small>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                        <p class="text-muted mb-0">Aucun document uploadé</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Candidatures -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-file-alt me-2"></i>Candidatures
+                    </h6>
+                    <span class="badge bg-primary">{{ candidatures|length }}</span>
+                </div>
+                <div class="card-body">
+                    {% if candidatures %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Offre</th>
+                                    <th>Date</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for candidature in candidatures %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ candidature.offre.titre }}</strong><br>
+                                        <small class="text-muted">{{ candidature.offre.entreprise.nom }}</small>
+                                    </td>
+                                    <td>{{ candidature.date_soumission|date:"d/m/Y" }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ candidature.get_statut_badge }}">
+                                            {{ candidature.get_statut_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'backoffice_candidature_detail' candidature.id %}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                        <p class="text-muted mb-0">Aucune candidature enregistrée</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+.experience-item {
+    position: relative;
+    padding-left: 20px;
+}
+
+.experience-item:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #4e73df;
+    border: 2px solid #fff;
+}
+
+.experience-item:not(:last-child):after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 25px;
+    bottom: -20px;
+    width: 2px;
+    background-color: #e3e6f0;
+}
+
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+.badge {
+    font-size: 0.75em;
+    padding: 0.35em 0.65em;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.card {
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.card-header {
+    border-bottom: 1px solid #e3e6f0;
+    background-color: #f8f9fc;
+}
+
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+    margin-bottom: 1rem;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Script pour gérer les interactions spécifiques à la page de détail
+$(document).ready(function() {
+    // Tooltips pour les badges et boutons
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+    
+    // Alternative pour les title attributes
+    $('[title]').each(function() {
+        if (!$(this).data('bs-toggle')) {
+            $(this).tooltip({
+                trigger: 'hover'
+            });
+        }
+    });
+
+    // Confirmation avant certaines actions
+    $('.btn-danger').click(function(e) {
+        if (!confirm('Êtes-vous sûr de vouloir effectuer cette action ?')) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}
