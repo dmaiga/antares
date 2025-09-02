@@ -148,7 +148,7 @@ WSGI_APPLICATION = 'antares_rh.wsgi.application'
 #    )
 #}
 
-
+#dev
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

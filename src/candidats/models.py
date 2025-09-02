@@ -68,9 +68,7 @@ TYPE_DOCUMENT_CHOICES = [
 LANGUE_CHOICES = [
     ('FR', 'Français'),
     ('EN', 'Anglais'),
-    ('ES', 'Espagnol'),
-    ('DE', 'Allemand'),
-    ('IT', 'Italien'),
+    ('AR', 'Arabe'),
     ('AUTRE', 'Autre'),
 ]
 
@@ -552,6 +550,16 @@ class Candidature(models.Model):
     def soft_delete(self):
         self.est_supprime = True
         self.save()
+    def get_statut_badge(self):
+        """Retourne une classe Bootstrap en fonction du statut"""
+        mapping = {
+            'POSTULE': 'primary',
+            'EN_COURS': 'warning',
+            'ACCEPTE': 'success',
+            'REFUSE': 'danger',
+            'RETIRE': 'secondary',
+        }
+        return mapping.get(self.statut, 'secondary')
 
 class Entretien(models.Model):
     candidature = models.ForeignKey(Candidature, on_delete=models.CASCADE, related_name='entretiens')

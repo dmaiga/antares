@@ -456,14 +456,15 @@ class DocumentForm(forms.ModelForm):
             'langue': forms.Select(attrs={'class': 'form-select'}),
             'mots_cles': forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Ex: python, react, gestion-projet, cloud, leadership, anglais - Mots-clés séparés par des virgules'
+            'placeholder': 'Ex: Management, Leadership, Anglais,Informatique - Mots-clés séparés par des virgules'
             }),
 
             'description': forms.Textarea(attrs={
-                'class': 'form-control',
-                'rows': 3,
-                'placeholder': 'Décrivez ce document et son importance (ex: "Certificat AWS obtenu en 2023 après 40h de formation pratique sur les services cloud")'
+            'class': 'form-control',
+            'rows': 3,
+            'placeholder': 'Décrivez le contenu ou l’importance du document... EX : " Diplôme de Licence en Informatique obtenu en 2022 ", " CV mis à jour avec 5 ans d’expérience en finance " )'
             }),
+
             'est_actif': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
     
@@ -1042,6 +1043,48 @@ class CandidatFilterForm(forms.Form):
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         label="Disponible immédiatement seulement"
     )
+    type_offre = forms.ChoiceField(
+        required=False,
+        choices=[('', 'Tous les types')] + list(JobType.choices),
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Type d'offre"
+    )
+
+    offre = forms.ModelChoiceField(
+        required=False,
+        queryset=JobOffer.objects.none(),  # vide par défaut
+        empty_label="Toutes les offres",
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    statut = forms.ChoiceField(  # Modifié: ChoiceField au lieu de MultipleChoiceField
+        required=False,
+        choices=[('', 'Tous les statuts')] + STATUT_CANDIDATURE_CHOICES,  # Ajout option "Tous"
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Statut"
+    )
+    
+    date_min = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date'
+        }),
+        label="Postulé après le"
+    )
+    
+    date_max = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date'
+        }),
+        label="Postulé avant le"
+    )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # ✅ Charger dynamiquement les offres
+        self.fields['offre'].queryset = JobOffer.objects.all()
+
 
 class CandidatureBackofficeForm(forms.ModelForm):
     """

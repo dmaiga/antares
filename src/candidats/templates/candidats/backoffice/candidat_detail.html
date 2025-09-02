@@ -4,6 +4,7 @@
 {% block title %}Profil Candidat - {{ candidat.get_full_name }} - Backoffice{% endblock %}
 
 {% block content %}
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <div class="container-fluid px-4">
     <!-- Breadcrumb/Retour -->
     <div class="row my-4">
@@ -464,7 +465,7 @@
                                         <strong>{{ candidature.offre.titre }}</strong><br>
                                         <small class="text-muted">{{ candidature.offre.entreprise.nom }}</small>
                                     </td>
-                                    <td>{{ candidature.date_soumission|date:"d/m/Y" }}</td>
+                                    <td>{{ candidature.date_postulation|date:"d/m/Y" }}</td>
                                     <td>
                                         <span class="badge bg-{{ candidature.get_statut_badge }}">
                                             {{ candidature.get_statut_display }}

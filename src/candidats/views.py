@@ -11,7 +11,7 @@ from authentication.models import User
 from jobs.models import JobOffer,JobStatus
 from .models import (
     ProfilCandidat, Diplome, ExperienceProfessionnelle,
-    Document, Candidature, Adresse, Entretien, Competence,
+    Document, Candidature, Adresse, Entretien, Competence,STATUT_CANDIDATURE_CHOICES,
     EvaluationEntretien  # NOUVEAU MODÈLE
 )
 from .forms import (
@@ -876,52 +876,62 @@ from django.http import FileResponse
 def telecharger_document(request, document_id):
     """Vue pour télécharger un document"""
     document = get_object_or_404(Document, id=document_id, est_supprime=False)
-    
-    # Vérifier que l'utilisateur a le droit de voir ce document
-    # (recruteur ou propriétaire du document)
-    
+
     response = FileResponse(document.fichier.open(), as_attachment=True, filename=document.nom)
     return response
 # ====================================================
 # VUES GESTION DES CANDIDATURES
 # ====================================================
-
 @login_required
 @user_passes_test(is_recruiter)
 def backoffice_candidature_list(request):
-    """Liste des candidatures avec filtres par offre"""
+    """Liste des candidatures avec filtres"""
     candidatures = Candidature.objects.filter(
         est_supprime=False
     ).select_related('candidat', 'offre').order_by('-date_postulation')
     
-    form = CandidatureFilterForm(request.GET or None)
+    # Gestion de la barre de recherche
+    search_query = request.GET.get('search')
+    if search_query:
+        candidatures = candidatures.filter(
+            Q(candidat__first_name__icontains=search_query) |
+            Q(candidat__last_name__icontains=search_query) |
+            Q(candidat__email__icontains=search_query) |
+            Q(offre__titre__icontains=search_query) |
+            Q(offre__type_offre__icontains=search_query)  # Ajout du type d'offre dans la recherche
+        )
     
-    if form.is_valid():
-        offre = form.cleaned_data.get('offre')
-        statut = form.cleaned_data.get('statut')
-        date_min = form.cleaned_data.get('date_min')
-        date_max = form.cleaned_data.get('date_max')
-        
-        if offre:
-            candidatures = candidatures.filter(offre=offre)
-        
-        if statut:
-            candidatures = candidatures.filter(statut__in=statut)
-        
-        if date_min:
+    # Filtre par statut
+    statut = request.GET.get('statut')
+    if statut:
+        candidatures = candidatures.filter(statut=statut)
+    
+    # Filtres par date
+    date_min = request.GET.get('date_min')
+    if date_min:
+        try:
             candidatures = candidatures.filter(date_postulation__date__gte=date_min)
-        
-        if date_max:
-            candidatures = candidatures.filter(date_postulation__date__lte=date_max)
+        except ValueError:
+            pass
     
+    date_max = request.GET.get('date_max')
+    if date_max:
+        try:
+            candidatures = candidatures.filter(date_postulation__date__lte=date_max)
+        except ValueError:
+            pass
+
     # Pagination
     paginator = Paginator(candidatures, 20)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
+    # Préparer les choix de statut pour le template
+    statut_choices = STATUT_CANDIDATURE_CHOICES
+    
     context = {
         'page_obj': page_obj,
-        'form': form,
+        'statut_choices': statut_choices,
     }
     
     return render(request, 'candidats/backoffice/candidature_list.html', context)
@@ -988,6 +998,7 @@ def backoffice_candidature_detail(request, candidature_id):
     }
     
     return render(request, 'candidats/backoffice/candidature_detail.html', context)
+
 
 @login_required
 @user_passes_test(is_recruiter)
