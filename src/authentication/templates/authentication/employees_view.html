@@ -1,9 +1,16 @@
 {% extends 'authentication/base.html' %}
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-4" style="margin-top: 2em;">
-    <h2 class="mb-0">Fiches Employés</h2>
-    <a class="btn btn-primary" href="{% url 'create-user' %}">➕ Créer un utilisateur</a>
+<div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+  <div>
+    <h2 class="mb-0"> <strong>Fiches Employés</strong></h2>
+    
+  </div>
+  <div class="btn">
+    <a  class="btn btn-primary" href="{% url 'create-user' %}" >Créer un utilisateur</a>
+    
+    <a  class="btn btn-primary"  href="{% url 'create-fiche-poste' %}">Créer une Fiche de poste</a>
+  </div>
 </div>
 
 <form method="get" class="mb-4">

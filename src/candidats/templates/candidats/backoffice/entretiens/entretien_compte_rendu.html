@@ -1,0 +1,174 @@
+<!-- entretien_compte_rendu.html -->
+{% extends 'authentication/base.html' %}
+{% load static %}
+
+{% block title %}Compte-rendu d'Entretien - Backoffice{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'backoffice_entretien_list' %}" class="text-decoration-none">
+                    <i class="fas fa-arrow-left me-2"></i>Retour aux entretiens
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'backoffice_entretien_detail' entretien.id %}" class="text-decoration-none">
+                    Entretien #{{ entretien.id }}
+                </a>
+            </li>
+            <li class="breadcrumb-item active">Compte-rendu</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clipboard-list me-2"></i>
+                        Compte-rendu d'entretien - {{ entretien.candidature.candidat.get_full_name }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Remplissez ce formulaire après l'entretien pour consigner vos observations et évaluations.
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Statut final</label>
+                                {{ form.statut }}
+                                {% if form.statut.errors %}
+                                    <div class="text-danger">{{ form.statut.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Date réelle</label>
+                                {{ form.date_reelle }}
+                                {% if form.date_reelle.errors %}
+                                    <div class="text-danger">{{ form.date_reelle.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Durée réelle (min)</label>
+                                {{ form.duree_reelle }}
+                                {% if form.duree_reelle.errors %}
+                                    <div class="text-danger">{{ form.duree_reelle.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Feedback général</label>
+                            {{ form.feedback }}
+                            {% if form.feedback.errors %}
+                                <div class="text-danger">{{ form.feedback.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Points abordés</label>
+                                {{ form.points_abordes }}
+                                {% if form.points_abordes.errors %}
+                                    <div class="text-danger">{{ form.points_abordes.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Questions posées</label>
+                                {{ form.questions_posees }}
+                                {% if form.questions_posees.errors %}
+                                    <div class="text-danger">{{ form.questions_posees.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Note globale /10</label>
+                            {{ form.note_globale }}
+                            {% if form.note_globale.errors %}
+                                <div class="text-danger">{{ form.note_globale.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Points positifs</label>
+                                {{ form.points_positifs }}
+                                {% if form.points_positifs.errors %}
+                                    <div class="text-danger">{{ form.points_positifs.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Points d'amélioration</label>
+                                {{ form.points_amelioration }}
+                                {% if form.points_amelioration.errors %}
+                                    <div class="text-danger">{{ form.points_amelioration.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Suite prévue</label>
+                            {{ form.suite_prevue }}
+                            {% if form.suite_prevue.errors %}
+                                <div class="text-danger">{{ form.suite_prevue.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Enregistrer le compte-rendu
+                            </button>
+                            <a href="{% url 'backoffice_entretien_detail' entretien.id %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Summernote JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+    .card {
+        border-radius: 12px;
+    }
+    
+    .card-header {
+        border-radius: 12px 12px 0 0 !important;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 10px;
+    }
+    
+    .note-editor {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .note-editor.note-frame {
+        margin-bottom: 0;
+    }
+</style>
+{% endblock %}

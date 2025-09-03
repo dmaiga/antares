@@ -66,7 +66,7 @@
     }
     
     .job-card:hover {
-        transform: translateY(-3px);
+        transform: translateY(-1px);
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
     }
     
@@ -132,6 +132,24 @@
     .mobile-stats {
         display: none;
     }
+     .type-badge {
+            margin-top: 30px; /* Espacement pour éviter le chevauchement avec le badge de statut */
+        }
+      /* Couleurs personnalisées pour les types d'offre */
+        .badge-type-emploi {
+            background-color: #0d6efd; /* Bleu pour les offres d'emploi */
+            color: white;
+        }
+        
+        .badge-type-appel_offre {
+            background-color: #6f42c1; /* Violet pour les appels d'offres */
+            color: white;
+        }
+        
+        .badge-type-autre {
+            background-color: #6c757d; /* Gris pour les autres types */
+            color: white;
+        }
     
     @media (max-width: 768px) {
         .desktop-stats {
@@ -233,8 +251,13 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <h5 class="card-title h6 mb-1 text-truncate fw-bold">{{ offre.titre }}</h5>
-                                    <span class="badge bg-primary-custom small">{{ offre.get_type_offre_display }}</span>
-                                </div>
+                                    <span class="badge small type-badge 
+                                        {% if offre.type_offre == 'emploi' %}badge-type-emploi
+                                        {% elif offre.type_offre == 'appel_offre' %}badge-type-appel_offre
+                                        {% else %}badge-type-autre{% endif %}">
+                                        {{ offre.get_type_offre_display }}
+                                    </span>
+                                  </div>
                                 <h6 class="card-subtitle mb-2 text-muted small">{{ offre.societe }}</h6>
                                 <p class="card-text text-muted small mb-3 line-clamp-2">
                                     {{ offre.mission_principale|striptags|truncatewords:20 }}

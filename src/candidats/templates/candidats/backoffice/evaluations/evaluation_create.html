@@ -1,0 +1,198 @@
+{% extends 'authentication/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <h4 class="page-title">Créer une évaluation pour l'entretien avec {{ entretien.candidat.prenom }} {{ entretien.candidat.nom }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" id="evaluationForm">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Compétences techniques -->
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h5 class="card-title mb-0">Compétences techniques</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        {{ form.note_technique|as_crispy_field }}
+                                        {{ form.commentaire_technique|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Communication -->
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h5 class="card-title mb-0">Communication</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        {{ form.note_communication|as_crispy_field }}
+                                        {{ form.commentaire_communication|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <!-- Motivation -->
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h5 class="card-title mb-0">Motivation</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        {{ form.note_motivation|as_crispy_field }}
+                                        {{ form.commentaire_motivation|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Fit culturel -->
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h5 class="card-title mb-0">Fit culturel</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        {{ form.note_culture|as_crispy_field }}
+                                        {{ form.commentaire_culture|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <!-- Évaluation globale -->
+                            <div class="col-12">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h5 class="card-title mb-0">Évaluation globale</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                {{ form.points_forts|as_crispy_field }}
+                                            </div>
+                                            <div class="col-md-6">
+                                                {{ form.points_amelioration|as_crispy_field }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                {{ form.recommandation|as_crispy_field }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                {{ form.recommander|as_crispy_field }}
+                                            </div>
+                                            <div class="col-md-6">
+                                                {{ form.niveau_urgence|as_crispy_field }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-12 text-end">
+                                <a href="{% url 'backoffice_entretien_detail' entretien.id %}" class="btn btn-light">Annuler</a>
+                                <button type="submit" class="btn btn-primary">Enregistrer l'évaluation</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Summernote -->
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Initialiser Summernote sur les champs de texte
+        $('#id_commentaire_technique').summernote({
+            height: 150,
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['para', ['ul', 'ol']],
+                ['view', ['fullscreen']]
+            ]
+        });
+        
+        $('#id_commentaire_communication').summernote({
+            height: 150,
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['para', ['ul', 'ol']],
+                ['view', ['fullscreen']]
+            ]
+        });
+        
+        $('#id_commentaire_motivation').summernote({
+            height: 150,
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['para', ['ul', 'ol']],
+                ['view', ['fullscreen']]
+            ]
+        });
+        
+        $('#id_commentaire_culture').summernote({
+            height: 150,
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['para', ['ul', 'ol']],
+                ['view', ['fullscreen']]
+            ]
+        });
+        
+        $('#id_points_forts').summernote({
+            height: 150,
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['para', ['ul', 'ol']],
+                ['view', ['fullscreen']]
+            ]
+        });
+        
+        $('#id_points_amelioration').summernote({
+            height: 150,
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['para', ['ul', 'ol']],
+                ['view', ['fullscreen']]
+            ]
+        });
+        
+        $('#id_recommandation').summernote({
+            height: 150,
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['para', ['ul', 'ol']],
+                ['view', ['fullscreen']]
+            ]
+        });
+    });
+</script>
+{% endblock %}

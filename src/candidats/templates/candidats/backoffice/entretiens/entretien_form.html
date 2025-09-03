@@ -1,0 +1,200 @@
+{% extends 'authentication/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        {{ title }}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="entretienForm">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="row">
+                            <!-- Candidature -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.candidature.id_for_label }}" class="form-label">
+                                    Candidature*
+                                </label>
+                                {{ form.candidature }}
+                                {% if form.candidature.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.candidature.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Type d'entretien -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.type_entretien.id_for_label }}" class="form-label">
+                                    Type d'entretien*
+                                </label>
+                                {{ form.type_entretien }}
+                                {% if form.type_entretien.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.type_entretien.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <!-- Date prévue -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.date_prevue.id_for_label }}" class="form-label">
+                                    Date et heure de l'entretien*
+                                </label>
+                                {{ form.date_prevue }}
+                                {% if form.date_prevue.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.date_prevue.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Durée prévue -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.duree_prevue.id_for_label }}" class="form-label">
+                                    Durée prévue (minutes)*
+                                </label>
+                                {{ form.duree_prevue }}
+                                {% if form.duree_prevue.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.duree_prevue.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <!-- Interlocuteurs -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.interlocuteurs.id_for_label }}" class="form-label">
+                                    Interlocuteurs
+                                </label>
+                                {{ form.interlocuteurs }}
+                                {% if form.interlocuteurs.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.interlocuteurs.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Lieu -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.lieu.id_for_label }}" class="form-label">
+                                    Lieu
+                                </label>
+                                {{ form.lieu }}
+                                {% if form.lieu.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.lieu.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Lien vidéo -->
+                        <div class="mb-3">
+                            <label for="{{ form.lien_video.id_for_label }}" class="form-label">
+                                Lien de visioconférence
+                            </label>
+                            {{ form.lien_video }}
+                            {% if form.lien_video.errors %}
+                            <div class="text-danger">
+                                {% for error in form.lien_video.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Notes de préparation -->
+                        <div class="mb-3">
+                            <label for="{{ form.notes_preparation.id_for_label }}" class="form-label">
+                                Notes de préparation
+                            </label>
+                            {{ form.notes_preparation }}
+                            {% if form.notes_preparation.errors %}
+                            <div class="text-danger">
+                                {% for error in form.notes_preparation.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="form-text">Grille de candidature, questions à poser, points à valider...</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% if entretien %}{% url 'backoffice_entretien_detail' entretien.id %}{% else %}{% url 'backoffice_entretien_list' %}{% endif %}" 
+                               class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Enregistrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Validation de la date
+    const dateField = document.getElementById('{{ form.date_prevue.id_for_label }}');
+    if (dateField) {
+        dateField.addEventListener('change', function() {
+            const selectedDate = new Date(this.value);
+            const now = new Date();
+            
+            if (selectedDate < now) {
+                alert('La date de l\'entretien ne peut pas être dans le passé.');
+                this.value = '';
+            }
+        });
+    }
+    
+    // Validation de la durée
+    const dureeField = document.getElementById('{{ form.duree_prevue.id_for_label }}');
+    if (dureeField) {
+        dureeField.addEventListener('change', function() {
+            if (this.value < 5) {
+                alert('La durée minimale est de 5 minutes.');
+                this.value = 5;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

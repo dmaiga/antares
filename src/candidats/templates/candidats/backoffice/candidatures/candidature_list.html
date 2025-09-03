@@ -6,7 +6,21 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0">Gestion des Candidatures</h1>
     </div>
-
+        <!-- Breadcrumb/Retour au dashboard -->
+    <div class="row my-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'backoffice_dashboard' %}">
+                            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Candidatures</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
     <!-- Filtres toujours visibles -->
     <div class="card mb-4">
         <div class="card-body">

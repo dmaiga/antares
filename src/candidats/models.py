@@ -651,6 +651,23 @@ class Entretien(models.Model):
         self.date_reelle = timezone.now()
         self.save()
 
+    # Dans le modèle Entretien
+    def a_un_compte_rendu_complet(self):
+        """Vérifie si l'entretien a un compte-rendu complet"""
+        champs_obligatoires = [
+            self.feedback,
+            self.points_abordes,
+            self.questions_posees,
+            self.points_positifs,
+            self.points_amelioration,
+            self.suite_prevue
+        ]
+        
+        # Un compte-rendu est considéré comme complet si au moins 5 des 6 champs sont remplis
+        # et si la note globale est présente
+        champs_remplis = sum(1 for champ in champs_obligatoires if champ and champ.strip())
+        return champs_remplis >= 5 and self.note_globale is not None
+
 # ====================================================
 # SYSTÈME D'ÉVALUATION (NOUVEAU)
 # ====================================================

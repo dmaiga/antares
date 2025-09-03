@@ -1,0 +1,160 @@
+{% extends 'authentication/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <div class="page-title-right">
+                    <a href="{% url 'backoffice_evaluation_edit' evaluation.id %}" class="btn btn-primary">
+                        <i class="uil uil-edit me-1"></i> Modifier
+                    </a>
+                </div>
+                <h4 class="page-title">Évaluation de {{ evaluation.entretien.candidat.prenom }} {{ evaluation.entretien.candidat.nom }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Évaluateur:</strong> {{ evaluation.evaluateur.get_full_name }}</p>
+                            <p><strong>Date de l'entretien:</strong> {{ evaluation.entretien.date_entretien|date:"d/m/Y" }}</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <p><strong>Note moyenne:</strong> 
+                                <span class="badge bg-{% if evaluation.note_moyenne >= 4 %}success{% elif evaluation.note_moyenne >= 3 %}warning{% else %}danger{% endif %} p-2">
+                                    {{ evaluation.note_moyenne_display }}
+                                </span>
+                            </p>
+                            <p><strong>Recommandation:</strong> 
+                                <span class="badge bg-{% if evaluation.recommander %}success{% else %}danger{% endif %} p-2">
+                                    {{ evaluation.recommander|yesno:"Oui,Non" }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Compétences techniques -->
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <h5 class="card-title mb-0">Compétences techniques</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Note:</strong> {{ evaluation.get_note_technique_display }}</p>
+                                    <div class="border rounded p-2 bg-light">
+                                        {{ evaluation.commentaire_technique|safe }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Communication -->
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <h5 class="card-title mb-0">Communication</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Note:</strong> {{ evaluation.get_note_communication_display }}</p>
+                                    <div class="border rounded p-2 bg-light">
+                                        {{ evaluation.commentaire_communication|safe }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Motivation -->
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <h5 class="card-title mb-0">Motivation</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Note:</strong> {{ evaluation.get_note_motivation_display }}</p>
+                                    <div class="border rounded p-2 bg-light">
+                                        {{ evaluation.commentaire_motivation|safe }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Fit culturel -->
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <h5 class="card-title mb-0">Fit culturel</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Note:</strong> {{ evaluation.get_note_culture_display }}</p>
+                                    <div class="border rounded p-2 bg-light">
+                                        {{ evaluation.commentaire_culture|safe }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Évaluation globale -->
+                        <div class="col-12">
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <h5 class="card-title mb-0">Évaluation globale</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>Points forts</h6>
+                                            <div class="border rounded p-2 bg-light">
+                                                {{ evaluation.points_forts|safe }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Points d'amélioration</h6>
+                                            <div class="border rounded p-2 bg-light">
+                                                {{ evaluation.points_amelioration|safe }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-12">
+                                            <h6>Recommandation</h6>
+                                            <div class="border rounded p-2 bg-light">
+                                                {{ evaluation.recommandation|safe }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-md-6">
+                                            <p><strong>Niveau d'urgence:</strong> {{ evaluation.get_niveau_urgence_display }}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Date de création:</strong> {{ evaluation.date_creation|date:"d/m/Y H:i" }}</p>
+                                            <p><strong>Dernière modification:</strong> {{ evaluation.date_maj|date:"d/m/Y H:i" }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <a href="{% url 'backoffice_entretien_detail' evaluation.entretien.id %}" class="btn btn-light">Retour à l'entretien</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

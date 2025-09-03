@@ -66,11 +66,28 @@ urlpatterns = [
     path('candidatures_backoffice/<int:candidature_id>/', views.backoffice_candidature_detail, name='backoffice_candidature_detail'),
     path('candidatures_backoffice/<int:candidature_id>/action/<str:action>/', views.backoffice_candidature_quick_action, name='backoffice_candidature_quick_action'),
     
+    
     # Entretiens
     path('entretiens_backoffice/', views.backoffice_entretien_list, name='backoffice_entretien_list'),
     path('entretiens_backoffice/<int:entretien_id>/', views.backoffice_entretien_detail, name='backoffice_entretien_detail'),
     path('entretiens_backoffice/<int:entretien_id>/action/<str:action>/', views.backoffice_entretien_quick_action, name='backoffice_entretien_quick_action'),
-    
+    path('entretiens_backoffice/creer/', views.backoffice_entretien_create, name='backoffice_entretien_create'),
+    path('entretiens_backoffice/creer/<int:candidature_id>/', views.backoffice_entretien_create, name='backoffice_entretien_create_for_candidature'),
+    path('entretiens_backoffice/<int:entretien_id>/modifier/', views.backoffice_entretien_edit, name='backoffice_entretien_edit'),
+    path('entretiens_backoffice/<int:entretien_id>/supprimer/', views.backoffice_entretien_delete, name='backoffice_entretien_delete'),
+    path('entretiens_backoffice/<int:entretien_id>/compte-rendu/', views.backoffice_entretien_compte_rendu, name='backoffice_entretien_compte_rendu'),
     # Évaluations
-    path('entretiens_backoffice/<int:entretien_id>/evaluation/', views.backoffice_evaluation_create, name='backoffice_evaluation_create'),
+    path('entretiens_backoffice/<int:entretien_id>/evaluation/create/', 
+         views.backoffice_evaluation_create, 
+         name='backoffice_evaluation_create'),
+    
+    path('evaluations_backoffice/<int:evaluation_id>/', 
+         views.backoffice_evaluation_detail, 
+         name='backoffice_evaluation_detail'),
+    
+    path('evaluations_backoffice/<int:evaluation_id>/edit/', 
+         views.backoffice_evaluation_edit, 
+         name='backoffice_evaluation_edit'),    
+     # Évaluations RH
+     path('evaluations_rh/', views.backoffice_evaluations_rh, name='backoffice_evaluations_rh'),
 ]

@@ -1,0 +1,116 @@
+{% extends 'authentication/base.html' %}
+{% load static %}
+
+{% block title %}Créer un Entretien - Backoffice{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calendar-plus me-2"></i>
+                        {% if candidature %}Planifier un entretien pour {{ candidature.candidat.get_full_name }}{% else %}Créer un nouvel entretien{% endif %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if not candidature %}
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Sélectionner la candidature</label>
+                            {{ form.candidature }}
+                            {% if form.candidature.errors %}
+                                <div class="text-danger">{{ form.candidature.errors }}</div>
+                            {% endif %}
+                        </div>
+                        {% else %}
+                        <input type="hidden" name="candidature" value="{{ candidature.id }}">
+                        {% endif %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Type d'entretien</label>
+                                {{ form.type_entretien }}
+                                {% if form.type_entretien.errors %}
+                                    <div class="text-danger">{{ form.type_entretien.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Date prévue</label>
+                                {{ form.date_prevue }}
+                                {% if form.date_prevue.errors %}
+                                    <div class="text-danger">{{ form.date_prevue.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Durée prévue (minutes)</label>
+                                {{ form.duree_prevue }}
+                                {% if form.duree_prevue.errors %}
+                                    <div class="text-danger">{{ form.duree_prevue.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Interlocuteurs</label>
+                                {{ form.interlocuteurs }}
+                                {% if form.interlocuteurs.errors %}
+                                    <div class="text-danger">{{ form.interlocuteurs.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Notes de préparation</label>
+                            {{ form.notes_preparation }}
+                            {% if form.notes_preparation.errors %}
+                                <div class="text-danger">{{ form.notes_preparation.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Lieu ou lien de visioconférence</label>
+                            {{ form.lieu }}
+                            {{ form.lien_video }}
+                            {% if form.lieu.errors or form.lien_video.errors %}
+                                <div class="text-danger">
+                                    {{ form.lieu.errors }}
+                                    {{ form.lien_video.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Créer l'entretien
+                            </button>
+                            <a href="{% if candidature %}{% url 'backoffice_candidature_detail' candidature.id %}{% else %}{% url 'backoffice_entretien_list' %}{% endif %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 12px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+</style>
+{% endblock %}

@@ -24,9 +24,17 @@
         <div class="col-lg-9 col-md-7 mb-4">
             <!-- Header de l'offre -->
             <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-gradient-primary text-white py-4">
+                <div class="card-header bg-gradient-primary text-white py-4 position-relative">
+                    <!-- Badge de type d'offre positionné en haut à droite -->
+                    <span class="badge position-absolute top-0 end-0 m-3 
+                        {% if offre.type_offre == 'emploi' %}bg-success
+                        {% elif offre.type_offre == 'appel_offre' %}bg-info
+                        {% else %}bg-secondary{% endif %} fs-6">
+                        {{ offre.get_type_offre_display }}
+                    </span>
+                    
                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
-                        <div class="mb-3 mb-md-0">
+                        <div class="mb-3 mb-md-0 pe-4">
                             <h1 class="h3 mb-2 fw-bold">{{ offre.titre }}</h1>
                             <div class="d-flex flex-wrap align-items-center gap-2">
                                 <span class="badge bg-white text-dark fs-6">
@@ -45,14 +53,28 @@
                     </div>
                 </div>
 
-                <!-- Métadonnées importantes -->
+                <!-- Métadonnées importantes - NOUVELLE VERSION -->
                 <div class="card-body">
-                    <div class="row g-4">
+                    <div class="row g-3">
+                        <!-- Type d'offre -->
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="d-flex align-items-center p-3 bg-light rounded-3 h-100">
+                                <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3 flex-shrink-0">
+                                    <i class="fas fa-briefcase text-primary"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Type</small>
+                                    <strong class="text-primary">{{ offre.get_type_offre_display }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Salaire -->
                         {% if offre.salaire %}
-                        <div class="col-sm-6 col-md-4">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3">
-                                    <i class="fas fa-euro-sign text-primary"></i>
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="d-flex align-items-center p-3 bg-light rounded-3 h-100">
+                                <div class="bg-success bg-opacity-10 p-2 rounded-circle me-3 flex-shrink-0">
+                                    <i class="fas fa-euro-sign text-success"></i>
                                 </div>
                                 <div>
                                     <small class="text-muted d-block">Salaire</small>
@@ -62,11 +84,12 @@
                         </div>
                         {% endif %}
 
+                        <!-- Niveau d'étude -->
                         {% if offre.niveau_etude %}
-                        <div class="col-sm-6 col-md-4">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-success bg-opacity-10 p-3 rounded-circle me-3">
-                                    <i class="fas fa-graduation-cap text-success"></i>
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="d-flex align-items-center p-3 bg-light rounded-3 h-100">
+                                <div class="bg-info bg-opacity-10 p-2 rounded-circle me-3 flex-shrink-0">
+                                    <i class="fas fa-graduation-cap text-info"></i>
                                 </div>
                                 <div>
                                     <small class="text-muted d-block">Niveau</small>
@@ -76,10 +99,11 @@
                         </div>
                         {% endif %}
 
+                        <!-- Expérience requise -->
                         {% if offre.experience_requise %}
-                        <div class="col-sm-6 col-md-4">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-warning bg-opacity-10 p-3 rounded-circle me-3">
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="d-flex align-items-center p-3 bg-light rounded-3 h-100">
+                                <div class="bg-warning bg-opacity-10 p-2 rounded-circle me-3 flex-shrink-0">
                                     <i class="fas fa-clock text-warning"></i>
                                 </div>
                                 <div>
@@ -90,10 +114,11 @@
                         </div>
                         {% endif %}
 
-                        <div class="col-sm-6 col-md-4">
-                            <div class="d-flex align-items-center">
-                                <div >
-                                    <i class="fas fa-calendar-plus text-info"></i>
+                        <!-- Date de publication -->
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="d-flex align-items-center p-3 bg-light rounded-3 h-100">
+                                <div class="bg-secondary bg-opacity-10 p-2 rounded-circle me-3 flex-shrink-0">
+                                    <i class="fas fa-calendar-plus text-secondary"></i>
                                 </div>
                                 <div>
                                     <small class="text-muted d-block">Publication</small>
@@ -102,25 +127,27 @@
                             </div>
                         </div>
 
-{% if offre.date_limite %}
-<div class="col-sm-6 col-md-4">
-    <div class="d-flex align-items-center">
-        <div>
-            <i class="fas fa-calendar-times text-{% if offre.est_expiree_db %}danger{% else %}secondary{% endif %}"></i>
-        </div>
-        <div>
-            <small class="text-muted d-block">Clôture</small>
-            <strong class="text-{% if offre.est_expiree_db %}danger{% endif %}">
-                {{ offre.date_limite|date:"d/m/Y" }}
-            </strong>
-        </div>
-    </div>
-</div>
-{% endif %}
+                        <!-- Date de clôture -->
+                        {% if offre.date_limite %}
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="d-flex align-items-center p-3 bg-light rounded-3 h-100">
+                                <div class="{% if offre.est_expiree_db %}bg-danger bg-opacity-10{% else %}bg-secondary bg-opacity-10{% endif %} p-2 rounded-circle me-3 flex-shrink-0">
+                                    <i class="fas fa-calendar-times {% if offre.est_expiree_db %}text-danger{% else %}text-secondary{% endif %}"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Clôture</small>
+                                    <strong class="{% if offre.est_expiree_db %}text-danger{% endif %}">
+                                        {{ offre.date_limite|date:"d/m/Y" }}
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
 
-                        <div class="col-sm-6 col-md-4">
-                            <div class="d-flex align-items-center">
-                                <div >
+                        <!-- Nombre de postes -->
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="d-flex align-items-center p-3 bg-light rounded-3 h-100">
+                                <div class="bg-dark bg-opacity-10 p-2 rounded-circle me-3 flex-shrink-0">
                                     <i class="fas fa-users text-dark"></i>
                                 </div>
                                 <div>
@@ -336,6 +363,16 @@
     .nav-tabs .nav-link:hover {
         border-bottom-color: #0d6efd;
         color: #0d6efd;
+    }
+    
+    /* Styles pour les métadonnées */
+    .metadata-item {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .metadata-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     
     @media (max-width: 768px) {

@@ -1,0 +1,442 @@
+<!-- entretien_detail.html -->
+{% extends 'authentication/base.html' %}
+{% load static %}
+
+{% block title %}Détail de l'Entretien - Backoffice{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'backoffice_entretien_list' %}" class="text-decoration-none">
+                    <i class="fas fa-arrow-left me-2"></i>Retour aux entretiens
+                </a>
+            </li>
+            <li class="breadcrumb-item active">Entretien #{{ entretien.id }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Informations principales -->
+        <div class="col-lg-8">
+            <!-- Candidat et Offre -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-tie me-2"></i>
+                        Détails de l'entretien
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-4">
+                                {% with candidat=entretien.candidature.candidat %}
+                                {% if candidat.profil_candidat.photo %}
+                                <img src="{{ candidat.profil_candidat.photo.url }}" 
+                                     class="rounded-circle me-3" 
+                                     width="60" 
+                                     height="60" 
+                                     alt="{{ candidat.get_full_name }}"
+                                     style="object-fit: cover;">
+                                {% else %}
+                                <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                     style="width: 60px; height: 60px;">
+                                    <i class="fas fa-user text-white fa-lg"></i>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <h6 class="mb-1">{{ candidat.get_full_name|default:candidat.email }}</h6>
+                                    <small class="text-muted">{{ candidat.email }}</small>
+                                    <br>
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar-alt me-1"></i>
+                                        Inscrit le {{ candidat.profil_candidat.date_inscription|date:"d/m/Y" }}
+                                    </small>
+                                </div>
+                                {% endwith %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary mb-2">Offre concernée</h6>
+                            <div class="bg-light p-3 rounded">
+                                <strong>{{ entretien.candidature.offre.titre }}</strong>
+                                <br>
+                                <small class="text-muted">
+                                    <i class="fas fa-building me-1"></i>
+                                    {{ entretien.candidature.offre.societe }}
+                                </small>
+                                <br>
+                                <small class="text-muted">
+                                    <i class="fas fa-hashtag me-1"></i>
+                                    Réf: {{ entretien.candidature.offre.reference }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informations de planification -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">
+                        <i class="fas fa-calendar-check me-2"></i>
+                        Planification de l'entretien
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold text-muted">Statut</label>
+                            <div>
+                                {% if entretien.statut == 'PLANIFIE' %}
+                                    <span class="badge bg-warning bg-opacity-25 text-warning">
+                                        <i class="fas fa-clock me-1"></i>Planifié
+                                    </span>
+                                {% elif entretien.statut == 'CONFIRME' %}
+                                    <span class="badge bg-primary bg-opacity-25 text-primary">
+                                        <i class="fas fa-check-circle me-1"></i>Confirmé
+                                    </span>
+                                {% elif entretien.statut == 'ANNULE' %}
+                                    <span class="badge bg-danger bg-opacity-25 text-danger">
+                                        <i class="fas fa-times-circle me-1"></i>Annulé
+                                    </span>
+                                {% elif entretien.statut == 'REPORTE' %}
+                                    <span class="badge bg-secondary bg-opacity-25 text-secondary">
+                                        <i class="fas fa-calendar-alt me-1"></i>Reporté
+                                    </span>
+                                {% elif entretien.statut == 'TERMINE' %}
+                                    <span class="badge bg-success bg-opacity-25 text-success">
+                                        <i class="fas fa-check me-1"></i>Terminé
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold text-muted">Type</label>
+                            <div class="fw-semibold">{{ entretien.get_type_entretien_display }}</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold text-muted">Date prévue</label>
+                            <div class="fw-semibold">
+                                {{ entretien.date_prevue|date:"d/m/Y" }} à {{ entretien.date_prevue|date:"H:i" }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold text-muted">Durée prévue</label>
+                            <div class="fw-semibold">{{ entretien.duree_prevue }} minutes</div>
+                        </div>
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label fw-bold text-muted">Interlocuteurs</label>
+                            <div class="fw-semibold">{{ entretien.interlocuteurs|default:"Non spécifié" }}</div>
+                        </div>
+                    </div>
+
+                    {% if entretien.lieu or entretien.lien_video %}
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label fw-bold text-muted">Lieu/Visio</label>
+                            <div class="fw-semibold">
+                                {% if entretien.lieu %}
+                                <i class="fas fa-map-marker-alt me-2 text-primary"></i>{{ entretien.lieu }}
+                                {% endif %}
+                                {% if entretien.lien_video %}
+                                <br>
+                                <i class="fas fa-video me-2 text-primary"></i>
+                                <a href="{{ entretien.lien_video }}" target="_blank" class="text-decoration-none">
+                                    {{ entretien.lien_video }}
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Section Compte-rendu -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="fas fa-clipboard-list me-2"></i>
+                        Compte-rendu d'entretien
+                    </h6>
+                    {% if a_un_compte_rendu %}
+                        <a href="{% url 'backoffice_entretien_compte_rendu' entretien.id %}" 
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit me-1"></i>Modifier le compte-rendu
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if a_un_compte_rendu %}
+                        <!-- Affichage du compte-rendu existant -->
+                        <div class="compte-rendu-section">
+                            {% if entretien.date_reelle %}
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-muted">Date réelle</label>
+                                    <div class="fw-semibold">{{ entretien.date_reelle|date:"d/m/Y à H:i" }}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-muted">Durée réelle</label>
+                                    <div class="fw-semibold">{{ entretien.duree_reelle }} minutes</div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if entretien.feedback %}
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-muted">Feedback général</label>
+                                <div class="bg-light p-3 rounded">{{ entretien.feedback|safe }}</div>
+                            </div>
+                            {% endif %}
+
+                            {% if entretien.points_abordes %}
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-muted">Points abordés</label>
+                                <div class="bg-light p-3 rounded">{{ entretien.points_abordes|safe }}</div>
+                            </div>
+                            {% endif %}
+
+                            {% if entretien.questions_posees %}
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-muted">Questions posées</label>
+                                <div class="bg-light p-3 rounded">{{ entretien.questions_posees|safe }}</div>
+                            </div>
+                            {% endif %}
+
+                            {% if entretien.note_globale is not None %}
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-muted">Note globale</label>
+                                <div class="fw-semibold">{{ entretien.note_globale }}/10</div>
+                            </div>
+                            {% endif %}
+
+                            {% if entretien.points_positifs %}
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-muted">Points positifs</label>
+                                <div class="bg-light p-3 rounded">{{ entretien.points_positifs|safe }}</div>
+                            </div>
+                            {% endif %}
+
+                            {% if entretien.points_amelioration %}
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-muted">Points d'amélioration</label>
+                                <div class="bg-light p-3 rounded">{{ entretien.points_amelioration|safe }}</div>
+                            </div>
+                            {% endif %}
+
+                            {% if entretien.suite_prevue %}
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-muted">Suite prévue</label>
+                                <div class="bg-light p-3 rounded">{{ entretien.suite_prevue|safe }}</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <!-- Aucun compte-rendu - Bouton pour en créer un -->
+                        <div class="text-center py-5">
+                            <i class="fas fa-clipboard fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted mb-3">Aucun compte-rendu n'a été rédigé pour cet entretien</h5>
+                            <a href="{% url 'backoffice_entretien_compte_rendu' entretien.id %}" 
+                               class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Rédiger le compte-rendu
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Section Évaluation (NOUVELLE SECTION) -->
+            <div class="card shadow-sm border-0 mt-4">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="fas fa-star me-2"></i>
+                        Évaluation de l'entretien
+                    </h6>
+                    {% if entretien.evaluation %}
+                        <a href="{% url 'backoffice_evaluation_edit' entretien.evaluation.id %}" 
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit me-1"></i>Modifier l'évaluation
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if entretien.evaluation %}
+                        <!-- Affichage sommaire de l'évaluation existante -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted">Note moyenne</label>
+                                <div class="fw-semibold">
+                                    <span class="badge bg-{% if entretien.evaluation.note_moyenne >= 4 %}success{% elif entretien.evaluation.note_moyenne >= 3 %}warning{% else %}danger{% endif %} p-2">
+                                        {{ entretien.evaluation.note_moyenne_display }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted">Recommandation</label>
+                                <div class="fw-semibold">
+                                    <span class="badge bg-{% if entretien.evaluation.recommander %}success{% else %}danger{% endif %} p-2">
+                                        {{ entretien.evaluation.recommander|yesno:"Oui,Non" }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <a href="{% url 'backoffice_evaluation_detail' entretien.evaluation.id %}" 
+                               class="btn btn-primary">
+                                <i class="fas fa-eye me-2"></i>Voir le détail de l'évaluation
+                            </a>
+                        </div>
+                    {% else %}
+                        <!-- Aucune évaluation - Bouton pour en créer une -->
+                        <div class="text-center py-4">
+                            <i class="fas fa-star fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted mb-3">Aucune évaluation n'a été créée pour cet entretien</h5>
+                            <a href="{% url 'backoffice_evaluation_create' entretien.id %}" 
+                               class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Créer une évaluation
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar avec informations complémentaires -->
+        <div class="col-lg-4">
+            <!-- Actions rapides -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>
+                        Actions rapides
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if entretien.statut != 'CONFIRME' %}
+                        <a href="{% url 'backoffice_entretien_quick_action' entretien.id 'confirmer' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-check-circle me-2"></i>Confirmer l'entretien
+                        </a>
+                        {% endif %}
+                        
+                        {% if entretien.statut != 'TERMINE' %}
+                        <a href="{% url 'backoffice_entretien_quick_action' entretien.id 'terminer' %}" class="btn btn-outline-success">
+                            <i class="fas fa-check me-2"></i>Marquer comme terminé
+                        </a>
+                        {% endif %}
+                        
+                        {% if entretien.statut != 'ANNULE' %}
+                        <a href="{% url 'backoffice_entretien_quick_action' entretien.id 'annuler' %}" class="btn btn-outline-danger">
+                            <i class="fas fa-times-circle me-2"></i>Annuler l'entretien
+                        </a>
+                        {% endif %}
+                        
+                        {% if entretien.statut != 'REPORTE' %}
+                        <a href="{% url 'backoffice_entretien_quick_action' entretien.id 'reporter' %}" class="btn btn-outline-warning">
+                            <i class="fas fa-calendar-alt me-2"></i>Reporter l'entretien
+                        </a>
+                        {% endif %}
+
+                        <!-- Lien vers le formulaire de compte-rendu -->
+                        {% if not a_un_compte_rendu %}
+                        <a href="{% url 'backoffice_entretien_compte_rendu' entretien.id %}" class="btn btn-primary">
+                            <i class="fas fa-clipboard-list me-2"></i>Rédiger le compte-rendu
+                        </a>
+                        {% endif %}
+
+                        <!-- Lien vers l'évaluation (NOUVEAU BOUTON) -->
+                        {% if entretien.evaluation %}
+                            <a href="{% url 'backoffice_evaluation_detail' entretien.evaluation.id %}" 
+                               class="btn btn-outline-info">
+                                <i class="fas fa-star me-2"></i>Voir l'évaluation
+                            </a>
+                        {% else %}
+                            <a href="{% url 'backoffice_evaluation_create' entretien.id %}" 
+                               class="btn btn-outline-info">
+                                <i class="fas fa-plus-circle me-2"></i>Créer une évaluation
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes de préparation -->
+            {% if entretien.notes_preparation %}
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">
+                        <i class="fas fa-sticky-note me-2"></i>
+                        Notes de préparation
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="bg-light p-3 rounded">
+                        {{ entretien.notes_preparation|linebreaks }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Métadonnées -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Informations techniques
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="small text-muted">
+                        <div class="mb-2">
+                            <strong>Créé le:</strong> {{ entretien.date_creation|date:"d/m/Y à H:i" }}
+                        </div>
+                        <div class="mb-2">
+                            <strong>Modifié le:</strong> {{ entretien.date_maj|date:"d/m/Y à H:i" }}
+                        </div>
+                        <div class="mb-2">
+                            <strong>ID:</strong> {{ entretien.id }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 12px;
+    }
+    
+    .card-header {
+        border-radius: 12px 12px 0 0 !important;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+    
+    .badge {
+        font-weight: 500;
+        padding: 8px 12px;
+    }
+    
+    .compte-rendu-section .bg-light {
+        border-radius: 8px;
+        min-height: 50px;
+    }
+</style>
+{% endblock %}

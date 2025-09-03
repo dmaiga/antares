@@ -11,10 +11,12 @@ from authentication.models import User
 from jobs.models import JobOffer,JobStatus
 from .models import (
     ProfilCandidat, Diplome, ExperienceProfessionnelle,
-    Document, Candidature, Adresse, Entretien, Competence,STATUT_CANDIDATURE_CHOICES,
+    Document, Candidature, Adresse, Entretien, Competence,
+    STATUT_CANDIDATURE_CHOICES,STATUT_ENTRETIEN_CHOICES,
     EvaluationEntretien  # NOUVEAU MODÈLE
 )
 from notes.models import NoteInterne,NoteReception
+
 from .forms import (
     ProfilCandidatForm, DiplomeForm, ExperienceForm,
     DocumentForm, CandidatureForm, AdresseForm,
@@ -23,9 +25,10 @@ from .forms import (
     SoftDeleteForm  # NOUVEAU FORMULAIRE
 )
 from django.db.models import Case, When, IntegerField, BooleanField, Exists, OuterRef
-
+from django.db.models import Q, Avg, Sum, Count, Min, Max  
 from django.utils import timezone
-
+from django.utils.timezone import datetime
+from datetime import timedelta
 from django.http import JsonResponse
 
 def check_candidat(user):
@@ -643,7 +646,7 @@ from .models import (
 from .forms import (
     CandidatFilterForm, CandidatureBackofficeForm,
     PlanifierEntretienForm, EntretienCompteRenduForm,
-    EvaluationEntretienBackofficeForm, CandidatureFilterForm,
+     CandidatureFilterForm,
     NoteInterneForm
 )
 
@@ -805,7 +808,7 @@ def backoffice_candidat_list(request):
         'form': form,
     }
     
-    return render(request, 'candidats/backoffice/candidat_list.html', context)
+    return render(request, 'candidats/backoffice/candidats/candidat_list.html', context)
 
 @login_required
 @user_passes_test(is_recruiter)
@@ -844,7 +847,7 @@ def backoffice_candidat_detail(request, candidat_id):
         'competences': competences,
     }
     
-    return render(request, 'candidats/backoffice/candidat_detail.html', context)
+    return render(request, 'candidats/backoffice/candidats/candidat_detail.html', context)
 
 
 @login_required
@@ -943,7 +946,7 @@ def backoffice_candidature_list(request):
         'statut_choices': statut_choices,
     }
     
-    return render(request, 'candidats/backoffice/candidature_list.html', context)
+    return render(request, 'candidats/backoffice/candidatures/candidature_list.html', context)
 
 
 @login_required
@@ -962,7 +965,12 @@ def backoffice_candidature_detail(request, candidature_id):
     )
     
     form_note = NoteInterneForm(request.POST or None)
-    form_entretien = PlanifierEntretienForm(request.POST or None)
+    
+    # Initialiser le formulaire d'entretien avec la candidature pré-remplie
+    form_entretien = PlanifierEntretienForm(
+        request.POST or None,
+        initial={'candidature': candidature}
+    )
     
     if request.method == 'POST':
         if 'update_candidature' in request.POST and form_candidature.is_valid():
@@ -988,24 +996,34 @@ def backoffice_candidature_detail(request, candidature_id):
             return redirect('backoffice_candidature_detail', candidature_id=candidature.id)
         
         elif 'planifier_entretien' in request.POST and form_entretien.is_valid():
-            # CRÉATION DE L'ENTRETIEN - NOUVEAU CODE
-            entretien = Entretien.objects.create(
-                candidature=candidature,
-                type_entretien=form_entretien.cleaned_data['type_entretien'],
-                statut='PLANIFIE',
-                date_prevue=form_entretien.cleaned_data['date_entretien'],
-                duree_prevue=60,  # Durée par défaut ou ajoutez un champ dans le formulaire
-                notes_preparation=form_entretien.cleaned_data['notes_preparation'],
-                interlocuteurs=f"Recruteur: {request.user.get_full_name()}"
-            )
+            # Sauvegarder l'entretien avec le formulaire
+            entretien = form_entretien.save(commit=False)
+            entretien.statut = 'PLANIFIE'
+            entretien.save()
             
-            # Créer une note interne pour l'entretien (optionnel)
+            # Créer une note interne pour l'entretien
+            note_contenu = f"""
+            Entretien planifié pour: {candidature.offre.titre}
+            Candidat: {candidature.candidat.get_full_name()}
+            
+            Détails de l'entretien:
+            Type: {entretien.get_type_entretien_display()}
+            Date: {entretien.date_prevue.strftime('%d/%m/%Y à %H:%M')}
+            Durée: {entretien.duree_prevue} minutes
+            Lieu: {entretien.lieu or 'Non spécifié'}
+            Lien visio: {entretien.lien_video or 'Non spécifié'}
+            Interlocuteurs: {entretien.interlocuteurs or 'Non spécifié'}
+            
+            Notes de préparation:
+            {entretien.notes_preparation or 'Aucune note spécifiée'}
+            """
+            
             note_entretien = NoteInterne(
                 expediteur=request.user,
                 sujet=f"Entretien planifié - {candidature.candidat.get_full_name()} - {candidature.offre.titre}",
-                contenu=form_entretien.cleaned_data['notes_preparation'],
+                contenu=note_contenu,
                 niveau_urgence='medium',
-                date_limite=form_entretien.cleaned_data['date_entretien']
+                date_limite=entretien.date_prevue
             )
             note_entretien.save()
             
@@ -1020,10 +1038,6 @@ def backoffice_candidature_detail(request, candidature_id):
                 )
             
             # Mettre à jour la candidature
-            candidature.entretien_planifie = True
-            candidature.date_entretien_prevue = form_entretien.cleaned_data['date_entretien']
-            candidature.type_entretien_prevue = form_entretien.cleaned_data['type_entretien']
-            candidature.note_entretien = note_entretien
             candidature.statut = 'ENTRETIEN'
             candidature.save()
             
@@ -1037,7 +1051,7 @@ def backoffice_candidature_detail(request, candidature_id):
         'form_entretien': form_entretien,
     }
     
-    return render(request, 'candidats/backoffice/candidature_detail.html', context)
+    return render(request, 'candidats/backoffice/candidatures/candidature_detail.html', context)
 
 
 @login_required
@@ -1070,6 +1084,208 @@ def backoffice_candidature_quick_action(request, candidature_id, action):
 # ====================================================
 # VUES GESTION DES ENTRETIENS
 # ====================================================
+@login_required
+@user_passes_test(is_recruiter)
+def backoffice_entretien_create(request, candidature_id=None):
+    """Création manuelle d'un entretien avec création de note automatique"""
+    # Initialiser avec ou sans candidature spécifique
+    initial = {}
+    candidature = None
+    if candidature_id:
+        candidature = get_object_or_404(Candidature, id=candidature_id, est_supprime=False)
+        initial['candidature'] = candidature
+    
+    form = PlanifierEntretienForm(request.POST or None, initial=initial)
+    
+    if request.method == 'POST' and form.is_valid():
+        try:
+            entretien = form.save(commit=False)
+            entretien.statut = 'PLANIFIE'
+            entretien.save()
+            
+            # Mettre à jour la candidature
+            candidature = entretien.candidature
+            candidature.entretien_planifie = True
+            candidature.date_entretien_prevue = entretien.date_prevue
+            candidature.type_entretien_prevue = entretien.type_entretien
+            candidature.statut = 'ENTRETIEN'
+            candidature.save()
+            
+            # Créer une note interne pour l'entretien
+            note_contenu = f"""
+            Entretien planifié pour le poste: {candidature.offre.titre}
+            Candidat: {candidature.candidat.get_full_name()}
+            Type: {entretien.get_type_entretien_display()}
+            Date: {entretien.date_prevue.strftime('%d/%m/%Y à %H:%M')}
+            Durée: {entretien.duree_prevue} minutes
+            
+            Notes de préparation:
+            {entretien.notes_preparation or 'Aucune note spécifiée'}
+            
+            Interlocuteurs: {entretien.interlocuteurs or 'Non spécifié'}
+            Lieu/URL: {entretien.lieu or entretien.lien_video or 'Non spécifié'}
+            """
+            
+            note_entretien = NoteInterne(
+                expediteur=request.user,
+                sujet=f"Entretien planifié - {candidature.candidat.get_full_name()} - {candidature.offre.titre}",
+                contenu=note_contenu,
+                niveau_urgence='medium',
+                date_limite=entretien.date_prevue
+            )
+            note_entretien.save()
+            
+            # Ajouter tous les utilisateurs avec les rôles spécifiés comme destinataires
+            roles_concernes = ['admin', 'rh', 'employe', 'stagiaire']
+            utilisateurs_concernes = User.objects.filter(role__in=roles_concernes)
+            
+            for utilisateur in utilisateurs_concernes:
+                NoteReception.objects.create(
+                    note=note_entretien,
+                    destinataire=utilisateur
+                )
+            
+            # Lier la note à l'entretien (si votre modèle a cette relation)
+            # entretien.note_liee = note_entretien
+            # entretien.save()
+            
+            messages.success(request, "Entretien créé avec succès et note interne générée.")
+            return redirect('backoffice_entretien_detail', entretien_id=entretien.id)
+            
+        except Exception as e:
+            messages.error(request, f"Erreur lors de la création de l'entretien: {str(e)}")
+    
+    context = {
+        'form': form,
+        'candidature': candidature,
+    }
+    return render(request, 'candidats/backoffice/entretiens/entretien_create.html', context)
+
+
+@login_required
+@user_passes_test(is_recruiter)
+def backoffice_entretien_edit(request, entretien_id):
+    """Modifier un entretien existant avec mise à jour de note"""
+    entretien = get_object_or_404(Entretien, id=entretien_id, est_supprime=False)
+    
+    if request.method == 'POST':
+        form = PlanifierEntretienForm(request.POST, instance=entretien)
+        if form.is_valid():
+            ancienne_date = entretien.date_prevue
+            ancien_type = entretien.type_entretien
+            
+            entretien = form.save()
+            
+            # Vérifier si les informations importantes ont changé
+            date_modifiee = ancienne_date != entretien.date_prevue
+            type_modifie = ancien_type != entretien.type_entretien
+            
+            # Si des informations importantes ont changé, créer une note de mise à jour
+            if date_modifiee or type_modifie or form.cleaned_data.get('notes_preparation'):
+                note_contenu = f"""
+                Mise à jour de l'entretien pour: {entretien.candidature.offre.titre}
+                Candidat: {entretien.candidature.candidat.get_full_name()}
+                
+                Modifications apportées:
+                {"- Date modifiée" if date_modifiee else ""}
+                {"- Type d'entretien modifié" if type_modifie else ""}
+                {"- Notes de préparation mises à jour" if form.cleaned_data.get('notes_preparation') else ""}
+                
+                Nouveaux détails:
+                Type: {entretien.get_type_entretien_display()}
+                Date: {entretien.date_prevue.strftime('%d/%m/%Y à %H:%M')}
+                Durée: {entretien.duree_prevue} minutes
+                
+                Notes de préparation:
+                {entretien.notes_preparation or 'Aucune note spécifiée'}
+                """
+                
+                note_mise_a_jour = NoteInterne(
+                    expediteur=request.user,
+                    sujet=f"Mise à jour entretien - {entretien.candidature.candidat.get_full_name()}",
+                    contenu=note_contenu,
+                    niveau_urgence='medium',
+                    date_limite=entretien.date_prevue
+                )
+                note_mise_a_jour.save()
+                
+                # Notifier les utilisateurs concernés
+                roles_concernes = ['admin', 'rh', 'employe', 'stagiaire']
+                utilisateurs_concernes = User.objects.filter(role__in=roles_concernes)
+                
+                for utilisateur in utilisateurs_concernes:
+                    NoteReception.objects.create(
+                        note=note_mise_a_jour,
+                        destinataire=utilisateur
+                    )
+            
+            messages.success(request, "Entretien modifié avec succès.")
+            return redirect('backoffice_entretien_detail', entretien_id=entretien.id)
+    else:
+        form = PlanifierEntretienForm(instance=entretien)
+    
+    context = {
+        'form': form,
+        'entretien': entretien,
+        'title': 'Modifier l\'entretien'
+    }
+    return render(request, 'candidats/backoffice/entretiens/entretien_form.html', context)
+
+
+@login_required
+@user_passes_test(is_recruiter)
+def backoffice_entretien_delete(request, entretien_id):
+    """Supprimer un entretien avec création de note d'annulation"""
+    entretien = get_object_or_404(Entretien, id=entretien_id, est_supprime=False)
+    
+    if request.method == 'POST':
+        # Créer une note d'annulation avant de supprimer
+        note_contenu = f"""
+        Annulation de l'entretien prévu pour: {entretien.candidature.offre.titre}
+        Candidat: {entretien.candidature.candidat.get_full_name()}
+        Date prévue: {entretien.date_prevue.strftime('%d/%m/%Y à %H:%M')}
+        Type: {entretien.get_type_entretien_display()}
+        
+        Raison de l'annulation: Entretien supprimé par {request.user.get_full_name()}
+        Date de suppression: {timezone.now().strftime('%d/%m/%Y à %H:%M')}
+        """
+        
+        note_annulation = NoteInterne(
+            expediteur=request.user,
+            sujet=f"Annulation entretien - {entretien.candidature.candidat.get_full_name()}",
+            contenu=note_contenu,
+            niveau_urgence='high',
+            date_limite=timezone.now() + timedelta(days=1)
+        )
+        note_annulation.save()
+        
+        # Notifier les administrateurs et RH
+        roles_concernes = ['admin', 'rh', 'employe', 'stagiaire']
+        utilisateurs_concernes = User.objects.filter(role__in=roles_concernes)
+        
+        for utilisateur in utilisateurs_concernes:
+            NoteReception.objects.create(
+                note=note_annulation,
+                destinataire=utilisateur
+            )
+        
+        # Supprimer l'entretien
+        entretien.soft_delete()
+        
+        # Mettre à jour le statut de la candidature
+        candidature = entretien.candidature
+        candidature.entretien_planifie = False
+        candidature.date_entretien_prevue = None
+        candidature.type_entretien_prevue = ''
+        candidature.statut = 'RETIRE'  
+        candidature.save()
+        
+        messages.success(request, "Entretien supprimé avec succès et note d'annulation créée.")
+        return redirect('backoffice_entretien_list')
+    
+    context = {'entretien': entretien}
+    return render(request, 'candidats/backoffice/entretiens/entretien_confirm_delete.html', context)
+
 
 @login_required
 @user_passes_test(is_recruiter)
@@ -1077,7 +1293,10 @@ def backoffice_entretien_list(request):
     """Liste des entretiens"""
     entretiens = Entretien.objects.filter(
         est_supprime=False
-    ).select_related('candidature__candidat', 'candidature__offre').order_by('date_prevue')
+    ).select_related(
+        'candidature__candidat__profil_candidat',  
+        'candidature__offre'
+    ).order_by('date_prevue')
     
     # Filtrage par statut
     statut_filter = request.GET.get('statut')
@@ -1086,14 +1305,34 @@ def backoffice_entretien_list(request):
     
     context = {
         'entretiens': entretiens,
+        'statut_choices': STATUT_ENTRETIEN_CHOICES,
+        'now': timezone.now(),
     }
     
-    return render(request, 'candidats/backoffice/entretien_list.html', context)
+    return render(request, 'candidats/backoffice/entretiens/entretien_list.html', context)
 
+# views.py
 @login_required
 @user_passes_test(is_recruiter)
 def backoffice_entretien_detail(request, entretien_id):
-    """Détail d'un entretien avec formulaire de compte-rendu"""
+    """Détail d'un entretien (affichage seulement)"""
+    entretien = get_object_or_404(
+        Entretien.objects.select_related('candidature__candidat', 'candidature__offre'),
+        id=entretien_id,
+        est_supprime=False
+    )
+    
+    context = {
+        'entretien': entretien,
+        'a_un_compte_rendu': entretien.a_un_compte_rendu_complet(),
+    }
+    
+    return render(request, 'candidats/backoffice/entretiens/entretien_detail.html', context)
+
+@login_required
+@user_passes_test(is_recruiter)
+def backoffice_entretien_compte_rendu(request, entretien_id):
+    """Édition du compte-rendu d'entretien"""
     entretien = get_object_or_404(
         Entretien.objects.select_related('candidature__candidat', 'candidature__offre'),
         id=entretien_id,
@@ -1115,7 +1354,8 @@ def backoffice_entretien_detail(request, entretien_id):
         'form': form,
     }
     
-    return render(request, 'candidats/backoffice/entretien_detail.html', context)
+    return render(request, 'candidats/backoffice/entretiens/entretien_compte_rendu.html', context)
+
 
 @login_required
 @user_passes_test(is_recruiter)
@@ -1141,39 +1381,6 @@ def backoffice_entretien_quick_action(request, entretien_id, action):
     
     return redirect('backoffice_entretien_detail', entretien_id=entretien.id)
 
-# ====================================================
-# VUES ÉVALUATIONS
-# ====================================================
-
-@login_required
-@user_passes_test(is_recruiter)
-def backoffice_evaluation_create(request, entretien_id):
-    """Création d'une évaluation pour un entretien"""
-    entretien = get_object_or_404(Entretien, id=entretien_id, est_supprime=False)
-    
-    # Vérifier si une évaluation existe déjà
-    if hasattr(entretien, 'evaluation'):
-        messages.info(request, "Une évaluation existe déjà pour cet entretien.")
-        return redirect('backoffice_entretien_detail', entretien_id=entretien.id)
-    
-    form = EvaluationEntretienBackofficeForm(request.POST or None)
-    
-    if request.method == 'POST' and form.is_valid():
-        evaluation = form.save(commit=False)
-        evaluation.entretien = entretien
-        evaluation.evaluateur = request.user
-        evaluation.save()
-        messages.success(request, "Évaluation créée avec succès.")
-        return redirect('backoffice_entretien_detail', entretien_id=entretien.id)
-    
-    context = {
-        'entretien': entretien,
-        'form': form,
-    }
-    
-    return render(request, 'candidats/backoffice/evaluation_create.html', context)
-
-
 
 @login_required
 @user_passes_test(is_recruiter)
@@ -1191,3 +1398,173 @@ def noteinterne_detail(request, note_id):
     }
     return render(request, 'notes/noteinterne_detail.html', context)
 
+# ====================================================
+# VUES ÉVALUATIONS
+# ====================================================
+@login_required
+@user_passes_test(is_recruiter)
+def backoffice_evaluation_create(request, entretien_id):
+    """Création d'une évaluation pour un entretien"""
+    entretien = get_object_or_404(Entretien, id=entretien_id, est_supprime=False)
+    
+    # Vérifier si une évaluation existe déjà
+    if hasattr(entretien, 'evaluation'):
+        messages.info(request, "Une évaluation existe déjà pour cet entretien.")
+        return redirect('backoffice_evaluation_detail', entretien_id=entretien.id)
+    
+    form = EvaluationEntretienForm(request.POST or None)
+    
+    if request.method == 'POST' and form.is_valid():
+        evaluation = form.save(commit=False)
+        evaluation.entretien = entretien
+        evaluation.evaluateur = request.user
+        evaluation.save()
+        messages.success(request, "Évaluation créée avec succès.")
+        return redirect('backoffice_evaluation_detail', evaluation_id=evaluation.id)
+    
+    context = {
+        'entretien': entretien,
+        'form': form,
+    }
+    
+    return render(request, 'candidats/backoffice/evaluations/evaluation_create.html', context)
+
+
+@login_required
+@user_passes_test(is_recruiter)
+def backoffice_evaluation_detail(request, evaluation_id):
+    """Détail d'une évaluation d'entretien"""
+    evaluation = get_object_or_404(EvaluationEntretien, id=evaluation_id)
+    
+    context = {
+        'evaluation': evaluation,
+    }
+    
+    return render(request, 'candidats/backoffice/evaluations/evaluation_detail.html', context)
+
+
+@login_required
+@user_passes_test(is_recruiter)
+def backoffice_evaluation_edit(request, evaluation_id):
+    """Modification d'une évaluation existante"""
+    evaluation = get_object_or_404(EvaluationEntretien, id=evaluation_id)
+    
+    form = EvaluationEntretienForm(request.POST or None, instance=evaluation)
+    
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, "Évaluation modifiée avec succès.")
+        return redirect('backoffice_evaluation_detail', evaluation_id=evaluation.id)
+    
+    context = {
+        'evaluation': evaluation,
+        'form': form,
+        'entretien': evaluation.entretien,
+    }
+    
+    return render(request, 'candidats/backoffice/evaluations/evaluation_edit.html', context)
+
+
+@login_required
+@user_passes_test(is_recruiter)
+def backoffice_evaluations_rh(request):
+    """
+    Vue RH pour consulter toutes les évaluations et comptes-rendus d'entretien
+    """
+    # Filtres
+    statut_filter = request.GET.get('statut', '')
+    evaluateur_filter = request.GET.get('evaluateur', '')
+    date_debut = request.GET.get('date_debut', '')
+    date_fin = request.GET.get('date_fin', '')
+    
+    # Récupérer toutes les évaluations avec les entretiens associés
+    evaluations = EvaluationEntretien.objects.select_related(
+        'entretien', 
+        'entretien__candidature',
+        'entretien__candidature__candidat',
+        'entretien__candidature__offre',
+        'evaluateur'
+    ).all()
+    
+    # Récupérer tous les entretiens avec compte-rendu complet
+    entretiens_avec_compte_rendu = Entretien.objects.filter(
+        est_supprime=False
+    ).exclude(
+        Q(feedback='') & 
+        Q(points_abordes='') & 
+        Q(questions_posees='') &
+        Q(note_globale__isnull=True) &
+        Q(points_positifs='') &
+        Q(points_amelioration='') &
+        Q(suite_prevue='')
+    ).select_related(
+        'candidature',
+        'candidature__candidat',
+        'candidature__offre'
+    )
+    
+    # Appliquer les filtres sur les évaluations
+    if statut_filter:
+        evaluations = evaluations.filter(entretien__statut=statut_filter)
+    
+    if evaluateur_filter:
+        evaluations = evaluations.filter(evaluateur_id=evaluateur_filter)
+    
+    if date_debut:
+        try:
+            date_debut_obj = datetime.strptime(date_debut, '%Y-%m-%d')
+            evaluations = evaluations.filter(entretien__date_prevue__date__gte=date_debut_obj)
+            entretiens_avec_compte_rendu = entretiens_avec_compte_rendu.filter(date_prevue__date__gte=date_debut_obj)
+        except ValueError:
+            pass
+    
+    if date_fin:
+        try:
+            date_fin_obj = datetime.strptime(date_fin, '%Y-%m-%d')
+            evaluations = evaluations.filter(entretien__date_prevue__date__lte=date_fin_obj)
+            entretiens_avec_compte_rendu = entretiens_avec_compte_rendu.filter(date_prevue__date__lte=date_fin_obj)
+        except ValueError:
+            pass
+    
+    # Récupérer la liste des évaluateurs pour le filtre
+    evaluateurs = User.objects.filter(
+        groups__name__in=['admin', 'rh','stagiaire']
+    ).distinct()
+    
+    # Calcul manuel de la moyenne des notes (car note_moyenne est une propriété Python)
+    notes_valides = [e.note_moyenne for e in evaluations if e.note_moyenne is not None]
+    moyenne_notes = sum(notes_valides) / len(notes_valides) if notes_valides else 0
+    
+    # Calcul du taux de recommandation
+    total_evaluations = evaluations.count()
+    if total_evaluations > 0:
+        taux_recommandation = evaluations.filter(recommander=True).count() / total_evaluations * 100
+    else:
+        taux_recommandation = 0
+    
+    # Récupérer les choix de statut depuis le champ du modèle
+    statut_choices = Entretien._meta.get_field('statut').choices
+    
+    # Statistiques
+    stats = {
+        'total_evaluations': total_evaluations,
+        'total_comptes_rendus': entretiens_avec_compte_rendu.count(),
+        'moyenne_notes': round(moyenne_notes, 1),
+        'taux_recommandation': round(taux_recommandation, 1),
+    }
+    
+    context = {
+        'evaluations': evaluations,
+        'entretiens_avec_compte_rendu': entretiens_avec_compte_rendu,
+        'evaluateurs': evaluateurs,
+        'statut_choices': statut_choices,  # Utiliser les choix récupérés du champ
+        'stats': stats,
+        'filters': {
+            'statut': statut_filter,
+            'evaluateur': evaluateur_filter,
+            'date_debut': date_debut,
+            'date_fin': date_fin,
+        }
+    }
+    
+    return render(request, 'candidats/backoffice/evaluations/evaluations_rh.html', context)

@@ -1131,52 +1131,65 @@ class CandidatureBackofficeForm(forms.ModelForm):
         # Réorganiser l'ordre des champs si nécessaire
         self.order_fields(['statut', 'motivation', 'points_forts', 'points_faibles', 'notes'])
 
+class PlanifierEntretienForm(forms.ModelForm):
+    """
+    Formulaire pour planifier un nouvel entretien (ModelForm)
+    """
+    class Meta:
+        model = Entretien
+        fields = ['candidature', 'type_entretien', 'date_prevue', 'duree_prevue', 
+                 'interlocuteurs', 'notes_preparation', 'lieu', 'lien_video']
+        widgets = {
+            'candidature': forms.HiddenInput(),
+            'type_entretien': forms.Select(attrs={'class': 'form-select'}),
+            'date_prevue': forms.DateTimeInput(attrs={
+                'class': 'form-control',
+                'type': 'datetime-local'
+            }),
+            'duree_prevue': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': 5,
+                'placeholder': 'Durée en minutes'
+            }),
+            'interlocuteurs': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Noms des interlocuteurs'
+            }),
+            'notes_preparation': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Grille de candidature, questions à poser, points à valider...'
+            }),
+            'lieu': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Adresse ou lieu de l\'entretien'
+            }),
+            'lien_video': forms.URLInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'https://meet.google.com/xxx-yyyy-zzz'
+            }),
+        }
+        labels = {
+            'date_prevue': "Date et heure de l'entretien",
+            'duree_prevue': "Durée prévue (minutes)",
+            'notes_preparation': "Notes de préparation",
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Filtrer les candidatures valides
+        self.fields['candidature'].queryset = Candidature.objects.filter(
+            est_supprime=False
+        ).select_related('candidat', 'offre')
+    
+    def clean_date_prevue(self):
+        date_prevue = self.cleaned_data.get('date_prevue')
+        if date_prevue and date_prevue < timezone.now():
+            raise forms.ValidationError("La date de l'entretien ne peut pas être dans le passé.")
+        return date_prevue
+    
 
-class PlanifierEntretienForm(forms.Form):
-    date_entretien = forms.DateTimeField(
-        required=True,
-        widget=forms.DateTimeInput(attrs={
-            'class': 'form-control datetimepicker',
-            'type': 'datetime-local'
-        }),
-        label="Date et heure de l'entretien"
-    )
     
-    type_entretien = forms.ChoiceField(
-        required=True,
-        choices=[
-            ('TELEPHONIQUE', 'Téléphonique'),
-            ('VIDEO', 'Vidéo'),
-            ('PRESENTIEL', 'Présentiel')
-        ],
-        widget=forms.Select(attrs={'class': 'form-select'}),
-        label="Type d'entretien",
-        initial='PRESENTIEL'  
-    )
-    
-    duree_prevue = forms.IntegerField(
-        required=True,
-        min_value=5,
-        max_value=300,
-        initial=60,
-        widget=forms.NumberInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Durée en minutes'
-        }),
-        label="Durée prévue (minutes)",
-        help_text="Durée estimée de l'entretien en minutes"
-    )
-    
-    notes_preparation = forms.CharField(
-        required=False,
-        widget=forms.Textarea(attrs={
-            'class': 'form-control',
-            'rows': 4,
-            'placeholder': 'Grille de candidature, questions à poser, points à valider...'
-        }),
-        label="Notes de préparation"
-    )
-
 
 class EntretienCompteRenduForm(forms.ModelForm):
     """
@@ -1272,7 +1285,6 @@ class EntretienCompteRenduForm(forms.ModelForm):
             }),
         }
 
-# Dans candidats/forms.py
 class EvaluationEntretienForm(forms.ModelForm):
     class Meta:
         model = EvaluationEntretien
@@ -1285,78 +1297,17 @@ class EvaluationEntretienForm(forms.ModelForm):
             'recommandation', 'recommander', 'niveau_urgence'
         ]
         widgets = {
-            'commentaire_technique': forms.Textarea(attrs={'rows': 3}),
-            'commentaire_communication': forms.Textarea(attrs={'rows': 3}),
-            'commentaire_motivation': forms.Textarea(attrs={'rows': 3}),
-            'commentaire_culture': forms.Textarea(attrs={'rows': 3}),
-            'points_forts': forms.Textarea(attrs={'rows': 3}),
-            'points_amelioration': forms.Textarea(attrs={'rows': 3}),
-            'recommandation': forms.Textarea(attrs={'rows': 3}),
+            'commentaire_technique': forms.Textarea(attrs={'class': 'summernote'}),
+            'commentaire_communication': forms.Textarea(attrs={'class': 'summernote'}),
+            'commentaire_motivation': forms.Textarea(attrs={'class': 'summernote'}),
+            'commentaire_culture': forms.Textarea(attrs={'class': 'summernote'}),
+            'points_forts': forms.Textarea(attrs={'class': 'summernote'}),
+            'points_amelioration': forms.Textarea(attrs={'class': 'summernote'}),
+            'recommandation': forms.Textarea(attrs={'class': 'summernote'}),
         }
 
-        
-class EvaluationEntretienBackofficeForm(forms.ModelForm):
-    """
-    Formulaire d'évaluation détaillée pour le backoffice.
-    Version plus complète que la précédente, intégrant Summernote.
-    """
-    class Meta:
-        model = EvaluationEntretien
-        fields = [
-            'note_technique', 'note_communication', 'note_motivation', 'note_culture',
-            'points_forts', 'points_amelioration', 'recommandation',
-            'recommander', 'niveau_urgence'
-        ]
-        widgets = {
-            'note_technique': forms.Select(attrs={'class': 'form-select'}),
-            'note_communication': forms.Select(attrs={'class': 'form-select'}),
-            'note_motivation': forms.Select(attrs={'class': 'form-select'}),
-            'note_culture': forms.Select(attrs={'class': 'form-select'}),
-            'points_forts': SummernoteWidget(attrs={
-                'summernote': {
-                    'toolbar': [
-                        ['style', ['bold']],
-                        ['para', ['ul']],
-                    ],
-                    'height': 150,
-                    'placeholder': 'Compétences techniques validées, expertise démontrée...'
-                }
-            }),
-            'points_amelioration': SummernoteWidget(attrs={
-                'summernote': {
-                    'toolbar': [
-                        ['style', ['bold']],
-                        ['para', ['ul']],
-                    ],
-                    'height': 150,
-                    'placeholder': 'Écarts avec le profil recherché, compétences manquantes...'
-                }
-            }),
-            'recommandation': SummernoteWidget(attrs={
-                'summernote': {
-                    'toolbar': [
-                        ['style', ['bold', 'italic']],
-                        ['para', ['ul', 'ol', 'paragraph']],
-                        ['view', ['codeview']],
-                    ],
-                    'height': 200,
-                    'placeholder': 'Analyse finale, avis pour la suite du processus, niveau de priorité...'
-                }
-            }),
-            'recommander': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'niveau_urgence': forms.Select(attrs={'class': 'form-select'}),
-        }
-        labels = {
-            'note_technique': "Compétences Techniques / Hard Skills",
-            'note_communication': "Communication / Soft Skills",
-            'note_motivation': "Motivation & Intérêt",
-            'note_culture': "Adéquation Culturelle (Fit)",
-            'points_forts': "Points Forts & Atouts",
-            'points_amelioration': "Points d'Amélioration & Risques",
-            'recommandation': "Recommandation Détaillée & Avis Final",
-            'recommander': "Je recommande ce candidat pour la suite",
-            'niveau_urgence': "Niveau d'Urgence / Priorité de traitement"
-        }
+
+  
 
 class CandidatureFilterForm(forms.Form):
     """
