@@ -51,6 +51,9 @@ urlpatterns = [
     #
     ####
     path('dashboard_backoffice/', views.backoffice_dashboard, name='backoffice_dashboard'),
+    path('note/<int:note_id>/', views.noteinterne_detail, name='noteinterne_detail'),
+
+
     path('documents/<int:document_id>/verifier/', views.verifier_document, name='verifier_document'),
     path('documents/<int:document_id>/annuler-verification/', views.annuler_verification_document, name='annuler_verification_document'),
     path('documents/<int:document_id>/telecharger/', views.telecharger_document, name='telecharger_document'),

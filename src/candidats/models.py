@@ -73,17 +73,15 @@ LANGUE_CHOICES = [
 ]
 
 STATUT_CANDIDATURE_CHOICES = [
-    ('BROUILLON', 'Brouillon'),
     ('POSTULE', 'Postulé'),
     ('RELANCE', 'Relancé'),
-    ('ENTRETIEN1', '1er entretien'),
-    ('ENTRETIEN2', '2ème entretien'),
-    ('ENTRETIEN3', '3ème entretien'),
+    ('ENTRETIEN', 'Entretien'),
     ('OFFRE', 'Offre reçue'),
     ('ACCEPTE', 'Accepté'),
     ('REFUSE', 'Refusé'),
     ('RETIRE', 'Retiré'),
 ]
+
 
 CANAL_CANDIDATURE_CHOICES = [
     ('SITE', 'Site carrière'),
@@ -516,21 +514,32 @@ class Candidature(models.Model):
     
     est_supprime = models.BooleanField(default=False)
     history = HistoricalRecords()
-    date_entretien = models.DateTimeField(null=True, blank=True, verbose_name="Date d'entretien")
-    type_entretien = models.CharField(max_length=20, choices=[
-        ('TELEPHONIQUE', 'Téléphonique'),
-        ('VIDEO', 'Vidéo'),
-        ('PRESENTIEL', 'Présentiel')
-    ], null=True, blank=True)
-    
-    # Ajout d'un champ pour évaluation post-entretien
-    evaluation_entretien = models.PositiveIntegerField(
-        null=True, blank=True, 
-        validators=[MinValueValidator(1), MaxValueValidator(5)],
-        verbose_name="Évaluation de l'entretien (1-5)"
-    )
-    feedback_recruteur = models.TextField(blank=True, verbose_name="Feedback du recruteur")
 
+    date_entretien = models.DateTimeField(null=True, blank=True, verbose_name="Date d'entretien")
+    entretien_planifie = models.BooleanField(default=False, verbose_name="Entretien planifié")
+    date_entretien_prevue = models.DateTimeField(null=True, blank=True, verbose_name="Date prévue d'entretien")
+    type_entretien_prevue = models.CharField(
+        max_length=20, 
+        choices=[
+            ('TELEPHONIQUE', 'Téléphonique'),
+            ('VIDEO', 'Vidéo'),
+            ('PRESENTIEL', 'Présentiel')
+        ], 
+        default='PRESENTIEL',
+        null=True, 
+        blank=True,
+        verbose_name="Type d'entretien prévu"
+    )
+    
+    # Lien vers la note interne créée pour l'entretien
+    note_entretien = models.OneToOneField(
+        'notes.NoteInterne',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='candidature_liee'
+    )
+    
 
     class Meta:
         verbose_name = "Candidature"
@@ -554,12 +563,27 @@ class Candidature(models.Model):
         """Retourne une classe Bootstrap en fonction du statut"""
         mapping = {
             'POSTULE': 'primary',
-            'EN_COURS': 'warning',
+            'RELANCE': 'warning',
+            'ENTRETIEN': 'info',
+            'OFFRE': 'success',
             'ACCEPTE': 'success',
             'REFUSE': 'danger',
             'RETIRE': 'secondary',
         }
         return mapping.get(self.statut, 'secondary')
+    
+    @property
+    def dernier_entretien(self):
+        """Retourne le dernier entretien de cette candidature"""
+        return self.entretiens.filter(est_supprime=False).order_by('-date_prevue').first()
+    
+    @property
+    def evaluation_entretien(self):
+        """Retourne l'évaluation du dernier entretien si elle existe"""
+        dernier_entretien = self.dernier_entretien
+        if dernier_entretien and hasattr(dernier_entretien, 'evaluation'):
+            return dernier_entretien.evaluation
+        return None
 
 class Entretien(models.Model):
     candidature = models.ForeignKey(Candidature, on_delete=models.CASCADE, related_name='entretiens')
@@ -571,16 +595,22 @@ class Entretien(models.Model):
     date_reelle = models.DateTimeField(null=True, blank=True, verbose_name="Date réelle")
     duree_reelle = models.PositiveIntegerField(null=True, blank=True, verbose_name="Durée réelle (minutes)")
     
-    interlocuteurs = models.TextField(verbose_name="Interlocuteur(s)")
+    interlocuteurs = models.TextField(verbose_name="Interlocuteur(s)", blank=True)
     poste_interlocuteurs = models.TextField(blank=True, verbose_name="Poste des interlocuteurs")
     
     ordre_du_jour = models.TextField(blank=True, verbose_name="Ordre du jour")
     notes_preparation = models.TextField(blank=True, verbose_name="Notes de préparation")
-    feedback = models.TextField(blank=True, verbose_name="Feedback")
+    feedback = models.TextField(blank=True, verbose_name="Feedback général")
     points_abordes = models.TextField(blank=True, verbose_name="Points abordés")
-    questions_posées = models.TextField(blank=True, verbose_name="Questions posées")
+    questions_posees = models.TextField(blank=True, verbose_name="Questions posées")
     
-    note_globale = models.PositiveIntegerField(null=True, blank=True, verbose_name="Note globale/10")
+    note_globale = models.PositiveIntegerField(
+        null=True, 
+        blank=True, 
+        verbose_name="Note globale/10",
+        validators=[MinValueValidator(1), MaxValueValidator(10)]
+    )
+    
     points_positifs = models.TextField(blank=True, verbose_name="Points positifs")
     points_amelioration = models.TextField(blank=True, verbose_name="Points d'amélioration")
     suite_prevue = models.TextField(blank=True, verbose_name="Suite prévue")
@@ -606,6 +636,20 @@ class Entretien(models.Model):
     def soft_delete(self):
         self.est_supprime = True
         self.save()
+    
+    @property
+    def est_termine(self):
+        return self.statut == 'TERMINE'
+    
+    @property
+    def est_planifie(self):
+        return self.statut == 'PLANIFIE'
+    
+    def terminer_entretien(self):
+        """Marque l'entretien comme terminé"""
+        self.statut = 'TERMINE'
+        self.date_reelle = timezone.now()
+        self.save()
 
 # ====================================================
 # SYSTÈME D'ÉVALUATION (NOUVEAU)
@@ -620,19 +664,53 @@ class EvaluationEntretien(models.Model):
     ]
     
     entretien = models.OneToOneField(Entretien, on_delete=models.CASCADE, related_name='evaluation')
-    evaluateur = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Évaluateur (RH)")
+    evaluateur = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Évaluateur")
     
-    note_technique = models.PositiveIntegerField(choices=NOTE_CHOICES, verbose_name="Compétences techniques")
-    note_communication = models.PositiveIntegerField(choices=NOTE_CHOICES, verbose_name="Communication")
-    note_motivation = models.PositiveIntegerField(choices=NOTE_CHOICES, verbose_name="Motivation")
-    note_culture = models.PositiveIntegerField(choices=NOTE_CHOICES, verbose_name="Fit culturel")
+    # Compétences techniques spécifiques au poste
+    note_technique = models.PositiveIntegerField(
+        choices=NOTE_CHOICES, 
+        verbose_name="Compétences techniques",
+        null=True,
+        blank=True
+    )
+    commentaire_technique = models.TextField(blank=True, verbose_name="Commentaire techniques")
     
+    # Soft skills
+    note_communication = models.PositiveIntegerField(
+        choices=NOTE_CHOICES, 
+        verbose_name="Communication",
+        null=True,
+        blank=True
+    )
+    commentaire_communication = models.TextField(blank=True, verbose_name="Commentaire communication")
+    
+    note_motivation = models.PositiveIntegerField(
+        choices=NOTE_CHOICES, 
+        verbose_name="Motivation",
+        null=True,
+        blank=True
+    )
+    commentaire_motivation = models.TextField(blank=True, verbose_name="Commentaire motivation")
+    
+    note_culture = models.PositiveIntegerField(
+        choices=NOTE_CHOICES, 
+        verbose_name="Fit culturel",
+        null=True,
+        blank=True
+    )
+    commentaire_culture = models.TextField(blank=True, verbose_name="Commentaire fit culturel")
+    
+    # Évaluation globale
     points_forts = models.TextField(verbose_name="Points forts observés")
     points_amelioration = models.TextField(verbose_name="Points d'amélioration")
     recommandation = models.TextField(verbose_name="Recommandation")
     
     recommander = models.BooleanField(default=False, verbose_name="Recommander ce candidat")
-    niveau_urgence = models.PositiveIntegerField(choices=[(1, 'Faible'), (2, 'Moyen'), (3, 'Élevé')], default=2, verbose_name="Niveau d'urgence")
+    niveau_urgence = models.PositiveIntegerField(
+        choices=[(1, 'Faible'), (2, 'Moyen'), (3, 'Élevé')], 
+        default=2, 
+        verbose_name="Niveau d'urgence"
+    )
     
     date_creation = models.DateTimeField(auto_now_add=True)
     date_maj = models.DateTimeField(auto_now=True)
@@ -647,5 +725,19 @@ class EvaluationEntretien(models.Model):
     
     @property
     def note_moyenne(self):
-        notes = [self.note_technique, self.note_communication, self.note_motivation, self.note_culture]
-        return sum(notes) / len(notes) if notes else 0
+        notes = []
+        if self.note_technique: notes.append(self.note_technique)
+        if self.note_communication: notes.append(self.note_communication)
+        if self.note_motivation: notes.append(self.note_motivation)
+        if self.note_culture: notes.append(self.note_culture)
+        
+        return round(sum(notes) / len(notes), 1) if notes else None
+    
+    @property
+    def note_moyenne_display(self):
+        moyenne = self.note_moyenne
+        if moyenne:
+            for note, display in self.NOTE_CHOICES:
+                if note == round(moyenne):
+                    return display
+        return "Non évalué"

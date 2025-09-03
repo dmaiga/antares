@@ -476,28 +476,16 @@ class DocumentForm(forms.ModelForm):
             ])
         ]
 
+
 class SuiviCandidatureForm(forms.ModelForm):
     class Meta:
         model = Candidature
-        fields = ['statut', 'notes', 'points_forts', 'points_faibles', 
-                 'date_entretien', 'type_entretien', 'evaluation_entretien', 
-                 'feedback_recruteur']
+        fields = ['statut', 'notes', 'points_forts', 'points_faibles']
         widgets = {
             'statut': forms.Select(attrs={'class': 'form-select'}),
             'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'points_forts': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'points_faibles': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'date_entretien': forms.DateTimeInput(attrs={
-                'class': 'form-control', 
-                'type': 'datetime-local'
-            }),
-            'type_entretien': forms.Select(attrs={'class': 'form-select'}),
-            'evaluation_entretien': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': 1,
-                'max': 5
-            }),
-            'feedback_recruteur': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
     
     def __init__(self, *args, **kwargs):
@@ -506,13 +494,18 @@ class SuiviCandidatureForm(forms.ModelForm):
         statut_actuel = self.instance.statut if self.instance else None
         statuts_possibles = self.get_statuts_possibles(statut_actuel)
         self.fields['statut'].choices = statuts_possibles
+        
+        # Masquer le champ canal comme demandé
+        if 'canal' in self.fields:
+            self.fields['canal'].widget = forms.HiddenInput()
     
     def get_statuts_possibles(self, statut_actuel):
         # Définir les transitions de statut possibles
         transitions = {
-            'POSTULE': [('POSTULE', 'Postulé'), ('EN_REVUE', 'En revue'), ('RETIRE', 'Retiré')],
-            'EN_REVUE': [('EN_REVUE', 'En revue'), ('ENTRETIEN', 'Entretien'), ('REFUSE', 'Refusé')],
-            'ENTRETIEN': [('ENTRETIEN', 'Entretien'), ('ACCEPTE', 'Accepté'), ('REFUSE', 'Refusé')],
+            'POSTULE': [('POSTULE', 'Postulé'), ('RELANCE', 'Relancé'), ('RETIRE', 'Retiré')],
+            'RELANCE': [('RELANCE', 'Relancé'), ('ENTRETIEN', 'Entretien'), ('REFUSE', 'Refusé')],
+            'ENTRETIEN': [('ENTRETIEN', 'Entretien'), ('OFFRE', 'Offre reçue'), ('REFUSE', 'Refusé')],
+            'OFFRE': [('OFFRE', 'Offre reçue'), ('ACCEPTE', 'Accepté'), ('REFUSE', 'Refusé')],
             'ACCEPTE': [('ACCEPTE', 'Accepté')],
             'REFUSE': [('REFUSE', 'Refusé')],
             'RETIRE': [('RETIRE', 'Retiré')],
@@ -588,7 +581,7 @@ class EntretienForm(forms.ModelForm):
 class EntretienFeedbackForm(forms.ModelForm):
     class Meta:
         model = Entretien
-        fields = ['feedback', 'points_abordes', 'questions_posées', 
+        fields = ['feedback', 'points_abordes', 'questions_posees', 
                  'note_globale', 'points_positifs', 'points_amelioration', 'suite_prevue']
         widgets = {
             'feedback': SummernoteWidget(attrs={
@@ -611,7 +604,7 @@ class EntretienFeedbackForm(forms.ModelForm):
                     'placeholder': 'Points abordés pendant l\'entretien...'
                 }
             }),
-            'questions_posées': SummernoteWidget(attrs={
+            'questions_posees': SummernoteWidget(attrs={
                 'summernote': {
                     'toolbar': [
                         ['style', ['bold']],
@@ -763,32 +756,15 @@ class SoftDeleteForm(forms.Form):
         })
     )
 
-
-
-
-
 class SuiviCandidatureForm(forms.ModelForm):
     class Meta:
         model = Candidature
-        fields = ['statut', 'notes', 'points_forts', 'points_faibles', 
-                 'date_entretien', 'type_entretien', 'evaluation_entretien', 
-                 'feedback_recruteur']
+        fields = ['statut', 'notes', 'points_forts', 'points_faibles']
         widgets = {
             'statut': forms.Select(attrs={'class': 'form-select'}),
             'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'points_forts': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'points_faibles': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'date_entretien': forms.DateTimeInput(attrs={
-                'class': 'form-control', 
-                'type': 'datetime-local'
-            }),
-            'type_entretien': forms.Select(attrs={'class': 'form-select'}),
-            'evaluation_entretien': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': 1,
-                'max': 5
-            }),
-            'feedback_recruteur': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
     
     def __init__(self, *args, **kwargs):
@@ -797,19 +773,23 @@ class SuiviCandidatureForm(forms.ModelForm):
         statut_actuel = self.instance.statut if self.instance else None
         statuts_possibles = self.get_statuts_possibles(statut_actuel)
         self.fields['statut'].choices = statuts_possibles
+        
+        # Masquer le champ canal comme demandé
+        if 'canal' in self.fields:
+            self.fields['canal'].widget = forms.HiddenInput()
     
     def get_statuts_possibles(self, statut_actuel):
-        # Définir les transitions de statut possibles
+        # Définir les transitions de statut possibles avec vos choix réels
         transitions = {
-            'POSTULE': [('POSTULE', 'Postulé'), ('EN_REVUE', 'En revue'), ('RETIRE', 'Retiré')],
-            'EN_REVUE': [('EN_REVUE', 'En revue'), ('ENTRETIEN', 'Entretien'), ('REFUSE', 'Refusé')],
-            'ENTRETIEN': [('ENTRETIEN', 'Entretien'), ('ACCEPTE', 'Accepté'), ('REFUSE', 'Refusé')],
+            'POSTULE': [('POSTULE', 'Postulé'), ('RELANCE', 'Relancé'), ('RETIRE', 'Retiré')],
+            'RELANCE': [('RELANCE', 'Relancé'), ('ENTRETIEN', 'Entretien'), ('REFUSE', 'Refusé')],
+            'ENTRETIEN': [('ENTRETIEN', 'Entretien'), ('OFFRE', 'Offre reçue'), ('REFUSE', 'Refusé')],
+            'OFFRE': [('OFFRE', 'Offre reçue'), ('ACCEPTE', 'Accepté'), ('REFUSE', 'Refusé')],
             'ACCEPTE': [('ACCEPTE', 'Accepté')],
             'REFUSE': [('REFUSE', 'Refusé')],
             'RETIRE': [('RETIRE', 'Retiré')],
         }
         return transitions.get(statut_actuel, STATUT_CANDIDATURE_CHOICES)
-    
 
 # candidats/forms.py
 from django import forms
@@ -1085,24 +1065,20 @@ class CandidatFilterForm(forms.Form):
         # ✅ Charger dynamiquement les offres
         self.fields['offre'].queryset = JobOffer.objects.all()
 
-
 class CandidatureBackofficeForm(forms.ModelForm):
     """
     Formulaire COMPLET de gestion d'une candidature pour le backoffice.
-    Permet de changer le statut, planifier un entretien, noter, etc.
+    Permet de changer le statut, noter, etc.
     """
     class Meta:
         model = Candidature
         fields = [
-            'statut', 'canal', 'notes', 'motivation', 'points_forts', 'points_faibles',
-            'date_entretien', 'type_entretien', 'evaluation_entretien', 'feedback_recruteur'
+            'statut', 'notes', 'motivation', 'points_forts', 'points_faibles'
         ]
         widgets = {
             'statut': forms.Select(attrs={
                 'class': 'form-select',
-                'onchange': 'toggleEntretienFields()'  # JS pour afficher/masquer les champs liés
             }),
-            'canal': forms.Select(attrs={'class': 'form-select'}),
             'notes': SummernoteWidget(attrs={
                 'summernote': {
                     'toolbar': [
@@ -1144,91 +1120,63 @@ class CandidatureBackofficeForm(forms.ModelForm):
                     'placeholder': 'Points faibles ou à améliorer...'
                 }
             }),
-            'date_entretien': forms.DateTimeInput(attrs={
-                'class': 'form-control',
-                'type': 'datetime-local'
-            }),
-            'type_entretien': forms.Select(attrs={'class': 'form-select'}),
-            'evaluation_entretien': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': 1,
-                'max': 5,
-                'step': 1
-            }),
-            'feedback_recruteur': SummernoteWidget(attrs={
-                'summernote': {
-                    'toolbar': [
-                        ['style', ['bold', 'italic']],
-                        ['para', ['ul', 'ol']],
-                    ],
-                    'height': 200,
-                    'placeholder': 'Feedback détaillé pour le candidat...'
-                }
-            }),
-        }
-        labels = {
-            'feedback_recruteur': 'Feedback pour le candidat',
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Masquer le champ canal comme demandé
+        if 'canal' in self.fields:
+            self.fields['canal'].widget = forms.HiddenInput()
+        
         # Réorganiser l'ordre des champs si nécessaire
-        self.order_fields([
-            'statut', 'canal', 'date_entretien', 'type_entretien',
-            'evaluation_entretien', 'feedback_recruteur',
-            'motivation', 'points_forts', 'points_faibles', 'notes'
-        ])
+        self.order_fields(['statut', 'motivation', 'points_forts', 'points_faibles', 'notes'])
 
-class EntretienPlanificationForm(forms.ModelForm):
-    """
-    Formulaire simplifié pour planifier rapidement un entretien depuis le détail d'une candidature.
-    """
-    envoyer_email = forms.BooleanField(
+
+class PlanifierEntretienForm(forms.Form):
+    date_entretien = forms.DateTimeField(
+        required=True,
+        widget=forms.DateTimeInput(attrs={
+            'class': 'form-control datetimepicker',
+            'type': 'datetime-local'
+        }),
+        label="Date et heure de l'entretien"
+    )
+    
+    type_entretien = forms.ChoiceField(
+        required=True,
+        choices=[
+            ('TELEPHONIQUE', 'Téléphonique'),
+            ('VIDEO', 'Vidéo'),
+            ('PRESENTIEL', 'Présentiel')
+        ],
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Type d'entretien",
+        initial='PRESENTIEL'  
+    )
+    
+    duree_prevue = forms.IntegerField(
+        required=True,
+        min_value=5,
+        max_value=300,
+        initial=60,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Durée en minutes'
+        }),
+        label="Durée prévue (minutes)",
+        help_text="Durée estimée de l'entretien en minutes"
+    )
+    
+    notes_preparation = forms.CharField(
         required=False,
-        initial=True,
-        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-        label="Envoyer un email d'invitation au candidat",
-        help_text="Si coché, un email avec les détails sera envoyé automatiquement."
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 4,
+            'placeholder': 'Grille de candidature, questions à poser, points à valider...'
+        }),
+        label="Notes de préparation"
     )
 
-    class Meta:
-        model = Entretien
-        fields = ['type_entretien', 'date_prevue', 'duree_prevue', 'interlocuteurs', 'lieu', 'lien_video', 'codes_acces']
-        widgets = {
-            'type_entretien': forms.Select(attrs={'class': 'form-select'}),
-            'date_prevue': forms.DateTimeInput(attrs={
-                'class': 'form-control',
-                'type': 'datetime-local'
-            }),
-            'duree_prevue': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': 5,
-                'step': 5,
-                'placeholder': 'Durée en minutes'
-            }),
-            'interlocuteurs': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Noms des interlocuteurs (RH, Tech Lead, etc.)'
-            }),
-            'lieu': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Adresse physique ou nom de la salle'
-            }),
-            'lien_video': forms.URLInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Lien Google Meet, Teams, Zoom, etc.'
-            }),
-            'codes_acces': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Code de la réunion, mot de passe'
-            }),
-        }
-
-    def clean_date_prevue(self):
-        date_prevue = self.cleaned_data.get('date_prevue')
-        if date_prevue and date_prevue < timezone.now():
-            raise forms.ValidationError("La date de l'entretien ne peut pas être dans le passé.")
-        return date_prevue
 
 class EntretienCompteRenduForm(forms.ModelForm):
     """
@@ -1239,7 +1187,7 @@ class EntretienCompteRenduForm(forms.ModelForm):
         model = Entretien
         fields = [
             'statut', 'date_reelle', 'duree_reelle',
-            'feedback', 'points_abordes', 'questions_posées',
+            'feedback', 'points_abordes', 'questions_posees',
             'note_globale', 'points_positifs', 'points_amelioration', 'suite_prevue'
         ]
         widgets = {
@@ -1275,7 +1223,7 @@ class EntretienCompteRenduForm(forms.ModelForm):
                     'placeholder': 'Liste des sujets et points techniques abordés...'
                 }
             }),
-            'questions_posées': SummernoteWidget(attrs={
+            'questions_posees': SummernoteWidget(attrs={
                 'summernote': {
                     'toolbar': [
                         ['style', ['bold']],
@@ -1324,6 +1272,29 @@ class EntretienCompteRenduForm(forms.ModelForm):
             }),
         }
 
+# Dans candidats/forms.py
+class EvaluationEntretienForm(forms.ModelForm):
+    class Meta:
+        model = EvaluationEntretien
+        fields = [
+            'note_technique', 'commentaire_technique',
+            'note_communication', 'commentaire_communication',
+            'note_motivation', 'commentaire_motivation',
+            'note_culture', 'commentaire_culture',
+            'points_forts', 'points_amelioration',
+            'recommandation', 'recommander', 'niveau_urgence'
+        ]
+        widgets = {
+            'commentaire_technique': forms.Textarea(attrs={'rows': 3}),
+            'commentaire_communication': forms.Textarea(attrs={'rows': 3}),
+            'commentaire_motivation': forms.Textarea(attrs={'rows': 3}),
+            'commentaire_culture': forms.Textarea(attrs={'rows': 3}),
+            'points_forts': forms.Textarea(attrs={'rows': 3}),
+            'points_amelioration': forms.Textarea(attrs={'rows': 3}),
+            'recommandation': forms.Textarea(attrs={'rows': 3}),
+        }
+
+        
 class EvaluationEntretienBackofficeForm(forms.ModelForm):
     """
     Formulaire d'évaluation détaillée pour le backoffice.
@@ -1389,6 +1360,7 @@ class EvaluationEntretienBackofficeForm(forms.ModelForm):
 
 class CandidatureFilterForm(forms.Form):
     """
+    
     Formulaire pour filtrer les candidatures par offre, statut, etc.
     """
     offre = forms.ModelChoiceField(
@@ -1441,7 +1413,7 @@ class NoteInterneForm(forms.Form):
                     ['style', ['bold', 'italic']],
                     ['para', ['ul', 'ol']],
                 ],
-                'height': 100,
+                'height': 200,
                 'placeholder': 'Ajoutez une note interne...'
             }
         })

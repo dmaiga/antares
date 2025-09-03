@@ -1,0 +1,78 @@
+<!-- Dans notes/templates/notes/noteinterne_detail.html -->
+{% extends "authentication/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'backoffice_candidature_list' %}">Candidatures</a></li>
+                    <li class="breadcrumb-item active">Note interne</li>
+                </ol>
+            </nav>
+            <h1 class="h3 mb-0">Note interne</h1>
+        </div>
+        <div>
+            <a href="{% url 'backoffice_candidature_list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">{{ note.sujet }}</h5>
+                <span class="badge bg-{{ note.niveau_urgence }}">
+                    {{ note.get_niveau_urgence_display }}
+                </span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <p><strong>Expéditeur:</strong> {{ note.expediteur.get_full_name }}</p>
+                    <p><strong>Date de création:</strong> {{ note.date_creation|date:"d/m/Y H:i" }}</p>
+                </div>
+                <div class="col-md-6">
+                    {% if note.date_limite %}
+                    <p><strong>Date limite:</strong> {{ note.date_limite|date:"d/m/Y H:i" }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h6>Contenu:</h6>
+                <div class="border rounded p-3 bg-light">
+                    {{ note.contenu|linebreaks }}
+                </div>
+            </div>
+
+            {% if note.pieces_jointes %}
+            <div class="mb-4">
+                <h6>Pièce jointe:</h6>
+                <a href="{{ note.pieces_jointes.url }}" class="btn btn-outline-primary" target="_blank">
+                    <i class="bi bi-download"></i> Télécharger
+                </a>
+            </div>
+            {% endif %}
+
+            <div class="mb-4">
+                <h6>Destinataires:</h6>
+                <ul class="list-group">
+                    {% for reception in note.receptions.all %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ reception.destinataire.get_full_name }}
+                        <span class="badge bg-{% if reception.est_lue %}success{% else %}warning{% endif %}">
+                            {% if reception.est_lue %}Lu{% else %}Non lu{% endif %}
+                        </span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
