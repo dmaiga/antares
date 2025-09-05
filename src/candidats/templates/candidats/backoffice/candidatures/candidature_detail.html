@@ -159,22 +159,35 @@
                     <h5 class="card-title mb-0">Statut et actions</h5>
                 </div>
                 <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="{{ form_candidature.statut.id_for_label }}" class="form-label">Statut</label>
-                            {{ form_candidature.statut }}
-                        </div>
-                        
-                        {% if form_candidature.canal %}
-                        <div class="mb-3">
-                            <label for="{{ form_candidature.canal.id_for_label }}" class="form-label">Canal</label>
-                            {{ form_candidature.canal }}
-                        </div>
+                    <!-- Affichage du statut actuel -->
+                    <div class="alert alert-{{ candidature.get_statut_badge }} text-center mb-3">
+                        <strong>Statut actuel:</strong><br>
+                        {{ candidature.get_statut_display }}
+                    </div>
+
+                    <!-- Actions rapides simplifiées -->
+                    <div class="d-grid gap-2 mb-3">
+                        <!-- Planifier entretien - seulement si statut POSTULE -->
+                        {% if candidature.statut == 'POSTULE' %}
+                        <a href="#planifier-entretien" class="btn btn-outline-info" onclick="scrollToPlanifier()">
+                            <i class="bi bi-calendar-plus"></i> Planifier entretien
+                        </a>
                         {% endif %}
                         
-                        <button type="submit" name="update_candidature" class="btn btn-primary w-100">Mettre à jour</button>
-                    </form>
+                        <!-- Accepter - seulement si en entretien -->
+                        {% if candidature.statut == 'ENTRETIEN' %}
+                        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#accepterModal">
+                            <i class="bi bi-check-circle"></i> Accepter la candidature
+                        </button>
+                        {% endif %}
+                        
+                        <!-- Refuser - seulement si en entretien -->
+                        {% if candidature.statut == 'ENTRETIEN' %}
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#refuserModal">
+                            <i class="bi bi-x-circle"></i> Refuser la candidature
+                        </button>
+                        {% endif %}
+                    </div>
 
                     <hr>
                     
@@ -192,14 +205,77 @@
                     </div>
                     {% endif %}
                     
+                    <!-- Actions secondaires -->
                     <div class="d-grid gap-2">
-                        <a href="{% url 'backoffice_candidature_quick_action' candidature.id 'relancer' %}" class="btn btn-outline-primary">
-                            <i class="bi bi-envelope"></i> Relancer le candidat
-                        </a>
+                        <button type="button" class="btn btn-outline-warning">
+                            <i class="bi bi-envelope"></i> Contacter le candidat
+                        </button>
                         <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                            <i class="bi bi-trash"></i> Supprimer la candidature
+                            <i class="bi bi-trash"></i> Archiver la candidature
                         </button>
                     </div>
+                </div>
+            </div>
+
+            <!-- Carte de planification d'entretien -->
+            <div class="card mb-4" id="planifier-entretien">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Planifier un entretien</h5>
+                </div>
+                <div class="card-body">
+                    {% if candidature.statut == 'POSTULE' and not candidature.entretien_planifie %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="candidature" value="{{ candidature.id }}">
+                        
+                        <div class="mb-2">
+                            <label class="form-label">Date et heure</label>
+                            {{ form_entretien.date_prevue }}
+                        </div>
+                        
+                        <div class="mb-2">
+                            <label class="form-label">Type d'entretien</label>
+                            {{ form_entretien.type_entretien }}
+                        </div>
+                        
+                        <div class="mb-2">
+                            <label class="form-label">Durée (minutes)</label>
+                            {{ form_entretien.duree_prevue }}
+                        </div>
+                        
+                        <div class="mb-2">
+                            <label class="form-label">Interlocuteurs</label>
+                            {{ form_entretien.interlocuteurs }}
+                        </div>
+                        
+                        <div class="mb-2">
+                            <label class="form-label">Lieu</label>
+                            {{ form_entretien.lieu }}
+                        </div>
+                        
+                        <div class="mb-2">
+                            <label class="form-label">Lien visioconférence</label>
+                            {{ form_entretien.lien_video }}
+                        </div>
+                        
+                        <div class="mb-2">
+                            <label class="form-label">Notes de préparation</label>
+                            {{ form_entretien.notes_preparation }}
+                        </div>
+                        
+                        <button type="submit" name="planifier_entretien" class="btn btn-primary w-100 mt-2">
+                            <i class="bi bi-calendar-check"></i> Planifier l'entretien
+                        </button>
+                    </form>
+                    {% else %}
+                    <p class="text-muted text-center">
+                        {% if candidature.entretien_planifie %}
+                        <i class="bi bi-info-circle"></i> Entretien déjà planifié
+                        {% else %}
+                        <i class="bi bi-info-circle"></i> Action non disponible pour ce statut
+                        {% endif %}
+                    </p>
+                    {% endif %}
                 </div>
             </div>
 
@@ -254,87 +330,6 @@
                     </div>
                 </div>
             </div>
-
-<!-- Carte de planification d'entretien -->
-<div class="card mb-4">
-    <div class="card-header bg-light">
-        <h5 class="card-title mb-0">Planification d'entretien</h5>
-    </div>
-    <div class="card-body">
-        {% if not candidature.entretien_planifie %}
-        <!-- Formulaire de planification -->
-        <form method="post">
-            {% csrf_token %}
-            <h6 class="mb-3">Planifier un entretien</h6>
-            
-            <!-- Afficher les erreurs du formulaire -->
-            {% if form_entretien.errors %}
-            <div class="alert alert-danger">
-                <strong>Erreurs dans le formulaire :</strong>
-                {{ form_entretien.errors }}
-            </div>
-            {% endif %}
-            
-            <!-- Champ caché pour la candidature -->
-            <input type="hidden" name="candidature" value="{{ candidature.id }}">
-            
-            <div class="mb-3">
-                <label for="{{ form_entretien.date_prevue.id_for_label }}" class="form-label">Date et heure</label>
-                {{ form_entretien.date_prevue }}
-                {% if form_entretien.date_prevue.errors %}
-                <div class="text-danger">{{ form_entretien.date_prevue.errors }}</div>
-                {% endif %}
-            </div>
-            
-            <div class="mb-3">
-                <label for="{{ form_entretien.type_entretien.id_for_label }}" class="form-label">Type d'entretien</label>
-                {{ form_entretien.type_entretien }}
-            </div>
-            
-            <div class="mb-3">
-                <label for="{{ form_entretien.duree_prevue.id_for_label }}" class="form-label">Durée (minutes)</label>
-                {{ form_entretien.duree_prevue }}
-                {% if form_entretien.duree_prevue.errors %}
-                <div class="text-danger">{{ form_entretien.duree_prevue.errors }}</div>
-                {% endif %}
-            </div>
-            
-            <div class="mb-3">
-                <label for="{{ form_entretien.interlocuteurs.id_for_label }}" class="form-label">Interlocuteurs</label>
-                {{ form_entretien.interlocuteurs }}
-            </div>
-            
-            <div class="mb-3">
-                <label for="{{ form_entretien.lieu.id_for_label }}" class="form-label">Lieu</label>
-                {{ form_entretien.lieu }}
-            </div>
-            
-            <div class="mb-3">
-                <label for="{{ form_entretien.lien_video.id_for_label }}" class="form-label">Lien de visioconférence</label>
-                {{ form_entretien.lien_video }}
-            </div>
-            
-            <div class="mb-3">
-                <label for="{{ form_entretien.notes_preparation.id_for_label }}" class="form-label">Notes de préparation</label>
-                {{ form_entretien.notes_preparation }}
-            </div>
-            
-            <button type="submit" name="planifier_entretien" class="btn btn-primary w-100">Planifier l'entretien</button>
-        </form>
-        {% else %}
-        <div class="alert alert-success">
-            <h6 class="alert-heading">Entretien déjà planifié</h6>
-            <p class="mb-1"><strong>Date:</strong> {{ candidature.date_entretien_prevue|date:"d/m/Y H:i" }}</p>
-            <p class="mb-1"><strong>Type:</strong> {{ candidature.get_type_entretien_prevue_display }}</p>
-            {% if candidature.note_entretien %}
-            <a href="{% url 'noteinterne_detail' candidature.note_entretien.id %}" class="btn btn-sm btn-outline-primary mt-2">
-                Voir la note interne
-            </a>
-            {% endif %}
-        </div>
-        {% endif %}
-    </div>
-</div>
         </div>
     </div>
 </div>
@@ -344,18 +339,102 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Confirmer la suppression</h5>
+                <h5 class="modal-title">Confirmer l'archivage</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p>Êtes-vous sûr de vouloir supprimer la candidature de <strong>{{ candidature.candidat.get_full_name }}</strong> pour l'offre <strong>{{ candidature.offre.titre }}</strong> ?</p>
-                <p class="text-danger">Cette action est irréversible.</p>
+                <p>Êtes-vous sûr de vouloir archiver la candidature de <strong>{{ candidature.candidat.get_full_name }}</strong> ?</p>
+                <p class="text-muted">La candidature sera marquée comme terminée et déplacée dans les archives.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                <form method="post" action="{% url 'backoffice_candidature_quick_action' candidature.id 'supprimer' %}">
+                <form method="post" action="{% url 'backoffice_candidature_quick_action' candidature.id 'archiver' %}">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Supprimer définitivement</button>
+                    <button type="submit" class="btn btn-danger">Archiver</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal d'acceptation de candidature -->
+<div class="modal fade" id="accepterModal" tabindex="-1" aria-labelledby="accepterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="accepterModalLabel">Accepter la candidature</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-success">
+                    <i class="bi bi-info-circle-fill"></i> Vous êtes sur le point d'accepter cette candidature.
+                </div>
+                
+                <h6>Implications de cette action :</h6>
+                <ul>
+                    <li>Le statut de la candidature passera à <span class="badge bg-success">Accepté</span></li>
+                    <li>Le candidat recevra une notification par email</li>
+                    <li>Cette action déclenchera le processus d'intégration</li>
+                    <li>Vous devrez planifier les prochaines étapes avec le candidat</li>
+                </ul>
+                
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="confirmAccept">
+                    <label class="form-check-label" for="confirmAccept">
+                        Je comprends les implications de cette action
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" action="{% url 'backoffice_candidature_quick_action' candidature.id 'accepter' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success" id="submitAccept" disabled>Confirmer l'acceptation</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de refus de candidature -->
+<div class="modal fade" id="refuserModal" tabindex="-1" aria-labelledby="refuserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="refuserModalLabel">Refuser la candidature</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle-fill"></i> Vous êtes sur le point de refuser cette candidature.
+                </div>
+                
+                <h6>Implications de cette action :</h6>
+                <ul>
+                    <li>Le statut de la candidature passera à <span class="badge bg-danger">Refusé</span></li>
+                    <li>Le candidat recevra une notification par email</li>
+                    <li>Cette action est irréversible</li>
+                    <li>Vous pouvez ajouter un commentaire pour expliquer la décision</li>
+                </ul>
+                
+                <div class="mb-3">
+                    <label for="refusalComment" class="form-label">Commentaire (optionnel) :</label>
+                    <textarea class="form-control" id="refusalComment" rows="3" placeholder="Raison du refus..."></textarea>
+                </div>
+                
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="confirmRefusal">
+                    <label class="form-check-label" for="confirmRefusal">
+                        Je confirme vouloir refuser cette candidature
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" action="{% url 'backoffice_candidature_quick_action' candidature.id 'refuser' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="commentaire" id="hiddenComment">
+                    <button type="submit" class="btn btn-danger" id="submitRefusal" disabled>Confirmer le refus</button>
                 </form>
             </div>
         </div>
@@ -371,6 +450,24 @@
     }
     .border-start {
         border-color: #0d6efd !important;
+    }
+    /* Style pour l'anchor */
+    html {
+        scroll-behavior: smooth;
+    }
+    #planifier-entretien {
+        scroll-margin-top: 20px;
+    }
+    /* Style pour les modales de confirmation */
+    .modal-content {
+        border: none;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    .modal-header {
+        border-bottom: 1px solid #dee2e6;
+        border-top-left-radius: 0.5rem;
+        border-top-right-radius: 0.5rem;
     }
 </style>
 {% endblock %}
@@ -399,6 +496,55 @@
         checks.forEach(check => {
             check.classList.add('form-check-input');
         });
+        
+        // Gestion de la confirmation d'acceptation
+        const confirmAccept = document.getElementById('confirmAccept');
+        const submitAccept = document.getElementById('submitAccept');
+        
+        if (confirmAccept && submitAccept) {
+            confirmAccept.addEventListener('change', function() {
+                submitAccept.disabled = !this.checked;
+            });
+        }
+        
+        // Gestion de la confirmation de refus
+        const confirmRefusal = document.getElementById('confirmRefusal');
+        const submitRefusal = document.getElementById('submitRefusal');
+        const refusalComment = document.getElementById('refusalComment');
+        const hiddenComment = document.getElementById('hiddenComment');
+        
+        if (confirmRefusal && submitRefusal && refusalComment && hiddenComment) {
+            confirmRefusal.addEventListener('change', function() {
+                submitRefusal.disabled = !this.checked;
+            });
+            
+            refusalComment.addEventListener('input', function() {
+                hiddenComment.value = this.value;
+            });
+        }
+    });
+
+    // Fonction pour scroller vers le formulaire de planification
+    function scrollToPlanifier() {
+        const element = document.getElementById('planifier-entretien');
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Ajouter un effet visuel
+            element.style.transition = 'all 0.3s ease';
+            element.style.boxShadow = '0 0 15px rgba(13, 110, 253, 0.5)';
+            setTimeout(() => {
+                element.style.boxShadow = 'none';
+            }, 1000);
+        }
+    }
+
+    // Si on arrive sur la page avec un anchor dans l'URL, scroller automatiquement
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.location.hash === '#planifier-entretien') {
+            setTimeout(() => {
+                scrollToPlanifier();
+            }, 300);
+        }
     });
 </script>
 {% endblock %}

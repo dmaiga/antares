@@ -10,11 +10,11 @@ from .forms import JobOfferForm
 from .models import JobOffer, JobStatus, JobType
 
 def is_rh_or_admin(user):
-    return user.is_authenticated and (user.is_superuser or getattr(user, 'role', '') in ['admin', 'rh'])
+    return user.is_authenticated and (user.is_superuser or getattr(user, 'role', '') in ['admin', 'rh','stagiaire','employee'])
 
 # --- LISTE DES OFFRES ---
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def job_offer_list(request):
     # Récupération des paramètres
     status_filter = request.GET.get('status', 'all')
@@ -60,7 +60,7 @@ def job_offer_list(request):
 
 # --- DETAIL D'UNE OFFRE ---
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def job_offer_detail(request, pk):
     offer = get_object_or_404(JobOffer, pk=pk)
     
@@ -72,7 +72,7 @@ def job_offer_detail(request, pk):
 
 # --- CREATION ---
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def job_offer_create(request):
     if request.method == 'POST':
         form = JobOfferForm(request.POST, request.FILES)
@@ -101,7 +101,7 @@ def job_offer_create(request):
 
 # --- MISE A JOUR ---
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def job_offer_update(request, pk):
     job_offer = get_object_or_404(JobOffer, pk=pk)
     
@@ -139,7 +139,7 @@ def job_offer_update(request, pk):
 
 # --- SUPPRESSION ---
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def job_offer_delete(request, pk):
     job_offer = get_object_or_404(JobOffer, pk=pk)
     
@@ -156,7 +156,7 @@ def job_offer_delete(request, pk):
 
 # --- PUBLIER ---
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def job_offer_publish(request, pk):
     job_offer = get_object_or_404(JobOffer, pk=pk)
     
@@ -175,7 +175,7 @@ def job_offer_publish(request, pk):
 
 # --- DE-PUBLIER ---
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def job_offer_unpublish(request, pk):
     job_offer = get_object_or_404(JobOffer, pk=pk)
     

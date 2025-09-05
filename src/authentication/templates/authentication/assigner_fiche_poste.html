@@ -1,0 +1,141 @@
+{% extends 'authentication/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">📋 Assigner une fiche de poste à {{ user_cible.get_full_name }}</h4>
+                </div>
+                <div class="card-body">
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Fiche de poste actuelle -->
+                    {% if user_cible.employeeprofile.fiche_poste %}
+                    <div class="alert alert-info mb-4">
+                        <h6>📄 Fiche de poste actuelle :</h6>
+                        <strong>{{ user_cible.employeeprofile.fiche_poste.titre }}</strong>
+                        <br>
+                        <small class="text-muted">
+                            Assignée le : {{ user_cible.employeeprofile.fiche_poste.date_creation|date:"d/m/Y" }}
+                        </small>
+                        <br>
+                        <a href="{% url 'detail-fiche-poste' user_cible.employeeprofile.fiche_poste.id %}" 
+                           class="btn btn-sm btn-outline-primary mt-2">
+                            👁️ Voir le détail
+                        </a>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning mb-4">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Aucune fiche de poste assignée actuellement.
+                    </div>
+                    {% endif %}
+
+                    <!-- Formulaire d'assignation -->
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Sélectionner un modèle de fiche de poste :</label>
+                            <select name="fiche_poste" class="form-select" required>
+                                <option value="">-- Choisir un modèle --</option>
+                                {% for modele in modeles_fiches %}
+                                    <option value="{{ modele.id }}">{{ modele.titre }}</option>
+                                {% endfor %}
+                            </select>
+                            <small class="text-muted">
+                                La fiche sera copiée et assignée à l'employé
+                            </small>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'edit-user-rh' user_cible.id %}" class="btn btn-secondary me-2">
+                                ← Retour au profil
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                ✅ Assigner la fiche
+                            </button>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <!-- Liste des modèles disponibles -->
+                    <h5>📚 Modèles disponibles :</h5>
+                    <div class="list-group">
+                        {% for modele in modeles_fiches %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{{ modele.titre }}</h6>
+                                        <small class="text-muted">
+                                            {{ modele.taches.count }} tâche(s) - 
+                                            Créé le : {{ modele.date_creation|date:"d/m/Y" }}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <a href="{% url 'detail-fiche-poste' modele.id %}" 
+                                           class="btn btn-sm btn-outline-info">
+                                            👁️ Prévisualiser
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="list-group-item">
+                                <div class="text-center text-muted py-3">
+                                    <i class="fas fa-folder-open fa-2x mb-2"></i>
+                                    <p>Aucun modèle de fiche de poste disponible.</p>
+                                    <a href="{% url 'create-modele-fiche-poste' %}" class="btn btn-primary">
+                                        ➕ Créer un modèle
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+        font-weight: 600;
+    }
+    
+    .list-group-item {
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        margin-bottom: 8px;
+    }
+    
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .btn {
+        border-radius: 6px;
+        font-weight: 500;
+    }
+</style>
+
+{% endblock %}

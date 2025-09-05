@@ -6,7 +6,9 @@ from django.utils import timezone
 from django.db.models import Exists, OuterRef
 from django.contrib.auth.views import PasswordChangeView
 from django.urls import reverse_lazy
-
+from logs.utils import enregistrer_action
+import logging
+logger = logging.getLogger(__name__)
 from authentication.models import User
 from jobs.models import JobOffer,JobStatus
 from .models import (
@@ -22,7 +24,7 @@ from .forms import (
     DocumentForm, CandidatureForm, AdresseForm,
     UserUpdateForm, CompetenceForm, EntretienForm,
     EntretienFeedbackForm, EvaluationEntretienForm,  # NOUVEAUX FORMULAIRES
-    SoftDeleteForm  # NOUVEAU FORMULAIRE
+    SoftDeleteForm  
 )
 from django.db.models import Case, When, IntegerField, BooleanField, Exists, OuterRef
 from django.db.models import Q, Avg, Sum, Count, Min, Max  
@@ -641,7 +643,7 @@ from jobs.models import JobOffer
 from .models import (
     ProfilCandidat, Diplome, ExperienceProfessionnelle,
     Document, Candidature, Entretien, Competence,
-    EvaluationEntretien
+    EvaluationEntretien,NIVEAU_CHOICES
 )
 from .forms import (
     CandidatFilterForm, CandidatureBackofficeForm,
@@ -658,7 +660,7 @@ def is_recruiter(user):
 # VUES TABLEAU DE BORD ET ACCUEIL
 # ====================================================
 @login_required
-@user_passes_test(is_recruiter)
+
 def backoffice_dashboard(request):
     """Tableau de bord simple du backoffice recrutement"""
     # Statistiques basiques seulement
@@ -719,7 +721,7 @@ def backoffice_dashboard(request):
 # VUES GESTION DES CANDIDATS (VUE 360)
 # ====================================================
 @login_required
-@user_passes_test(is_recruiter)
+
 def backoffice_candidat_list(request):
     """Liste des candidats avec filtres avancés"""
     candidats = User.objects.filter(
@@ -811,7 +813,7 @@ def backoffice_candidat_list(request):
     return render(request, 'candidats/backoffice/candidats/candidat_list.html', context)
 
 @login_required
-@user_passes_test(is_recruiter)
+
 def backoffice_candidat_detail(request, candidat_id):
     """Vue détaillée 360° d'un candidat"""
     candidat = get_object_or_404(User, id=candidat_id)
@@ -851,7 +853,7 @@ def backoffice_candidat_detail(request, candidat_id):
 
 
 @login_required
-@user_passes_test(is_recruiter)
+
 def verifier_document(request, document_id):
     """Vue pour vérifier un document"""
     document = get_object_or_404(Document, id=document_id, est_supprime=False)
@@ -867,7 +869,7 @@ def verifier_document(request, document_id):
     return redirect('backoffice_candidat_detail', candidat_id=document.candidat.id)
 
 @login_required
-@user_passes_test(is_recruiter)
+
 def annuler_verification_document(request, document_id):
     """Vue pour annuler la vérification d'un document"""
     document = get_object_or_404(Document, id=document_id, est_supprime=False)
@@ -884,7 +886,7 @@ def annuler_verification_document(request, document_id):
 from django.http import FileResponse
 
 @login_required
-@user_passes_test(is_recruiter)
+
 def telecharger_document(request, document_id):
     """Vue pour télécharger un document"""
     document = get_object_or_404(Document, id=document_id, est_supprime=False)
@@ -895,7 +897,7 @@ def telecharger_document(request, document_id):
 # VUES GESTION DES CANDIDATURES
 # ====================================================
 @login_required
-@user_passes_test(is_recruiter)
+
 def backoffice_candidature_list(request):
     """Liste des candidatures avec filtres"""
     candidatures = Candidature.objects.filter(
@@ -950,7 +952,6 @@ def backoffice_candidature_list(request):
 
 
 @login_required
-@user_passes_test(is_recruiter)
 def backoffice_candidature_detail(request, candidature_id):
     candidature = get_object_or_404(
         Candidature.objects.select_related('candidat', 'offre', 'cv_utilise', 'lettre_motivation'),
@@ -1039,6 +1040,10 @@ def backoffice_candidature_detail(request, candidature_id):
             
             # Mettre à jour la candidature
             candidature.statut = 'ENTRETIEN'
+            candidature.entretien_planifie = True
+            candidature.date_entretien_prevue = entretien.date_prevue
+            candidature.type_entretien_prevue = entretien.type_entretien
+            candidature.note_entretien = note_entretien
             candidature.save()
             
             messages.success(request, "Entretien planifié avec succès et note interne créée.")
@@ -1049,43 +1054,62 @@ def backoffice_candidature_detail(request, candidature_id):
         'form_candidature': form_candidature,
         'form_note': form_note,
         'form_entretien': form_entretien,
+        'now': timezone.now(),  # Ajout pour les comparaisons de date
     }
     
     return render(request, 'candidats/backoffice/candidatures/candidature_detail.html', context)
 
-
+# views.py - Version avec validation renforcée
 @login_required
-@user_passes_test(is_recruiter)
 def backoffice_candidature_quick_action(request, candidature_id, action):
-    """Actions rapides sur les candidatures (changement de statut)"""
+    """Actions rapides sur les candidatures avec validation renforcée"""
     candidature = get_object_or_404(Candidature, id=candidature_id, est_supprime=False)
     
     actions_valides = {
-        'passer_entretien': 'ENTRETIEN',
         'accepter': 'ACCEPTE',
         'refuser': 'REFUSE',
-        'mettre_en_attente': 'EN_REVUE',
     }
     
-    if action in actions_valides:
-        ancien_statut = candidature.statut
-        nouveau_statut = actions_valides[action]
-        
-        candidature.statut = nouveau_statut
-        candidature.save()
-        
-        messages.success(
-            request, 
-            f"Candidature passée de '{ancien_statut}' à '{nouveau_statut}'"
-        )
+    if action not in actions_valides:
+        messages.error(request, "Action non valide.")
+        return redirect('backoffice_candidature_detail', candidature_id=candidature.id)
     
+    # Validation de cohérence
+    if candidature.statut != 'ENTRETIEN':
+        messages.error(request, "Seules les candidatures en entretien peuvent être acceptées ou refusées.")
+        return redirect('backoffice_candidature_detail', candidature_id=candidature.id)
+    
+    ancien_statut = candidature.statut
+    nouveau_statut = actions_valides[action]
+    
+    candidature.statut = nouveau_statut
+    candidature.save()
+    
+    # Créer une note automatique pour documenter la décision
+    note_contenu = f"""
+    Décision prise sur la candidature: {candidature.candidat.get_full_name()}
+    Offre: {candidature.offre.titre}
+    Ancien statut: {ancien_statut}
+    Nouveau statut: {nouveau_statut}
+    Décision prise par: {request.user.get_full_name()}
+    Date: {timezone.now().strftime('%d/%m/%Y à %H:%M')}
+    """
+    
+    NoteInterne.objects.create(
+        expediteur=request.user,
+        sujet=f"Décision candidature - {candidature.candidat.get_full_name()}",
+        contenu=note_contenu,
+        niveau_urgence='low'
+    )
+    
+    messages.success(request, f"Candidature {nouveau_statut.lower()} avec succès.")
     return redirect('backoffice_candidature_detail', candidature_id=candidature.id)
 
 # ====================================================
 # VUES GESTION DES ENTRETIENS
 # ====================================================
+
 @login_required
-@user_passes_test(is_recruiter)
 def backoffice_entretien_create(request, candidature_id=None):
     """Création manuelle d'un entretien avec création de note automatique"""
     # Initialiser avec ou sans candidature spécifique
@@ -1161,9 +1185,7 @@ def backoffice_entretien_create(request, candidature_id=None):
     }
     return render(request, 'candidats/backoffice/entretiens/entretien_create.html', context)
 
-
 @login_required
-@user_passes_test(is_recruiter)
 def backoffice_entretien_edit(request, entretien_id):
     """Modifier un entretien existant avec mise à jour de note"""
     entretien = get_object_or_404(Entretien, id=entretien_id, est_supprime=False)
@@ -1233,7 +1255,7 @@ def backoffice_entretien_edit(request, entretien_id):
 
 
 @login_required
-@user_passes_test(is_recruiter)
+
 def backoffice_entretien_delete(request, entretien_id):
     """Supprimer un entretien avec création de note d'annulation"""
     entretien = get_object_or_404(Entretien, id=entretien_id, est_supprime=False)
@@ -1288,7 +1310,7 @@ def backoffice_entretien_delete(request, entretien_id):
 
 
 @login_required
-@user_passes_test(is_recruiter)
+
 def backoffice_entretien_list(request):
     """Liste des entretiens"""
     entretiens = Entretien.objects.filter(
@@ -1313,7 +1335,7 @@ def backoffice_entretien_list(request):
 
 # views.py
 @login_required
-@user_passes_test(is_recruiter)
+
 def backoffice_entretien_detail(request, entretien_id):
     """Détail d'un entretien (affichage seulement)"""
     entretien = get_object_or_404(
@@ -1330,7 +1352,7 @@ def backoffice_entretien_detail(request, entretien_id):
     return render(request, 'candidats/backoffice/entretiens/entretien_detail.html', context)
 
 @login_required
-@user_passes_test(is_recruiter)
+
 def backoffice_entretien_compte_rendu(request, entretien_id):
     """Édition du compte-rendu d'entretien"""
     entretien = get_object_or_404(
@@ -1356,34 +1378,152 @@ def backoffice_entretien_compte_rendu(request, entretien_id):
     
     return render(request, 'candidats/backoffice/entretiens/entretien_compte_rendu.html', context)
 
-
 @login_required
-@user_passes_test(is_recruiter)
 def backoffice_entretien_quick_action(request, entretien_id, action):
-    """Actions rapides sur les entretiens"""
-    entretien = get_object_or_404(Entretien, id=entretien_id, est_supprime=False)
-    
-    actions_valides = {
-        'confirmer': 'CONFIRME',
-        'annuler': 'ANNULE',
-        'reporter': 'REPORTE',
-        'terminer': 'TERMINE',
-    }
-    
-    if action in actions_valides:
-        entretien.statut = actions_valides[action]
+    """Actions rapides sur les entretiens - Version simplifiée et cohérente"""
+    try:
+        entretien = get_object_or_404(Entretien, id=entretien_id, est_supprime=False)
         
-        if action == 'terminer':
-            entretien.date_reelle = timezone.now()
-        
-        entretien.save()
-        messages.success(request, f"Entretien marqué comme {actions_valides[action]}")
+        # Actions valides simplifiées
+        if action == 'annuler':
+            return _annuler_entretien(request, entretien)
+        elif action == 'terminer':
+            return _terminer_entretien(request, entretien)
+        elif action == 'reporter':
+            # Rediriger vers le formulaire de modification pour reporter
+            return redirect('backoffice_entretien_edit', entretien_id=entretien.id)
+        else:
+            messages.error(request, "Action non valide.")
+            
+    except Exception as e:
+        logger.error(f"Erreur lors de l'action rapide sur l'entretien {entretien_id}: {str(e)}")
+        messages.error(request, "Une erreur s'est produite lors de la modification de l'entretien.")
     
     return redirect('backoffice_entretien_detail', entretien_id=entretien.id)
 
 
+def _annuler_entretien(request, entretien):
+    """Annuler un entretien avec création de note d'annulation"""
+    # Validation de cohérence
+    if entretien.statut == 'TERMINE':
+        messages.error(request, "Impossible d'annuler un entretien déjà terminé.")
+        return redirect('backoffice_entretien_detail', entretien_id=entretien.id)
+    
+    if entretien.statut == 'ANNULE':
+        messages.info(request, "L'entretien est déjà annulé.")
+        return redirect('backoffice_entretien_detail', entretien_id=entretien.id)
+    
+    ancien_statut = entretien.statut
+    entretien.statut = 'ANNULE'
+    entretien.save()
+    
+    # Créer une note d'annulation
+    note_contenu = f"""
+    **Annulation de l'entretien**
+    
+    **Candidature:** {entretien.candidature.offre.titre}
+    **Candidat:** {entretien.candidature.candidat.get_full_name()}
+    
+    **Détails de l'annulation:**
+    - ❌ Ancien statut: {entretien._get_ancien_statut_display(ancien_statut)}
+    - 🚫 Nouveau statut: Annulé
+    - 👤 Action par: {request.user.get_full_name()}
+    - 📅 Date d'annulation: {timezone.now().strftime('%d/%m/%Y à %H:%M')}
+    
+    **Informations sur l'entretien annulé:**
+    - Type: {entretien.get_type_entretien_display()}
+    - Date prévue: {entretien.date_prevue.strftime('%d/%m/%Y à %H:%M') if entretien.date_prevue else 'Non définie'}
+    - Durée: {entretien.duree_prevue} minutes
+    """
+    
+    note_annulation = NoteInterne(
+        expediteur=request.user,
+        sujet=f"🚫 Annulation - {entretien.candidature.candidat.get_full_name()} - {entretien.candidature.offre.titre}",
+        contenu=note_contenu,
+        niveau_urgence='high',
+        date_limite=timezone.now() + timedelta(days=1)
+    )
+    note_annulation.save()
+    
+    # Notifier les RH et administrateurs
+    _notifier_utilisateurs(note_annulation, ['admin', 'rh'])
+    
+    messages.success(request, "✅ Entretien annulé et notification créée.")
+    return redirect('backoffice_entretien_detail', entretien_id=entretien.id)
+
+
+def _terminer_entretien(request, entretien):
+    """Marquer un entretien comme terminé"""
+    # Validation de cohérence
+    if entretien.statut == 'ANNULE':
+        messages.error(request, "Impossible de terminer un entretien annulé.")
+        return redirect('backoffice_entretien_detail', entretien_id=entretien.id)
+    
+    if entretien.statut == 'TERMINE':
+        messages.info(request, "L'entretien est déjà terminé.")
+        return redirect('backoffice_entretien_detail', entretien_id=entretien.id)
+    
+    if not entretien.date_prevue:
+        messages.error(request, "Impossible de terminer un entretien sans date prévue.")
+        return redirect('backoffice_entretien_detail', entretien_id=entretien.id)
+    
+    if entretien.date_prevue > timezone.now():
+        messages.error(request, "Impossible de terminer un entretien dont la date est dans le futur.")
+        return redirect('backoffice_entretien_detail', entretien_id=entretien.id)
+    
+    ancien_statut = entretien.statut
+    entretien.statut = 'TERMINE'
+    entretien.date_reelle = timezone.now()
+    entretien.save()
+    
+    # Créer une note de clôture
+    note_contenu = f"""
+    **Entretien terminé**
+    
+    **Candidature:** {entretien.candidature.offre.titre}
+    **Candidat:** {entretien.candidature.candidat.get_full_name()}
+    
+    **Détails de la clôture:**
+    - ✅ Ancien statut: {entretien._get_ancien_statut_display(ancien_statut)}
+    - 🎯 Nouveau statut: Terminé
+    - 👤 Action par: {request.user.get_full_name()}
+    - 📅 Date de clôture: {timezone.now().strftime('%d/%m/%Y à %H:%M')}
+    - ⏱️ Date réelle: {entretien.date_reelle.strftime('%d/%m/%Y à %H:%M')}
+    
+    **Informations sur l'entretien:**
+    - Type: {entretien.get_type_entretien_display()}
+    - Date prévue: {entretien.date_prevue.strftime('%d/%m/%Y à %H:%M')}
+    - Durée prévue: {entretien.duree_prevue} minutes
+    """
+    
+    note_cloture = NoteInterne(
+        expediteur=request.user,
+        sujet=f"🎯 Terminé - {entretien.candidature.candidat.get_full_name()} - {entretien.candidature.offre.titre}",
+        contenu=note_contenu,
+        niveau_urgence='low',
+        date_limite=timezone.now() + timedelta(days=7)  # Délai pour rédiger le compte-rendu
+    )
+    note_cloture.save()
+    
+    # Notifier les personnes concernées
+    _notifier_utilisateurs(note_cloture, ['admin', 'rh', 'employe', 'stagiaire'])
+    
+    messages.success(request, "✅ Entretien marqué comme terminé et notification créée.")
+    return redirect('backoffice_entretien_detail', entretien_id=entretien.id)
+
+
+def _notifier_utilisateurs(note, roles):
+    """Notifier les utilisateurs concernés"""
+    utilisateurs_concernes = User.objects.filter(role__in=roles, is_active=True)
+    
+    for utilisateur in utilisateurs_concernes:
+        NoteReception.objects.create(
+            note=note,
+            destinataire=utilisateur
+        )
+
 @login_required
-@user_passes_test(is_recruiter)
+
 def noteinterne_detail(request, note_id):
     """Affiche le détail d'une note interne"""
     note = get_object_or_404(NoteInterne, id=note_id)
@@ -1402,7 +1542,7 @@ def noteinterne_detail(request, note_id):
 # VUES ÉVALUATIONS
 # ====================================================
 @login_required
-@user_passes_test(is_recruiter)
+
 def backoffice_evaluation_create(request, entretien_id):
     """Création d'une évaluation pour un entretien"""
     entretien = get_object_or_404(Entretien, id=entretien_id, est_supprime=False)
@@ -1431,7 +1571,7 @@ def backoffice_evaluation_create(request, entretien_id):
 
 
 @login_required
-@user_passes_test(is_recruiter)
+
 def backoffice_evaluation_detail(request, evaluation_id):
     """Détail d'une évaluation d'entretien"""
     evaluation = get_object_or_404(EvaluationEntretien, id=evaluation_id)
@@ -1444,7 +1584,7 @@ def backoffice_evaluation_detail(request, evaluation_id):
 
 
 @login_required
-@user_passes_test(is_recruiter)
+
 def backoffice_evaluation_edit(request, evaluation_id):
     """Modification d'une évaluation existante"""
     evaluation = get_object_or_404(EvaluationEntretien, id=evaluation_id)
@@ -1466,7 +1606,7 @@ def backoffice_evaluation_edit(request, evaluation_id):
 
 
 @login_required
-@user_passes_test(is_recruiter)
+
 def backoffice_evaluations_rh(request):
     """
     Vue RH pour consulter toutes les évaluations et comptes-rendus d'entretien

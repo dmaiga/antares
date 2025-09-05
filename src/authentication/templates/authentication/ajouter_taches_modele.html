@@ -6,6 +6,8 @@
   {% csrf_token %}
   <input type="text" name="titre" class="form-control mb-2" placeholder="Nom de la tâche" required>
   <textarea name="description" class="form-control mb-2" placeholder="Description"></textarea>
+  <!-- Optionnel : ajouter un champ pour la durée estimée -->
+  <input type="number" name="duree_estimee" class="form-control mb-2" placeholder="Durée estimée (minutes)" min="0">
   <button type="submit" class="btn btn-success">Ajouter</button>
 </form>
 
@@ -17,6 +19,9 @@
       <div>
         <strong>{{ tache.titre }}</strong><br>
         <small>{{ tache.description }}</small>
+        {% if tache.duree_estimee %}
+          <br><small class="text-muted">Durée estimée: {{ tache.duree_estimee_formattee }}</small>
+        {% endif %}
       </div>
       <div>
         <a href="{% url 'modifier-tache' tache.id %}" class="btn btn-sm btn-outline-primary me-2">✏️</a>

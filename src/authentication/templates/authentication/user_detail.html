@@ -2,58 +2,447 @@
 {% load static %}
 
 {% block content %}
-<h2>Détail de l'utilisateur</h2>
+<div class="container mt-4">
+    <!-- En-tête avec photo et informations principales -->
+    <div class="card mb-4 shadow">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    {% if profile_cible.photo %}
+                        <img src="{{ profile_cible.photo.url }}" class="img-thumbnail rounded-circle mb-3" alt="Photo de profil" width="120" height="120">
+                    {% else %}
+                        <img src="{% static 'default-avatar.png' %}" class="img-thumbnail rounded-circle mb-3" alt="Avatar par défaut" width="120" height="120">
+                    {% endif %}
+                </div>
+                <div class="col-md-7">
+                    <h2 class="mb-1">{{ user_cible.get_full_name }}</h2>
+                    <p class="text-muted mb-1">{{ profile_cible.poste_occupe|default:"Poste non spécifié" }}</p>
+                    <p class="mb-1"><span class="badge bg-{% if profile_cible.actif %}success{% else %}danger{% endif %}">
+                        {{ profile_cible.actif|yesno:"Actif,Inactif" }}
+                    </span></p>
+                    <p class="text-muted mb-0">{{ user_cible.email }}</p>
+                </div>
+                <div class="col-md-3 text-md-end">
+                    <a href="{% url 'employees-view' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Retour
+                    </a>
+                    <a class="btn btn-primary" href="{% url 'edit-user-rh' user_cible.id %}">
+                        <i class="fas fa-edit"></i> Modifier
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<div class="card p-4 shadow">
-    <div class="row">
-        <!-- Photo -->
-        <div class="col-md-3 text-center">
-            {% if user_cible.photo %}
-                <img src="{{ user_cible.photo.url }}" class="img-thumbnail mb-3" alt="Photo de profil" width="150">
-            {% else %}
-                <img src="{% static 'default-avatar.png' %}" class="img-thumbnail mb-3" alt="Avatar par défaut" width="150">
-            {% endif %}
-            <h5>{{ user_cible.get_full_name }}</h5>
-            <p class="text-muted">{{ user_cible.username }}</p>
+    <!-- Navigation par onglets -->
+    <ul class="nav nav-tabs" id="userDetailTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="professional-tab" data-bs-toggle="tab" data-bs-target="#professional" type="button" role="tab" aria-controls="professional" aria-selected="true">
+                Professionnel
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab" aria-controls="personal" aria-selected="false">
+                Personnel
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="skills-tab" data-bs-toggle="tab" data-bs-target="#skills" type="button" role="tab" aria-controls="skills" aria-selected="false">
+                Compétences
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="financial-tab" data-bs-toggle="tab" data-bs-target="#financial" type="button" role="tab" aria-controls="financial" aria-selected="false">
+                Financier
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="documents-tab" data-bs-toggle="tab" data-bs-target="#documents" type="button" role="tab" aria-controls="documents" aria-selected="false">
+                Documents
+            </button>
+        </li>
+    </ul>
+
+    <!-- Contenu des onglets -->
+    <div class="tab-content p-3 border-start border-end border-bottom rounded-bottom shadow-sm bg-white" id="userDetailTabsContent">
+        <!-- Onglet Professionnel -->
+        <div class="tab-pane fade show active" id="professional" role="tabpanel" aria-labelledby="professional-tab">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Informations professionnelles</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-item">
+                                <span class="info-label">Rôle :</span>
+                                <span class="info-value">{{ user_cible.get_role_display }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Poste occupé :</span>
+                                <span class="info-value">{{ profile_cible.poste_occupe|default:"Non spécifié" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Statut :</span>
+                                <span class="info-value">{{ profile_cible.get_statut_display|default:"Non spécifié" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Département :</span>
+                                <span class="info-value">{{ profile_cible.department|default:"Non spécifié" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Site :</span>
+                                <span class="info-value">{{ profile_cible.site|default:"Non spécifié" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Bureau :</span>
+                                <span class="info-value">{{ profile_cible.bureau|default:"Non spécifié" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Type de contrat :</span>
+                                <span class="info-value">{{ profile_cible.get_contract_type_display|default:"Non spécifié" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Matricule :</span>
+                                <span class="info-value">{{ profile_cible.matricule|default:"Non spécifié" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Dates importantes</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-item">
+                                <span class="info-label">Date d'embauche :</span>
+                                <span class="info-value">{{ profile_cible.start_date|date:"d/m/Y"|default:"Non spécifiée" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Date de fin de contrat :</span>
+                                <span class="info-value">{{ profile_cible.end_date|date:"d/m/Y"|default:"Non spécifiée" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Date d'intégration :</span>
+                                <span class="info-value">{{ profile_cible.date_integration|date:"d/m/Y"|default:"Non spécifiée" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Date d'inscription :</span>
+                                <span class="info-value">{{ user_cible.date_joined|date:"d/m/Y" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Dernière connexion :</span>
+                                <span class="info-value">{{ user_cible.last_login|date:"d/m/Y H:i"|default:"Jamais" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Performance</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-item">
+                                <span class="info-label">Taux d'absentéisme :</span>
+                                <span class="info-value">{{ profile_cible.taux_absenteeisme|floatformat:2 }} %</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Indice de productivité :</span>
+                                <span class="info-value">{{ profile_cible.productivite|floatformat:2|default:"Non spécifié" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Niveau de satisfaction :</span>
+                                <span class="info-value">{{ profile_cible.satisfaction|floatformat:2|default:"Non spécifié" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Suivi RH</h5>
+                </div>
+                <div class="card-body">
+                    <div class="info-item">
+                        <span class="info-label">Notes RH internes :</span>
+                        <span class="info-value">{{ profile_cible.notes_rh|default:"Aucune" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Points forts :</span>
+                        <span class="info-value">{{ profile_cible.points_forts|default:"Non spécifiés" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Axes d'amélioration :</span>
+                        <span class="info-value">{{ profile_cible.axes_amelioration|default:"Non spécifiés" }}</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Informations -->
-        <div class="col-md-9">
-            <h5>Informations professionnelles</h5>
-            <ul class="list-group mb-3">
-                <li class="list-group-item"><strong>Rôle :</strong> {{ user_cible.get_role_display }}</li>
-                <li class="list-group-item"><strong>Poste occupé :</strong> {{ user_cible.poste_occupe }}</li>
-                 <li class="list-group-item"><strong>Fiche de poste :</strong> {{ user_cible.fiche_poste }}</li>
-                <li class="list-group-item"><strong>Statut :</strong> {{ user_cible.get_statut_display }}</li>
-                <li class="list-group-item"><strong>Début de contrat :</strong> {{ user_cible.start_date|date:"d/m/Y" }}</li>
-                <li class="list-group-item"><strong>Date d'inscription :</strong> {{ user_cible.date_joined|date:"d/m/Y" }}</li>
-                <li class="list-group-item"><strong>Dernière connexion :</strong> {{ user_cible.last_login|date:"d/m/Y H:i" }}</li>
-            </ul>
+        <!-- Onglet Personnel -->
+        <div class="tab-pane fade" id="personal" role="tabpanel" aria-labelledby="personal-tab">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Informations personnelles</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-item">
+                                <span class="info-label">Date de naissance :</span>
+                                <span class="info-value">{{ profile_cible.date_naissance|date:"d/m/Y"|default:"Non spécifiée" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Contacts</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-item">
+                                <span class="info-label">Email professionnel :</span>
+                                <span class="info-value">{{ profile_cible.email_pro|default:"Non spécifié" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Email personnel :</span>
+                                <span class="info-value">{{ user_cible.email }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Téléphone professionnel :</span>
+                                <span class="info-value">{{ profile_cible.telephone_pro|default:"Non spécifié" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Téléphone personnel :</span>
+                                <span class="info-value">{{ profile_cible.telephone_perso|default:"Non spécifié" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Contact d'urgence :</span>
+                                <span class="info-value">{{ profile_cible.contact_urgence|default:"Non spécifié" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Adresse</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-item">
+                                <span class="info-label">Ville :</span>
+                                <span class="info-value">{{ profile_cible.ville|default:"Non spécifiée" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Quartier :</span>
+                                <span class="info-value">{{ profile_cible.quartier|default:"Non spécifié" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Rue :</span>
+                                <span class="info-value">{{ profile_cible.rue|default:"Non spécifiée" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Porte/N° :</span>
+                                <span class="info-value">{{ profile_cible.porte|default:"Non spécifiée" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            <h5>Contacts</h5>
-            <ul class="list-group mb-3">
-                <li class="list-group-item"><strong>Email :</strong> {{ user_cible.email }}</li>
-                <li class="list-group-item"><strong>Téléphone pro :</strong> {{ user_cible.telephone_pro }}</li>
-                <li class="list-group-item"><strong>Téléphone personnel :</strong> {{ user_cible.telephone_perso }}</li>
-                <li class="list-group-item"><strong>Contact d'urgence :</strong> {{ user_cible.contact_urgence }}</li>
-            </ul>
+        <!-- Onglet Compétences -->
+        <div class="tab-pane fade" id="skills" role="tabpanel" aria-labelledby="skills-tab">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Formation</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-item">
+                                <span class="info-label">Niveau d'étude :</span>
+                                <span class="info-value">{{ profile_cible.get_niveau_etude_display|default:"Non spécifié" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Domaine d'étude :</span>
+                                <span class="info-value">{{ profile_cible.domaine_etude|default:"Non spécifié" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Années d'expérience :</span>
+                                <span class="info-value">{{ profile_cible.annees_experience|default:"Non spécifié" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Compétences</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-item">
+                                <span class="info-label">Compétences techniques :</span>
+                                <span class="info-value">{{ profile_cible.competences|default:"Non spécifiées" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Compétences comportementales :</span>
+                                <span class="info-value">{{ profile_cible.competences_soft|default:"Non spécifiées" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            <h5>Adresse</h5>
-            <ul class="list-group mb-3">
-                <li class="list-group-item"><strong>Ville :</strong> {{ user_cible.ville }}</li>
-                <li class="list-group-item"><strong>Quartier :</strong> {{ user_cible.quartier }}</li>
-                <li class="list-group-item"><strong>Rue :</strong> {{ user_cible.rue }}</li>
-                <li class="list-group-item"><strong>Porte :</strong> {{ user_cible.porte }}</li>
-            </ul>
+        <!-- Onglet Financier -->
+        <div class="tab-pane fade" id="financial" role="tabpanel" aria-labelledby="financial-tab">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Données financières</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-item">
+                                <span class="info-label">Salaire brut mensuel :</span>
+                                <span class="info-value">{{ profile_cible.salaire_brut|floatformat:2|default:"Non spécifié" }} €</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Coût total mensuel :</span>
+                                <span class="info-value">{{ profile_cible.cout_total|floatformat:2|default:"Non spécifié" }} €</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            <h5>Informations personnelles</h5>
-            <ul class="list-group mb-3">
-                <li class="list-group-item"><strong>Date de naissance :</strong> {{ user_cible.date_naissance|date:"d/m/Y" }}</li>
-            </ul>
-
-            <a href="{% url 'employees-view' %}" class="btn btn-secondary mt-3">← Retour au tableau</a>
-            <a class="btn btn-secondary mt-3" href="{% url 'edit-user-rh' user_cible.id %}">✏️ Modifier</a>
+        <!-- Onglet Documents -->
+        <div class="tab-pane fade" id="documents" role="tabpanel" aria-labelledby="documents-tab">
+            <div class="row">
+                <div class="col-md-6 offset-md-3">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Documents</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-item document-item">
+                                <span class="info-label">CV :</span>
+                                <span class="info-value">
+                                    {% if profile_cible.cv %}
+                                        <a href="{{ profile_cible.cv.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-download"></i> Télécharger
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted">Non fourni</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="info-item document-item">
+                                <span class="info-label">Contrat de travail :</span>
+                                <span class="info-value">
+                                    {% if profile_cible.contract_file %}
+                                        <a href="{{ profile_cible.contract_file.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-download"></i> Télécharger
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted">Non fourni</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="info-item document-item">
+                                <span class="info-label">Autres documents :</span>
+                                <span class="info-value">
+                                    {% if profile_cible.documents %}
+                                        <a href="{{ profile_cible.documents.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-download"></i> Télécharger
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted">Non fournis</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="info-item document-item">
+                                <span class="info-label">Fiche de poste :</span>
+                                <span class="info-value">
+                                    {% if profile_cible.fiche_poste %}
+                                        <span>{{ profile_cible.fiche_poste }}</span>
+                                    {% else %}
+                                        <span class="text-muted">Aucune</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .info-value {
+        color: #6c757d;
+        text-align: right;
+        max-width: 60%;
+    }
+    
+    .document-item {
+        align-items: center;
+    }
+    
+    .nav-tabs .nav-link {
+        color: #495057;
+        font-weight: 500;
+    }
+    
+    .nav-tabs .nav-link.active {
+        font-weight: 600;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+        .info-item {
+            flex-direction: column;
+        }
+        
+        .info-value {
+            text-align: left;
+            max-width: 100%;
+            margin-top: 5px;
+        }
+    }
+</style>
+
+<script>
+    // Activation des onglets Bootstrap
+    document.addEventListener('DOMContentLoaded', function() {
+        var triggerTabList = [].slice.call(document.querySelectorAll('#userDetailTabs button'))
+        triggerTabList.forEach(function(triggerEl) {
+            new bootstrap.Tab(triggerEl)
+        })
+    });
+</script>
 {% endblock %}

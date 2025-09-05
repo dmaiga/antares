@@ -74,11 +74,11 @@ def entreprise_registry(request):
 #_____________________________________________________________________________________
 
 def is_rh_or_admin(user):
-    return user.is_authenticated and user.role in ['admin', 'rh']
+    return user.is_authenticated and user.role in ['admin', 'rh','stagiaire','employee']
 #___________________________________________________________________________________
 #
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def dashboard_rh(request):
     # Statistiques principales
     stats = {
@@ -128,7 +128,7 @@ def dashboard_rh(request):
 
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def entreprise_liste(request):
     # Récupérer toutes les entreprises (sans filtre deleted par défaut)
     entreprises = Entreprise.objects.all().select_related('user').order_by('-date_inscription')
@@ -170,7 +170,7 @@ def entreprise_liste(request):
 #
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def detail_entreprise(request, entreprise_id):
     entreprise = get_object_or_404(
         Entreprise.objects.select_related('user').prefetch_related(
@@ -269,7 +269,7 @@ def detail_entreprise(request, entreprise_id):
 #
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def entreprises_actives(request):
     # Construction de la requête de base
     queryset = Entreprise.objects.filter(
@@ -325,7 +325,7 @@ def entreprises_actives(request):
 #
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def entreprises_en_attente(request):
     entreprises = User.objects.filter(  role='entreprise', is_active=False,  entreprise__isnull=False).select_related('entreprise')
     return render(request, 'entreprise/backend/entreprise_en_attente.html', {'entreprises': entreprises})
@@ -336,7 +336,7 @@ def entreprises_en_attente(request):
 
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def add_entreprise(request):
     if request.method == 'POST':
         form = CreateEntrepriseForm(request.POST, request.FILES)
@@ -395,7 +395,7 @@ def add_entreprise(request):
 
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def activite_recente(request):
     entreprises = Entreprise.objects.filter(approuvee=True).order_by('-date_inscription')[:10]
     return render(request, 'entreprise/backend/activite_recente.html', {'entreprises': entreprises})
@@ -403,7 +403,7 @@ def activite_recente(request):
 #
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def corbeille_entreprises(request):
     entreprises = Entreprise.objects.filter(deleted=True).select_related('user', 'deleted_by')
     return render(request, 'entreprise/backend/corbeille.html', {'entreprises': entreprises})
@@ -414,7 +414,7 @@ def corbeille_entreprises(request):
 
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def approuver_entreprise(request, entreprise_id):
     entreprise = get_object_or_404(Entreprise, id=entreprise_id)
     user = entreprise.user
@@ -453,7 +453,7 @@ def approuver_entreprise(request, entreprise_id):
 
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def rejeter_entreprise(request, entreprise_id):
     entreprise = get_object_or_404(Entreprise, id=entreprise_id)
 
@@ -465,7 +465,7 @@ def rejeter_entreprise(request, entreprise_id):
 #
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def restaurer_entreprise(request, entreprise_id):
     entreprise = get_object_or_404(Entreprise, id=entreprise_id, deleted=True)
 
@@ -487,7 +487,7 @@ def restaurer_entreprise(request, entreprise_id):
 #
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def entreprises_desactivees(request, entreprise_id):
     entreprise = get_object_or_404(Entreprise, id=entreprise_id)
 
@@ -504,7 +504,7 @@ from django.utils.crypto import get_random_string
 from django.utils.crypto import get_random_string
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def reset_password_entreprise(request, entreprise_id):
     entreprise = get_object_or_404(Entreprise, id=entreprise_id)
     user = entreprise.user
@@ -526,7 +526,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
 
-@user_passes_test(is_rh_or_admin)
+
 def generer_facture(request, service_id):
     service = get_object_or_404(ServiceEntreprise, id=service_id)
     
@@ -588,7 +588,7 @@ from django.core.paginator import Paginator
 
 from django.db.models import Q
 from django.utils.dateparse import parse_date
-@user_passes_test(is_rh_or_admin)
+
 def gerer_statut_service(request, service_id):
     service = get_object_or_404(ServiceEntreprise, id=service_id)
     factures = FactureLibre.objects.filter(service=service).order_by('-date_envoi')
@@ -656,7 +656,7 @@ def gerer_statut_service(request, service_id):
 #06_08
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def creer_proposition_financiere(request, service_id):
     service = get_object_or_404(ServiceEntreprise, id=service_id)
     
@@ -701,7 +701,7 @@ def creer_proposition_financiere(request, service_id):
 #___________________________________________________________________________________
 #
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def liste_services_pour_traitement(request):
     services = ServiceEntreprise.objects.filter(
         statut='contre_proposition'
@@ -712,7 +712,7 @@ def liste_services_pour_traitement(request):
     })
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def traiter_reponse_proposition(request, service_id):
     try:
         service = ServiceEntreprise.objects.get(id=service_id)
@@ -776,7 +776,7 @@ def traiter_reponse_proposition(request, service_id):
 
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def creer_service(request, demande_id):
     demande = get_object_or_404(DemandeService, id=demande_id)
     if request.method == 'POST':
@@ -797,7 +797,7 @@ def creer_service(request, demande_id):
 #
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def detail_demande_client(request, demande_id):
     demande = get_object_or_404(DemandeService, id=demande_id)
     
@@ -810,7 +810,7 @@ def detail_demande_client(request, demande_id):
 #
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def demande_client_edit(request, demande_id):
     demande = get_object_or_404(DemandeService, id=demande_id)
     
@@ -836,7 +836,7 @@ def demande_client_edit(request, demande_id):
 #
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def consulter_demande(request, demande_id):
     demande = get_object_or_404(DemandeService, id=demande_id)
     
@@ -858,7 +858,7 @@ def consulter_demande(request, demande_id):
 #___________________________________________________________________________________
 #
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def refuser_demande_motif(request, demande_id):
     demande = get_object_or_404(DemandeService, id=demande_id)
 
@@ -890,7 +890,7 @@ def refuser_demande_motif(request, demande_id):
 
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def facture_libre_create(request, entreprise_id):
     entreprise = get_object_or_404(Entreprise, id=entreprise_id)
     
@@ -924,7 +924,7 @@ def facture_libre_create(request, entreprise_id):
 #___________________________________________________________________________________
 #
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def liste_demandes_client(request, entreprise_id):
     entreprise = get_object_or_404(Entreprise, id=entreprise_id)
     demandes = DemandeService.objects.filter(entreprise=entreprise).order_by('-date_demande')
@@ -942,7 +942,7 @@ def liste_demandes_client(request, entreprise_id):
 #
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def creer_facture_libre(request, entreprise_id):
     entreprise = get_object_or_404(Entreprise, id=entreprise_id)
     
@@ -977,7 +977,7 @@ def creer_facture_libre(request, entreprise_id):
 #
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def detail_service_client(request, service_id):
     service = get_object_or_404(ServiceEntreprise, id=service_id)
 
@@ -1012,7 +1012,7 @@ def detail_service_client(request, service_id):
 #
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def demande_client_accepter(request, pk):
     demande = get_object_or_404(DemandeService, pk=pk)
 
@@ -1045,7 +1045,7 @@ def demande_client_accepter(request, pk):
 from django.shortcuts import render
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def demande_client_refuser(request, pk):
     demande = get_object_or_404(DemandeService, pk=pk)
 
@@ -1083,7 +1083,7 @@ def demande_client_refuser(request, pk):
 
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def toutes_les_demandes_rh(request):
     demandes = DemandeService.objects.select_related('entreprise', 'service').all().order_by('-date_demande')
     
@@ -1115,7 +1115,7 @@ def toutes_les_demandes_rh(request):
     return render(request, 'entreprise/backend/toutes_les_demandes_rh.html', context)
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def liste_services_par_entreprise(request, entreprise_id):
     entreprise = get_object_or_404(Entreprise, id=entreprise_id)
     services = ServiceEntreprise.objects.filter(entreprise=entreprise)
@@ -1141,7 +1141,7 @@ def liste_services_par_entreprise(request, entreprise_id):
 
 
 @login_required
-@user_passes_test(is_rh_or_admin)  
+  
 def liste_toutes_factures(request):
     factures = FactureLibre.objects.all().order_by('-date_envoi')
 
@@ -1162,7 +1162,7 @@ def liste_toutes_factures(request):
     return render(request, 'entreprise/backend/factures_liste.html', context)
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def liste_factures_par_entreprise(request, entreprise_id):
     entreprise = get_object_or_404(Entreprise, id=entreprise_id)
     factures = FactureLibre.objects.filter(entreprise=entreprise)
@@ -1185,7 +1185,7 @@ def liste_factures_par_entreprise(request, entreprise_id):
 
 
 @login_required
-@user_passes_test(is_rh_or_admin)  
+  
 def liste_notifications(request):
     notifications = NotificationEntreprise.objects.all().order_by('-date_envoi')
 
@@ -1200,7 +1200,7 @@ def liste_notifications(request):
 
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def liste_notifications_par_entreprise(request, entreprise_id):
     entreprise = get_object_or_404(Entreprise, id=entreprise_id)
     notifications = NotificationEntreprise.objects.filter(entreprise=entreprise)
@@ -1234,7 +1234,7 @@ from django.shortcuts import render, get_object_or_404
 from .models import FactureLibre
 
 @login_required
-@user_passes_test(is_rh_or_admin)
+
 def facture_detail(request, facture_id):
     facture = get_object_or_404(FactureLibre, id=facture_id)
 

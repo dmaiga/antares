@@ -29,29 +29,28 @@ class Tache(models.Model):
     
     titre = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-    jour_prevu = models.PositiveIntegerField(null=True, blank=True)
     commentaire_rh = models.TextField(blank=True)
-
-
     
-    def calculer_duree(self):
-        """Calcule la durée en tenant compte des timezones"""
-        if not self.start_time:
-            return timedelta(0)
-            
-        if self.end_time:
-            return self.end_time - self.start_time
-            
-        return timezone.now() - self.start_time
-
-    def save(self, *args, **kwargs):
-        """Met à jour automatiquement la durée totale"""
-        if self.end_time and self.start_time:
-            self.duree_total = self.calculer_duree()
-        super().save(*args, **kwargs)
+    # Durée estimée (pour les modèles seulement)
+    duree_estimee = models.PositiveIntegerField(
+        null=True, 
+        blank=True, 
+        help_text="Durée estimée en minutes",
+        verbose_name="Durée estimée"
+    )
 
     def __str__(self):
         return self.titre
+
+    def duree_estimee_formattee(self):
+        """Retourne la durée estimée formatée"""
+        if self.duree_estimee:
+            heures = self.duree_estimee // 60
+            minutes = self.duree_estimee % 60
+            if heures > 0:
+                return f"{heures}h{minutes:02d}"
+            return f"{minutes}min"
+        return "Non estimée"
 
 
 

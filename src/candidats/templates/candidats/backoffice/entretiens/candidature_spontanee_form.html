@@ -1,0 +1,295 @@
+{% extends 'authentication/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-user-plus me-2"></i>
+                        Candidature Spontanée
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="candidatureForm" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Section Informations personnelles -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2">
+                                <i class="fas fa-user me-2"></i>Informations personnelles
+                            </h5>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Prénom*</label>
+                                    {{ form.prenom }}
+                                    {% if form.prenom.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.prenom.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nom*</label>
+                                    {{ form.nom }}
+                                    {% if form.nom.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.nom.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Email*</label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.email.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Téléphone*</label>
+                                    {{ form.telephone }}
+                                    {% if form.telephone.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.telephone.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Section Profil professionnel -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2">
+                                <i class="fas fa-briefcase me-2"></i>Profil professionnel
+                            </h5>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Poste recherché*</label>
+                                {{ form.poste_recherche }}
+                                {% if form.poste_recherche.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.poste_recherche.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Domaine d'expertise*</label>
+                                {{ form.domaine_expertise }}
+                                {% if form.domaine_expertise.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.domaine_expertise.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Années d'expérience*</label>
+                                {{ form.annees_experience }}
+                                {% if form.annees_experience.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.annees_experience.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Niveau d'étude</label>
+                                {{ form.niveau_etude }}
+                                {% if form.niveau_etude.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.niveau_etude.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Compétences principales*</label>
+                                {{ form.competences }}
+                                <div class="form-text">Séparez les compétences par des virgules</div>
+                                {% if form.competences.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.competences.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Section Documents -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2">
+                                <i class="fas fa-file me-2"></i>Documents
+                            </h5>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">CV*</label>
+                                {{ form.cv }}
+                                {% if form.cv.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.cv.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Lettre de motivation</label>
+                                {{ form.lettre_motivation }}
+                                {% if form.lettre_motivation.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.lettre_motivation.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Section Informations supplémentaires -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2">
+                                <i class="fas fa-info-circle me-2"></i>Informations supplémentaires
+                            </h5>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Comment avez-vous connu notre entreprise ?</label>
+                                {{ form.source_recrutement }}
+                                {% if form.source_recrutement.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.source_recrutement.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Disponibilité</label>
+                                {{ form.disponibilite }}
+                                {% if form.disponibilite.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.disponibilite.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Prétentions salariales</label>
+                                {{ form.pretentions_salariales }}
+                                {% if form.pretentions_salariales.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.pretentions_salariales.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Message complémentaire</label>
+                                {{ form.message_complementaire }}
+                                {% if form.message_complementaire.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.message_complementaire.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'liste_candidatures_spontanees' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+                            </a>
+                            <button type="submit" class="btn btn-info">
+                                <i class="fas fa-paper-plane me-1"></i> Envoyer la candidature
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Validation des fichiers
+    const cvInput = document.getElementById('{{ form.cv.id_for_label }}');
+    if (cvInput) {
+        cvInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                // Vérifier la taille du fichier (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Le fichier CV ne doit pas dépasser 5MB.');
+                    this.value = '';
+                }
+                
+                // Vérifier l'extension
+                const allowedExtensions = ['.pdf', '.doc', '.docx'];
+                const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
+                if (!allowedExtensions.includes(fileExtension)) {
+                    alert('Veuillez uploader un fichier PDF, DOC ou DOCX.');
+                    this.value = '';
+                }
+            }
+        });
+    }
+    
+    // Validation similaire pour la lettre de motivation
+    const lettreInput = document.getElementById('{{ form.lettre_motivation.id_for_label }}');
+    if (lettreInput) {
+        lettreInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file && file.size > 2 * 1024 * 1024) {
+                alert('La lettre de motivation ne doit pas dépasser 2MB.');
+                this.value = '';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

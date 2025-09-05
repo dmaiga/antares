@@ -72,16 +72,14 @@ LANGUE_CHOICES = [
     ('AUTRE', 'Autre'),
 ]
 
+# models.py - Statuts simplifiés
 STATUT_CANDIDATURE_CHOICES = [
-    ('POSTULE', 'Postulé'),
-    ('RELANCE', 'Relancé'),
-    ('ENTRETIEN', 'Entretien'),
-    ('OFFRE', 'Offre reçue'),
-    ('ACCEPTE', 'Accepté'),
-    ('REFUSE', 'Refusé'),
-    ('RETIRE', 'Retiré'),
+    ('POSTULE', 'Postulé'),          # Candidature reçue
+    ('ENTRETIEN', 'Entretien'),      # Entretien planifié
+    ('ACCEPTE', 'Accepté'),          # Candidat accepté
+    ('REFUSE', 'Refusé'),            # Candidat refusé
+    ('RETIRE', 'Retiré'),            # Candidature retirée
 ]
-
 
 CANAL_CANDIDATURE_CHOICES = [
     ('SITE', 'Site carrière'),
@@ -562,13 +560,11 @@ class Candidature(models.Model):
     def get_statut_badge(self):
         """Retourne une classe Bootstrap en fonction du statut"""
         mapping = {
-            'POSTULE': 'primary',
-            'RELANCE': 'warning',
-            'ENTRETIEN': 'info',
-            'OFFRE': 'success',
-            'ACCEPTE': 'success',
-            'REFUSE': 'danger',
-            'RETIRE': 'secondary',
+            'POSTULE': 'primary',    # Bleu - En attente
+            'ENTRETIEN': 'info',     # Cyan - En cours
+            'ACCEPTE': 'success',    # Vert - Positif
+            'REFUSE': 'danger',      # Rouge - Négatif
+            'RETIRE': 'secondary',   # Gris - Neutre
         }
         return mapping.get(self.statut, 'secondary')
     
@@ -644,6 +640,19 @@ class Entretien(models.Model):
     @property
     def est_planifie(self):
         return self.statut == 'PLANIFIE'
+    @property
+    def est_confirme(self):
+        """Un entretien est confirmé s'il n'est pas annulé et a une date prévue passée"""
+        if self.statut == 'ANNULE':
+            return False
+        if self.date_prevue and self.date_prevue <= timezone.now():
+            return True
+        return False
+
+    def _get_ancien_statut_display(self, ancien_statut):
+        """Méthode utilitaire pour afficher l'ancien statut"""
+        statuts_dict = dict(STATUT_ENTRETIEN_CHOICES)
+        return statuts_dict.get(ancien_statut, ancien_statut)
     
     def terminer_entretien(self):
         """Marque l'entretien comme terminé"""

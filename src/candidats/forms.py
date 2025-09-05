@@ -1375,3 +1375,45 @@ class NoteInterneForm(forms.Form):
         label="Marquer comme importante",
         help_text="Les notes importantes sont mises en évidence."
     )
+
+
+# forms.py
+#from django import forms
+#
+#
+#class CandidatureSpontaneeForm(forms.ModelForm):
+#    class Meta:
+#        model = CandidatureSpontanee
+#        fields = [
+#            'prenom', 'nom', 'email', 'telephone', 
+#            'poste_recherche', 'domaine_expertise', 'annees_experience',
+#            'niveau_etude', 'competences', 'cv', 'lettre_motivation',
+#            'source_recrutement', 'disponibilite', 'pretentions_salariales',
+#            'message_complementaire'
+#        ]
+#        widgets = {
+#            'prenom': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénom'}),
+#            'nom': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom'}),
+#            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'email@exemple.com'}),
+#            'telephone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+XXX XX XX XX XX'}),
+#            'poste_recherche': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: Développeur Python'}),
+#            'domaine_expertise': forms.Select(attrs={'class': 'form-select'}),
+#            'annees_experience': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
+#            'niveau_etude': forms.Select(attrs={'class': 'form-select'}),
+#            'competences': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Python, Django, React, ...'}),
+#            'cv': forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.doc,.docx'}),
+#            'lettre_motivation': forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.doc,.docx'}),
+#            'source_recrutement': forms.Select(attrs={'class': 'form-select'}),
+#            'disponibilite': forms.Select(attrs={'class': 'form-select'}),
+#            'pretentions_salariales': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: 40-45K€'}),
+#            'message_complementaire': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Votre message...'}),
+#        }
+#    
+#    def clean_cv(self):
+#        cv = self.cleaned_data.get('cv')
+#        if cv:
+#            if cv.size > 5 * 1024 * 1024:  # 5MB max
+#                raise forms.ValidationError("Le fichier CV ne doit pas dépasser 5MB.")
+#            if not cv.name.lower().endswith(('.pdf', '.doc', '.docx')):
+#                raise forms.ValidationError("Format de fichier non supporté. Utilisez PDF, DOC ou DOCX.")
+#        return cv

@@ -312,66 +312,91 @@
                 </div>
             </div>
         </div>
+<!-- Sidebar avec informations complémentaires -->
+<div class="col-lg-4">
+    <!-- Actions rapides -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-light">
+            <h6 class="mb-0">
+                <i class="fas fa-bolt me-2"></i>
+                Actions rapides
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="d-grid gap-2">
+                <!-- Bouton Terminer - Visible seulement si l'entretien peut être terminé -->
+                {% if entretien.statut != 'TERMINE' and entretien.statut != 'ANNULE' and entretien.date_prevue and entretien.date_prevue <= now %}
+                <form method="post" action="{% url 'backoffice_entretien_quick_action' entretien.id 'terminer' %}" class="d-grid">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-success">
+                        <i class="fas fa-check me-2"></i>Marquer comme terminé
+                    </button>
+                </form>
+                {% endif %}
+                
+                <!-- Bouton Annuler - Visible seulement si l'entretien n'est pas déjà annulé ou terminé -->
+                {% if entretien.statut != 'ANNULE' and entretien.statut != 'TERMINE' %}
+                <form method="post" action="{% url 'backoffice_entretien_quick_action' entretien.id 'annuler' %}" class="d-grid">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger">
+                        <i class="fas fa-times-circle me-2"></i>Annuler l'entretien
+                    </button>
+                </form>
+                {% endif %}
+                
+                <!-- Bouton Reporter/Modifier - Redirige vers le formulaire d'édition -->
+                {% if entretien.statut != 'TERMINE' and entretien.statut != 'ANNULE' %}
+                <a href="{% url 'backoffice_entretien_edit' entretien.id %}" class="btn btn-outline-warning">
+                    <i class="fas fa-calendar-alt me-2"></i>{% if entretien.statut == 'REPORTE' %}Modifier{% else %}Reporter/Modifier{% endif %}
+                </a>
+                {% endif %}
 
-        <!-- Sidebar avec informations complémentaires -->
-        <div class="col-lg-4">
-            <!-- Actions rapides -->
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0">
-                        <i class="fas fa-bolt me-2"></i>
-                        Actions rapides
-                    </h6>
+                <!-- Lien vers le formulaire de compte-rendu - Visible seulement si l'entretien est terminé -->
+                {% if entretien.statut == 'TERMINE' %}
+                    {% if not a_un_compte_rendu %}
+                    <a href="{% url 'backoffice_entretien_compte_rendu' entretien.id %}" class="btn btn-primary">
+                        <i class="fas fa-clipboard-list me-2"></i>Rédiger le compte-rendu
+                    </a>
+                    {% else %}
+                    <a href="{% url 'backoffice_entretien_compte_rendu' entretien.id %}" class="btn btn-outline-primary">
+                        <i class="fas fa-edit me-2"></i>Modifier le compte-rendu
+                    </a>
+                    {% endif %}
+                {% endif %}
+
+                <!-- Lien vers l'évaluation - Visible seulement si l'entretien est terminé -->
+                {% if entretien.statut == 'TERMINE' %}
+                    {% if entretien.evaluation %}
+                    <a href="{% url 'backoffice_evaluation_detail' entretien.evaluation.id %}" 
+                       class="btn btn-outline-info">
+                        <i class="fas fa-star me-2"></i>Voir l'évaluation
+                    </a>
+                    {% else %}
+                    <a href="{% url 'backoffice_evaluation_create' entretien.id %}" 
+                       class="btn btn-outline-info">
+                        <i class="fas fa-plus-circle me-2"></i>Créer une évaluation
+                    </a>
+                    {% endif %}
+                {% endif %}
+
+                <!-- Indicateur de statut pour les entretiens non terminables -->
+                {% if entretien.statut == 'ANNULE' %}
+                <div class="alert alert-warning text-center mb-0">
+                    <i class="fas fa-ban me-1"></i>Entretien annulé
                 </div>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        {% if entretien.statut != 'CONFIRME' %}
-                        <a href="{% url 'backoffice_entretien_quick_action' entretien.id 'confirmer' %}" class="btn btn-outline-primary">
-                            <i class="fas fa-check-circle me-2"></i>Confirmer l'entretien
-                        </a>
-                        {% endif %}
-                        
-                        {% if entretien.statut != 'TERMINE' %}
-                        <a href="{% url 'backoffice_entretien_quick_action' entretien.id 'terminer' %}" class="btn btn-outline-success">
-                            <i class="fas fa-check me-2"></i>Marquer comme terminé
-                        </a>
-                        {% endif %}
-                        
-                        {% if entretien.statut != 'ANNULE' %}
-                        <a href="{% url 'backoffice_entretien_quick_action' entretien.id 'annuler' %}" class="btn btn-outline-danger">
-                            <i class="fas fa-times-circle me-2"></i>Annuler l'entretien
-                        </a>
-                        {% endif %}
-                        
-                        {% if entretien.statut != 'REPORTE' %}
-                        <a href="{% url 'backoffice_entretien_quick_action' entretien.id 'reporter' %}" class="btn btn-outline-warning">
-                            <i class="fas fa-calendar-alt me-2"></i>Reporter l'entretien
-                        </a>
-                        {% endif %}
-
-                        <!-- Lien vers le formulaire de compte-rendu -->
-                        {% if not a_un_compte_rendu %}
-                        <a href="{% url 'backoffice_entretien_compte_rendu' entretien.id %}" class="btn btn-primary">
-                            <i class="fas fa-clipboard-list me-2"></i>Rédiger le compte-rendu
-                        </a>
-                        {% endif %}
-
-                        <!-- Lien vers l'évaluation (NOUVEAU BOUTON) -->
-                        {% if entretien.evaluation %}
-                            <a href="{% url 'backoffice_evaluation_detail' entretien.evaluation.id %}" 
-                               class="btn btn-outline-info">
-                                <i class="fas fa-star me-2"></i>Voir l'évaluation
-                            </a>
-                        {% else %}
-                            <a href="{% url 'backoffice_evaluation_create' entretien.id %}" 
-                               class="btn btn-outline-info">
-                                <i class="fas fa-plus-circle me-2"></i>Créer une évaluation
-                            </a>
-                        {% endif %}
-                    </div>
+                {% elif entretien.statut == 'TERMINE' %}
+                <div class="alert alert-success text-center mb-0">
+                    <i class="fas fa-check-circle me-1"></i>Entretien terminé
                 </div>
+                {% elif entretien.date_prevue and entretien.date_prevue > now %}
+                <div class="alert alert-info text-center mb-0">
+                    <i class="fas fa-clock me-1"></i>En attente ({{ entretien.date_prevue|timeuntil }})
+                </div>
+                {% endif %}
             </div>
-
+        </div>
+    </div>
+</div>
             <!-- Notes de préparation -->
             {% if entretien.notes_preparation %}
             <div class="card shadow-sm border-0 mb-4">

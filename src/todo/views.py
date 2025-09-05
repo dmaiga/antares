@@ -16,64 +16,17 @@ from django.utils.timezone import localdate
 from django.utils.timezone import now
 from calendar import monthrange
 from django.db.models import Count, Q,Sum
-
+from django.contrib import messages
 from django.db.models.functions import TruncMonth, TruncDate
 import csv
 from io import BytesIO
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-
+from authentication.models import EmployeeProfile
 from xhtml2pdf import pisa  
 
 
 
-
-
-
-
-@login_required
-def programmer_semaine(request):
-    user = request.user
-    today = timezone.localdate()
-
-    if request.method == 'POST':
-        date_str = request.POST.get("date_selection")
-        date_selection = parse_date(date_str) or today
-
-        # ✅ Liste des tâches actuellement sélectionnées pour ce jour
-        anciennes_selectionnees = TacheSelectionnee.objects.filter(user=user, date_selection=date_selection)
-
-        # ✅ Nouvelles tâches sélectionnées dans le formulaire
-        tache_ids = set(map(int, request.POST.getlist('taches')))
-
-        # ✅ Supprimer celles décochées
-        anciennes_selectionnees.exclude(tache__id__in=tache_ids).delete()
-
-        # ✅ Ajouter les nouvelles (en évitant les doublons)
-        for tache_id in tache_ids:
-            tache = Tache.objects.get(id=tache_id)
-            TacheSelectionnee.objects.get_or_create(
-                user=user,
-                tache=tache,
-                date_selection=date_selection
-            )
-
-        return redirect('dashboard')
-
-    # GET
-    date_str = request.GET.get("date")
-    date_selection = parse_date(date_str) if date_str else today
-
-    taches = Tache.objects.filter(fiche_poste=user.fiche_poste)
-    selectionnees = TacheSelectionnee.objects.filter(user=user, date_selection=date_selection)
-    taches_selectionnees_ids = [s.tache.id for s in selectionnees]
-
-    return render(request, 'todo/programmer_semaine.html', {
-        'taches': taches,
-        'taches_selectionnees_ids': taches_selectionnees_ids,
-        'date_selection': date_selection,
-        'today': today,
-    })
 
 
 
@@ -104,41 +57,6 @@ def planning_hebdo(request):
     ctx = get_planning_context(request)
     return render(request, "todo/planning_hebdo.html", ctx)
 
-
-
-@login_required
-def selection_taches(request):
-    user = request.user
-    today = timezone.now().date()
-
-    if request.method == 'POST':
-        date_str = request.POST.get("date_selection")
-        date_selection = parse_date(date_str) or today
-
-        tache_ids = request.POST.getlist('taches')
-        for tache_id in tache_ids:
-            tache = Tache.objects.get(id=tache_id)
-            TacheSelectionnee.objects.get_or_create(
-                user=user,
-                tache=tache,
-                date_selection=date_selection
-            )
-        return redirect('mes-taches')  
-
-    # Si GET, on peut aussi préremplir pour la date passée en paramètre
-    date_str = request.GET.get("date")
-    date_selection = parse_date(date_str) if date_str else today
-
-    taches = Tache.objects.filter(fiche_poste=user.fiche_poste)
-    selectionnees = TacheSelectionnee.objects.filter(user=user, date_selection=date_selection)
-    taches_selectionnees_ids = [s.tache.id for s in selectionnees]
-
-    return render(request, 'todo/selection_taches.html', {
-        'taches': taches,
-        'taches_selectionnees_ids': taches_selectionnees_ids,
-        'date_selection': date_selection,
-        'today': today,
-    })
 
 
 @login_required
@@ -556,3 +474,193 @@ def statistique_globale(request):
 
     return render(request, 'todo/statistique.html', context)
 
+
+
+
+from django.contrib import messages
+from django.core.exceptions import ObjectDoesNotExist
+from authentication.models import EmployeeProfile
+
+@login_required
+def programmer_semaine(request):
+    user = request.user
+    today = timezone.localdate()
+
+    # Vérifier si l'utilisateur a un profil employé
+    try:
+        profile = user.employeeprofile
+    except EmployeeProfile.DoesNotExist:
+        messages.error(request, "❌ Vous n'avez pas de profil employé configuré. Contactez les RH.")
+        return render(request, 'todo/programmer_semaine.html', {
+            'taches': [],
+            'taches_selectionnees_ids': [],
+            'date_selection': today,
+            'today': today,
+        })
+
+    # Vérifier si l'utilisateur a une fiche de poste
+    if not profile.fiche_poste:
+        messages.error(request, "❌ Aucune fiche de poste n'est associée à votre profil. Contactez les RH.")
+        return render(request, 'todo/programmer_semaine.html', {
+            'taches': [],
+            'taches_selectionnees_ids': [],
+            'date_selection': today,
+            'today': today,
+        })
+
+    if request.method == 'POST':
+        try:
+            date_str = request.POST.get("date_selection")
+            date_selection = parse_date(date_str) or today
+
+            # ✅ Liste des tâches actuellement sélectionnées pour ce jour
+            anciennes_selectionnees = TacheSelectionnee.objects.filter(user=user, date_selection=date_selection)
+
+            # ✅ Nouvelles tâches sélectionnées dans le formulaire
+            tache_ids = set()
+            for tache_id_str in request.POST.getlist('taches'):
+                try:
+                    tache_ids.add(int(tache_id_str))
+                except (ValueError, TypeError):
+                    continue  # Ignorer les valeurs invalides
+
+            # ✅ Supprimer celles décochées
+            anciennes_selectionnees.exclude(tache__id__in=tache_ids).delete()
+
+            # ✅ Ajouter les nouvelles (en évitant les doublons)
+            for tache_id in tache_ids:
+                try:
+                    tache = Tache.objects.get(id=tache_id, fiche_poste=profile.fiche_poste)
+                    TacheSelectionnee.objects.get_or_create(
+                        user=user,
+                        tache=tache,
+                        date_selection=date_selection
+                    )
+                except Tache.DoesNotExist:
+                    messages.warning(request, f"⚠️ La tâche #{tache_id} n'existe pas ou ne fait pas partie de votre fiche de poste.")
+                    continue
+
+            messages.success(request, "✅ Votre programme a été mis à jour avec succès.")
+            return redirect('dashboard')
+
+        except Exception as e:
+            messages.error(request, f"❌ Une erreur s'est produite lors de la programmation: {str(e)}")
+            return redirect('dashboard')
+
+    # GET
+    try:
+        date_str = request.GET.get("date")
+        date_selection = parse_date(date_str) if date_str else today
+
+        taches = Tache.objects.filter(fiche_poste=profile.fiche_poste)
+        selectionnees = TacheSelectionnee.objects.filter(user=user, date_selection=date_selection)
+        taches_selectionnees_ids = [s.tache.id for s in selectionnees]
+
+        # Debug: Vérifier ce qui est récupéré
+        print(f"Fiche de poste: {profile.fiche_poste}")
+        print(f"Nombre de tâches: {taches.count()}")
+
+        return render(request, 'todo/programmer_semaine.html', {
+            'taches': taches,
+            'taches_selectionnees_ids': taches_selectionnees_ids,
+            'date_selection': date_selection,
+            'today': today,
+        })
+
+    except Exception as e:
+        messages.error(request, f"❌ Une erreur s'est produite: {str(e)}")
+        return render(request, 'todo/programmer_semaine.html', {
+            'taches': [],
+            'taches_selectionnees_ids': [],
+            'date_selection': today,
+            'today': today,
+        })
+
+
+@login_required
+def selection_taches(request):
+    user = request.user
+    today = timezone.now().date()
+
+    # Vérifier si l'utilisateur a un profil employé
+    try:
+        profile = user.employeeprofile
+    except EmployeeProfile.DoesNotExist:
+        messages.error(request, "❌ Vous n'avez pas de profil employé configuré. Contactez les RH.")
+        return render(request, 'todo/selection_taches.html', {
+            'taches': [],
+            'taches_selectionnees_ids': [],
+            'date_selection': today,
+            'today': today,
+        })
+
+    # Vérifier si l'utilisateur a une fiche de poste
+    if not profile.fiche_poste:
+        messages.error(request, "❌ Aucune fiche de poste n'est associée à votre profil. Contactez les RH.")
+        return render(request, 'todo/selection_taches.html', {
+            'taches': [],
+            'taches_selectionnees_ids': [],
+            'date_selection': today,
+            'today': today,
+        })
+
+    if request.method == 'POST':
+        try:
+            date_str = request.POST.get("date_selection")
+            date_selection = parse_date(date_str) or today
+
+            tache_ids = []
+            for tache_id_str in request.POST.getlist('taches'):
+                try:
+                    tache_ids.append(int(tache_id_str))
+                except (ValueError, TypeError):
+                    continue  # Ignorer les valeurs invalides
+
+            for tache_id in tache_ids:
+                try:
+                    # Vérifier que la tâche appartient à la fiche de poste de l'utilisateur
+                    tache = Tache.objects.get(id=tache_id, fiche_poste=profile.fiche_poste)
+                    TacheSelectionnee.objects.get_or_create(
+                        user=user,
+                        tache=tache,
+                        date_selection=date_selection
+                    )
+                except Tache.DoesNotExist:
+                    messages.warning(request, f"⚠️ La tâche #{tache_id} n'existe pas ou ne fait pas partie de votre fiche de poste.")
+                    continue
+
+            messages.success(request, "✅ Vos tâches ont été sélectionnées avec succès.")
+            return redirect('mes-taches')
+
+        except Exception as e:
+            messages.error(request, f"❌ Une erreur s'est produite lors de la sélection: {str(e)}")
+            return redirect('mes-taches')
+
+    # Si GET, on peut aussi préremplir pour la date passée en paramètre
+    try:
+        date_str = request.GET.get("date")
+        date_selection = parse_date(date_str) if date_str else today
+
+        taches = Tache.objects.filter(fiche_poste=profile.fiche_poste)
+        selectionnees = TacheSelectionnee.objects.filter(user=user, date_selection=date_selection)
+        taches_selectionnees_ids = [s.tache.id for s in selectionnees]
+
+        # Debug: Vérifier ce qui est récupéré
+        print(f"Fiche de poste: {profile.fiche_poste}")
+        print(f"Nombre de tâches: {taches.count()}")
+
+        return render(request, 'todo/selection_taches.html', {
+            'taches': taches,
+            'taches_selectionnees_ids': taches_selectionnees_ids,
+            'date_selection': date_selection,
+            'today': today,
+        })
+
+    except Exception as e:
+        messages.error(request, f"❌ Une erreur s'est produite: {str(e)}")
+        return render(request, 'todo/selection_taches.html', {
+            'taches': [],
+            'taches_selectionnees_ids': [],
+            'date_selection': today,
+            'today': today,
+        })

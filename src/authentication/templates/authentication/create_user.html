@@ -1,10 +1,101 @@
 {% extends 'authentication/base.html' %}
+{% load static %}
 
 {% block content %}
-<h2>Créer un utilisateur</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Créer</button>
-</form>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">➕ Créer un nouveau collaborateur</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            Tous les champs marqués d'un * sont obligatoires.
+                        </div>
+
+                        <!-- Informations personnelles -->
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Prénom *</label>
+                                {{ form.first_name }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Nom *</label>
+                                {{ form.last_name }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Email professionnel *</label>
+                                {{ form.email }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Rôle *</label>
+                                {{ form.role }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Poste occupé *</label>
+                                {{ form.poste_occupe }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Département *</label>
+                                {{ form.department }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Type de contrat *</label>
+                                {{ form.contract_type }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Date d'embauche *</label>
+                                {{ form.start_date }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Fiche de poste</label>
+                                {{ form.fiche_poste }}
+                                <small class="text-muted">(Optionnel)</small>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'employees-view' %}" class="btn btn-secondary me-2">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Créer le collaborateur</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control, .form-select {
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        padding: 10px;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    label {
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+    
+    .alert {
+        border-radius: 8px;
+    }
+</style>
+
 {% endblock %}
